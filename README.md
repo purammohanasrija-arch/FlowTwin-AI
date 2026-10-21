@@ -130,7 +130,25 @@ For production deployments, configure your Google Cloud project as follows:
    - **Application Restrictions**: Under **Google Maps Platform > Credentials**, restrict the browser key by HTTP referrers (e.g., `http://localhost:*/*`, `https://yourdomain.com/*`).
    - **API Restrictions**: Restrict the key to only the 3 enabled APIs above.
 
-### 3. Run Development Servers
+### 3. AI Provider Configuration (Google Gemini & Grounded Engine)
+
+FlowTwin AI Copilot features a dual-intelligence architecture:
+
+1. **Google Gemini LLM Integration**:
+   - Add your Gemini API key in `server/.env`:
+     ```env
+     GEMINI_API_KEY=your_gemini_api_key_here
+     ```
+   - Uses `gemini-1.5-flash` with a 12-second timeout, system instruction grounding, and live North American logistics telemetry context.
+   - Private API keys are kept strictly on the backend and are never bundled into client assets.
+
+2. **Grounded Deterministic Logistics Engine (Zero-Configuration Fallback)**:
+   - If `GEMINI_API_KEY` is not provided, the Copilot automatically runs on the **Grounded Logistics Engine**.
+   - Queries active SQLite records for delayed shipments (`SH-1042`, etc.), road closure blast radii (I-80 Midwest Blizzard), facility load metrics (FAC-CHI-01 Chicago Central at 86.4%), vehicle availability, and recovery plans.
+   - Accurately reports when queried consignments (e.g. `SH-9999`) are not found in registered manifests.
+   - Fully supports conversational inquiries (`"hu"`, `"hello"`, `"help"`), suggested quick inquiries, and logs real-time steps to the **Agent Telemetry** tab.
+
+### 4. Run Development Servers
 Start both the backend server (`http://localhost:5000`) and the Vite frontend (`http://localhost:3000`) concurrently:
 ```bash
 npm run dev

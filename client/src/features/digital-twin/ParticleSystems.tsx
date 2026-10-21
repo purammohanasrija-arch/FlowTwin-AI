@@ -113,10 +113,10 @@ export const ParticleSystems: React.FC = () => {
   return (
     <points ref={particlesRef} geometry={geometry}>
       <pointsMaterial
-        size={quality === 'cinematic' ? 0.45 : 0.32}
+        size={quality === 'cinematic' ? 1.8 : 1.4}
         vertexColors
         transparent
-        opacity={0.85}
+        opacity={0.95}
         blending={THREE.AdditiveBlending}
         depthWrite={false}
       />

@@ -203,33 +203,54 @@ export const SelectedEntityDrawer: React.FC = () => {
           </>
         )}
 
-        {/* ROUTE DETAILS */}
+        {/* ROUTE & CONNECTION DETAILS */}
         {type === 'route' && (
           <>
             <div>
-              <span className="text-gray-400 block text-[10px]">CORRIDOR NAME</span>
-              <p className="font-sans font-bold text-sm text-gray-100">{data.name}</p>
+              <span className="text-gray-400 block text-[10px]">CORRIDOR / CONNECTION</span>
+              <p className="font-sans font-bold text-sm text-gray-100">{data.name || data.label || id}</p>
+              {data.sourceName && data.targetName && (
+                <p className="text-[11px] text-cyan-300 mt-0.5">
+                  {data.sourceName} <ArrowRight className="w-3 h-3 inline mx-1 text-gray-400" /> {data.targetName}
+                </p>
+              )}
             </div>
 
             <div className="grid grid-cols-2 gap-2 p-2 rounded-xl bg-[#12172E] border border-[#1E2648]">
-              <div>
-                <span className="text-gray-400 text-[10px]">DISTANCE</span>
-                <p className="text-sm font-bold text-cyan-300">{data.distanceKm} km</p>
-              </div>
-              <div>
-                <span className="text-gray-400 text-[10px]">EST. DURATION</span>
-                <p className="text-sm font-bold text-gray-200">{data.estimatedDurationHours} hours</p>
-              </div>
+              {data.distanceKm !== undefined ? (
+                <div>
+                  <span className="text-gray-400 text-[10px]">DISTANCE</span>
+                  <p className="text-sm font-bold text-cyan-300">{data.distanceKm} km</p>
+                </div>
+              ) : (
+                <div>
+                  <span className="text-gray-400 text-[10px]">LINK TYPE</span>
+                  <p className="text-sm font-bold text-cyan-300">
+                    {data.isDisrupted ? 'Hazard Alert' : data.isBypass ? 'Recovery Bypass' : 'Active Dispatch'}
+                  </p>
+                </div>
+              )}
+              {data.estimatedDurationHours !== undefined ? (
+                <div>
+                  <span className="text-gray-400 text-[10px]">EST. DURATION</span>
+                  <p className="text-sm font-bold text-gray-200">{data.estimatedDurationHours} hours</p>
+                </div>
+              ) : (
+                <div>
+                  <span className="text-gray-400 text-[10px]">TELEMETRY FLOW</span>
+                  <p className="text-sm font-bold text-purple-300">Synchronized (Live)</p>
+                </div>
+              )}
               <div>
                 <span className="text-gray-400 text-[10px]">STATUS</span>
-                <p className={`text-sm font-bold ${data.isClosed ? 'text-red-400' : 'text-emerald-400'}`}>
-                  {data.isClosed ? 'ROADBLOCK CLOSED' : 'OPTIMAL FLOW'}
+                <p className={`text-sm font-bold ${data.isClosed || data.isDisrupted ? 'text-red-400' : 'text-emerald-400'}`}>
+                  {data.isClosed ? 'ROADBLOCK CLOSED' : data.isDisrupted ? 'HAZARD IMPACT' : data.isBypass ? 'BYPASS ACTIVE' : 'OPTIMAL FLOW'}
                 </p>
               </div>
               <div>
-                <span className="text-gray-400 text-[10px]">TYPE</span>
+                <span className="text-gray-400 text-[10px]">CORRIDOR</span>
                 <p className="text-sm font-bold text-purple-300">
-                  {data.routeType?.toUpperCase()}
+                  {data.roadCorridor || (data.isBypass ? 'I-70 Bypass' : data.isDisrupted ? 'I-80 Alert' : 'Intermodal')}
                 </p>
               </div>
             </div>

@@ -101,16 +101,12 @@ export const ApproveRecoveryPlanSchema = z.object({
 });
 
 export const AiChatRequestSchema = z.object({
-  message: z.string().min(1),
+  message: z.string().min(1, 'Message cannot be empty').max(2000, 'Message cannot exceed 2000 characters'),
   conversationHistory: z.array(
     z.object({
-      role: z.enum(['user', 'assistant', 'system']),
-      content: z.string(),
-    })
-  ).optional(),
-  context: z.object({
-    currentPage: z.string().optional(),
-    selectedShipmentId: z.string().optional(),
-    activeScenarioId: z.string().optional(),
-  }).optional(),
+      role: z.string().optional().default('user'),
+      content: z.string().optional().default(''),
+    }).passthrough()
+  ).optional().default([]),
+  context: z.record(z.any()).optional().default({}),
 });

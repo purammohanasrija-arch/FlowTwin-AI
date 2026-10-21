@@ -1,0 +1,40 @@
+name: FlowTwin AI CI & Build Verification
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-verify:
+    name: Build & Verify Monorepo
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install All Monorepo Dependencies
+        run: npm run install:all
+
+      - name: Build Server
+        run: npm run build --prefix server
+
+      - name: Build Client (Vite Production Distribution)
+        run: npm run build --prefix client
+
+      - name: Verify Distribution Artifacts
+        run: |
+          test -d client/dist
+          test -f client/dist/index.html
+          echo "Client production bundle verified successfully."

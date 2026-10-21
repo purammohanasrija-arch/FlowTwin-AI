@@ -841,15 +841,44 @@ apiRouter.post('/ai/chat', authenticate, async (req: AuthenticatedRequest, res: 
   try {
     const parse = AiChatRequestSchema.safeParse(req.body);
     if (!parse.success) {
-      return res.status(400).json({ error: 'Validation error', details: parse.error.format() });
+      const errorMsg = parse.error.issues?.[0]?.message || 'Validation error: invalid chat message';
+      return res.status(400).json({
+        ok: false,
+        error: { code: 'VALIDATION_ERROR', message: errorMsg },
+      });
     }
 
     const { message, conversationHistory, context } = parse.data;
-    const response = await AiService.handleChat(message, conversationHistory, context, req.user?.role || 'Operations Analyst');
+    const response = await AiService.handleChat(
+      message,
+      conversationHistory,
+      context,
+      req.user?.role || 'Operations Analyst'
+    );
 
-    res.json(response);
+    if (!response || (!response.reply && !response.content)) {
+      return res.status(500).json({
+        ok: false,
+        error: {
+          code: 'AI_RESPONSE_EMPTY',
+          message: 'The logistics copilot could not generate a response. Please try again.',
+        },
+      });
+    }
+
+    res.json({
+      conversationId: `conv-${Date.now()}`,
+      ...response,
+    });
   } catch (err: any) {
-    res.status(500).json({ error: err.message });
+    console.error('[FlowTwin AI Chat Endpoint Error]', err?.message || err);
+    res.status(500).json({
+      ok: false,
+      error: {
+        code: 'AI_INTERNAL_ERROR',
+        message: 'The assistant encountered an internal processing issue. Deterministic fallback engaged.',
+      },
+    });
   }
 });
 

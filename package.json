@@ -1,0 +1,22 @@
+{
+  "name": "flowtwin-ai-root",
+  "version": "1.0.0",
+  "description": "FlowTwin AI - Autonomous Logistics Intelligence & Interactive Supply Chain Digital Twin",
+  "private": true,
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "install:all": "npm install && npm --prefix server install && npm --prefix client install",
+    "dev": "concurrently -n \"SERVER,CLIENT\" -c \"magenta.bold,cyan.bold\" \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "dev:server": "npm run dev --prefix server",
+    "dev:client": "npm run dev --prefix client",
+    "build": "npm run build --prefix server && npm run build --prefix client",
+    "start": "npm run start --prefix server",
+    "test": "npm run test --prefix server"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.5"
+  }
+}

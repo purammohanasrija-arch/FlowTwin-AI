@@ -80,18 +80,18 @@ async function startServer() {
     } else {
       console.log(`[FlowTwin AI] Database active with ${shipmentCount} existing shipments.`);
     }
-
-    server.listen(PORT, () => {
-      console.log(`=======================================================`);
-      console.log(`  FlowTwin AI Control Tower Server Running on Port ${PORT}`);
-      console.log(`  API Base URL: http://localhost:${PORT}/api`);
-      console.log(`  Health Check: http://localhost:${PORT}/api/health`);
-      console.log(`=======================================================`);
-    });
   } catch (err: any) {
-    console.error('[FlowTwin AI] Failed to start server:', err.message);
-    process.exit(1);
+    console.warn('[FlowTwin AI] MongoDB connection notice:', err.message);
+    console.warn('[FlowTwin AI] Server listening in resilient mode. Set MONGODB_URI in Render dashboard if needed.');
   }
+
+  server.listen(Number(PORT), '0.0.0.0', () => {
+    console.log(`=======================================================`);
+    console.log(`  FlowTwin AI Control Tower Server Running on Port ${PORT}`);
+    console.log(`  API Base URL: http://0.0.0.0:${PORT}/api`);
+    console.log(`  Health Check: http://0.0.0.0:${PORT}/api/health`);
+    console.log(`=======================================================`);
+  });
 }
 
 startServer();

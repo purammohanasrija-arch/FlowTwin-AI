@@ -36,10 +36,10 @@ import {
   LoginRequestSchema,
   RegisterRequestSchema,
 } from '../shared/schemas.js';
-import mongoose from 'mongoose';
+import { isValidObjectId } from '../db/sqlite.js';
 
 function buildIdOrCodeQuery(idOrCode: string, codeField: string) {
-  if (mongoose.isValidObjectId(idOrCode)) {
+  if (isValidObjectId(idOrCode)) {
     return { $or: [{ _id: idOrCode }, { [codeField]: idOrCode }] };
   }
   return { [codeField]: idOrCode };
@@ -75,6 +75,10 @@ apiRouter.post('/auth/login', async (req: Request, res: Response) => {
       } else {
         return res.status(401).json({ error: 'Invalid email or password' });
       }
+    }
+
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid email or password' });
     }
 
     const isValid = await bcrypt.compare(password, user.passwordHash);
@@ -150,7 +154,10 @@ apiRouter.post('/auth/register', async (req: Request, res: Response) => {
 
 apiRouter.get('/auth/me', authenticate, async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const user = await User.findById(req.user?.id);
+    if (!req.user?.id) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+    const user = await User.findById(req.user.id);
     if (!user) {
       return res.json({ user: req.user });
     }
@@ -805,6 +812,10 @@ apiRouter.post('/documents/:id/confirm', authenticate, requireRole(['Administrat
         ],
         isDemo: true,
       });
+    }
+
+    if (!shipment) {
+      return res.status(500).json({ error: 'Failed to create or find shipment' });
     }
 
     doc.processingStatus = 'confirmed';

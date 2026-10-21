@@ -14,5 +14,5 @@ services:
         value: 10000
       - key: JWT_SECRET
         generateValue: true
-      - key: MONGODB_URI
-        sync: false
+      - key: SQLITE_DB_PATH
+        value: ./data/flowtwin.sqlite

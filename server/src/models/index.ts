@@ -686,15 +686,19 @@ const AuditEventSchema = new Schema<IAuditEvent>(
   { timestamps: true }
 );
 
-// Export Models
-export const User: Model<IUser> = mongoose.models.User || mongoose.model<IUser>('User', UserSchema);
-export const Shipment: Model<IShipment> = mongoose.models.Shipment || mongoose.model<IShipment>('Shipment', ShipmentSchema);
-export const Facility: Model<IFacility> = mongoose.models.Facility || mongoose.model<IFacility>('Facility', FacilitySchema);
-export const Vehicle: Model<IVehicle> = mongoose.models.Vehicle || mongoose.model<IVehicle>('Vehicle', VehicleSchema);
-export const Route: Model<IRoute> = mongoose.models.Route || mongoose.model<IRoute>('Route', RouteSchema);
-export const Incident: Model<IIncident> = mongoose.models.Incident || mongoose.model<IIncident>('Incident', IncidentSchema);
-export const SimulationScenario: Model<ISimulationScenario> = mongoose.models.SimulationScenario || mongoose.model<ISimulationScenario>('SimulationScenario', SimulationScenarioSchema);
-export const RecoveryPlan: Model<IRecoveryPlan> = mongoose.models.RecoveryPlan || mongoose.model<IRecoveryPlan>('RecoveryPlan', RecoveryPlanSchema);
-export const DocumentRecord: Model<IDocumentRecord> = mongoose.models.DocumentRecord || mongoose.model<IDocumentRecord>('DocumentRecord', DocumentRecordSchema);
-export const Alert: Model<IAlert> = mongoose.models.Alert || mongoose.model<IAlert>('Alert', AlertSchema);
-export const AuditEvent: Model<IAuditEvent> = mongoose.models.AuditEvent || mongoose.model<IAuditEvent>('AuditEvent', AuditEventSchema);
+import { createSqliteModel, ISqliteModel, isValidObjectId } from '../db/sqlite.js';
+
+// Export Models powered by SQLite file-based persistence
+export const User: ISqliteModel<IUser> = createSqliteModel<IUser>('User', 'users');
+export const Shipment: ISqliteModel<IShipment> = createSqliteModel<IShipment>('Shipment', 'shipments');
+export const Facility: ISqliteModel<IFacility> = createSqliteModel<IFacility>('Facility', 'facilities');
+export const Vehicle: ISqliteModel<IVehicle> = createSqliteModel<IVehicle>('Vehicle', 'vehicles');
+export const Route: ISqliteModel<IRoute> = createSqliteModel<IRoute>('Route', 'routes');
+export const Incident: ISqliteModel<IIncident> = createSqliteModel<IIncident>('Incident', 'incidents');
+export const SimulationScenario: ISqliteModel<ISimulationScenario> = createSqliteModel<ISimulationScenario>('SimulationScenario', 'simulationscenarios');
+export const RecoveryPlan: ISqliteModel<IRecoveryPlan> = createSqliteModel<IRecoveryPlan>('RecoveryPlan', 'recoveryplans');
+export const DocumentRecord: ISqliteModel<IDocumentRecord> = createSqliteModel<IDocumentRecord>('DocumentRecord', 'documentrecords');
+export const Alert: ISqliteModel<IAlert> = createSqliteModel<IAlert>('Alert', 'alerts');
+export const AuditEvent: ISqliteModel<IAuditEvent> = createSqliteModel<IAuditEvent>('AuditEvent', 'auditevents');
+
+export { isValidObjectId };

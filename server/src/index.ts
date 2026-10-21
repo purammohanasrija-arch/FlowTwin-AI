@@ -5,10 +5,10 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import dotenv from 'dotenv';
-import mongoose from 'mongoose';
 import { apiRouter } from './routes/api.js';
 import { seedDemoWorkspace } from './data/seedData.js';
 import { Shipment } from './models/index.js';
+import { initSqliteDatabase } from './db/sqlite.js';
 
 dotenv.config();
 
@@ -16,7 +16,6 @@ const app = express();
 const server = http.createServer(app);
 
 const PORT = process.env.PORT || 5000;
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/flowtwin';
 
 // Socket.IO configuration
 export const io = new SocketIOServer(server, {
@@ -47,7 +46,7 @@ app.get('/api/health', (req, res) => {
     product: 'FlowTwin AI',
     version: '1.0.0',
     timestamp: new Date().toISOString(),
-    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
+    database: 'sqlite (file-persisted: data/flowtwin.sqlite)',
   });
 });
 
@@ -63,31 +62,31 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   });
 });
 
-// MongoDB Connection & Server Launch
+// SQLite File Database Initialization & Server Launch
 async function startServer() {
   try {
-    console.log(`[FlowTwin AI] Connecting to MongoDB at ${MONGODB_URI}...`);
-    await mongoose.connect(MONGODB_URI, {
-      serverSelectionTimeoutMS: 5000,
-    });
-    console.log('[FlowTwin AI] MongoDB connection established successfully.');
+    console.log('[FlowTwin AI] Initializing SQLite file-based database...');
+    await initSqliteDatabase();
+    console.log('[FlowTwin AI] SQLite database initialized and ready.');
 
     // Auto-seed demo dataset if database is empty
     const shipmentCount = await Shipment.countDocuments();
     if (shipmentCount === 0) {
-      console.log('[FlowTwin AI] Empty database detected. Auto-seeding enterprise logistics dataset...');
+      console.log('[FlowTwin AI] Empty database detected. Auto-seeding enterprise logistics dataset into SQLite...');
       await seedDemoWorkspace(true);
+      const seededCount = await Shipment.countDocuments();
+      console.log(`[FlowTwin AI] SQLite successfully populated with ${seededCount} shipments and network infrastructure.`);
     } else {
-      console.log(`[FlowTwin AI] Database active with ${shipmentCount} existing shipments.`);
+      console.log(`[FlowTwin AI] SQLite active with ${shipmentCount} existing shipments.`);
     }
   } catch (err: any) {
-    console.warn('[FlowTwin AI] MongoDB connection notice:', err.message);
-    console.warn('[FlowTwin AI] Server listening in resilient mode. Set MONGODB_URI in Render dashboard if needed.');
+    console.error('[FlowTwin AI] SQLite initialization error:', err.message);
   }
 
   server.listen(Number(PORT), '0.0.0.0', () => {
     console.log(`=======================================================`);
     console.log(`  FlowTwin AI Control Tower Server Running on Port ${PORT}`);
+    console.log(`  Database Engine: SQLite (Local & Render Persistent File)`);
     console.log(`  API Base URL: http://0.0.0.0:${PORT}/api`);
     console.log(`  Health Check: http://0.0.0.0:${PORT}/api/health`);
     console.log(`=======================================================`);

@@ -5,7 +5,7 @@
 [![React](https://img.shields.io/badge/React-v18.3-blue)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-v5.7-blue)](https://www.typescriptlang.org/)
 [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-v3.4-38bdf8)](https://tailwindcss.com/)
-[![MongoDB](https://img.shields.io/badge/MongoDB-Mongoose-green)](https://www.mongodb.com/)
+[![SQLite](https://img.shields.io/badge/SQLite-sql.js-003B57?logo=sqlite)](https://www.sqlite.org/)
 [![License](https://img.shields.io/badge/License-MIT-purple)](LICENSE)
 
 FlowTwin AI is a next-generation enterprise logistics command center, interactive supply chain digital twin, and disruption simulation laboratory. It converts unstructured shipment documents, delivery manifests, and telematics into a real-time reactive graph model. Operators can introduce hypothetical shocks (interstate closures, breakdowns, warehouse outages), calculate deterministic delay impacts, evaluate multi-objective recovery trade-offs, and authorize mitigation actions with role-gated governance.
@@ -51,7 +51,7 @@ FlowTwin AI is a next-generation enterprise logistics command center, interactiv
 - **Disruption Blast Radius**: 1-click propagation analysis highlighting upstream and downstream dependencies affected by corridor holds.
 
 ### 7. AI Logistics Copilot & Multi-Agent Architecture
-- **Persistent Conversational Assistant**: Grounded in live MongoDB records; cites specific shipment IDs and facility codes.
+- **Persistent Conversational Assistant**: Grounded in live database records; cites specific shipment IDs and facility codes.
 - **Multi-Agent Telemetry**: Live trace panel for Agent A (Doc), Agent B (Risk), Agent C (Disruption), Agent D (Recovery), Agent E (Validation), and Agent F (Reporting).
 - **Out-of-the-Box Demo**: Works 100% autonomously without external API keys via smart deterministic fallback; also supports Google Gemini API when configured.
 
@@ -63,7 +63,7 @@ FlowTwin AI is a next-generation enterprise logistics command center, interactiv
 |---|---|
 | **Frontend** | React 18, Vite, TypeScript, Tailwind CSS, `@vis.gl/react-google-maps`, Google Maps JavaScript API, Three.js / R3F, Framer Motion, Lucide React, Recharts, React Flow |
 | **Backend** | Node.js (v20+ / v24), Express, TypeScript, Socket.IO, Multer, XLSX, Zod |
-| **Database** | MongoDB with Mongoose (Local daemon or MongoDB Atlas) |
+| **Database** | SQLite with WebAssembly (`sql.js`) — Zero-configuration file persistence (`./data/flowtwin.sqlite`), auto-seeding demo datasets on first boot |
 | **AI / ML** | Configurable Google Gemini API (`gemini-1.5-flash`) + Deterministic Logistics Intelligence Engine |
 
 ---
@@ -72,12 +72,12 @@ FlowTwin AI is a next-generation enterprise logistics command center, interactiv
 
 ### Prerequisites
 - **Node.js**: v18.0.0 or higher (v24.x tested and verified)
-- **MongoDB**: Local MongoDB instance running on `mongodb://127.0.0.1:27017` or a MongoDB Atlas URI
+- **Database**: Zero setup required! SQLite runs natively in pure JS and persists to `./data/flowtwin.sqlite`.
 
 ### 1. Clone & Install Dependencies
 ```bash
-git clone https://github.com/your-org/flowtwin-ai.git
-cd flowtwin-ai
+git clone https://github.com/purammohanasrija-arch/FlowTwin-AI.git
+cd FlowTwin-AI
 
 # Install all workspace dependencies
 npm run install:all
@@ -93,7 +93,7 @@ cp .env.example server/.env
 Default development settings:
 ```ini
 PORT=5000
-MONGODB_URI=mongodb://127.0.0.1:27017/flowtwin
+SQLITE_DB_PATH=./data/flowtwin.sqlite
 JWT_SECRET=flowtwin_enterprise_jwt_secret_dev_2026
 GEMINI_API_KEY=   # Optional: Leave empty for offline deterministic demo mode
 ```

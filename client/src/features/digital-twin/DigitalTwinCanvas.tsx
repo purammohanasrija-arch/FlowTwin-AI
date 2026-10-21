@@ -19,7 +19,15 @@ import { ScenarioRenderer } from './ScenarioRenderer.js';
 import { SpatialLabels } from './SpatialLabels.js';
 import { CameraDirector } from './CameraDirector.js';
 import { SpatialHUD } from './SpatialHUD.js';
-import { Loader2, AlertCircle } from 'lucide-react';
+import { Loader2, AlertCircle, Box, Sparkles } from 'lucide-react';
+
+const CanvasReadyNotifier: React.FC<{ onReady: () => void }> = ({ onReady }) => {
+  useEffect(() => {
+    const t = setTimeout(onReady, 250);
+    return () => clearTimeout(t);
+  }, [onReady]);
+  return null;
+};
 
 export const DigitalTwinCanvas: React.FC = () => {
   const quality = useDigitalTwinStore(s => s.quality);
@@ -28,7 +36,7 @@ export const DigitalTwinCanvas: React.FC = () => {
   const isPlaying = useDigitalTwinStore(s => s.isPlaying);
 
   const [webGLSupported, setWebGLSupported] = useState(true);
-  const [loading, setLoading] = useState(false);
+  const [is3DReady, setIs3DReady] = useState(false);
 
   // Check WebGL availability
   useEffect(() => {
@@ -162,12 +170,48 @@ export const DigitalTwinCanvas: React.FC = () => {
 
             {/* Floating Spatial HUD Labels */}
             <SpatialLabels />
+
+            {/* Signal that first 3D frame has rendered */}
+            <CanvasReadyNotifier onReady={() => setIs3DReady(true)} />
           </Suspense>
         </Canvas>
       </div>
 
       {/* 2. SPATIAL HOLOGRAPHIC 2D INTERFACE OVERLAY */}
       <SpatialHUD />
+
+      {/* 3. 3D WEBGL INITIALIZATION OVERLAY */}
+      {!is3DReady && (
+        <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-[#06070D]/95 backdrop-blur-md transition-opacity duration-700">
+          <div className="relative flex items-center justify-center mb-6">
+            <div className="w-20 h-20 rounded-full border-2 border-purple-500/30 animate-ping absolute" />
+            <div className="w-16 h-16 rounded-full border-2 border-purple-500 border-t-cyan-400 border-r-transparent animate-spin" />
+            <Box className="w-7 h-7 text-purple-400 absolute animate-pulse" />
+          </div>
+
+          <div className="text-center space-y-2 max-w-sm px-6">
+            <div className="flex items-center justify-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+              <h3 className="text-sm font-bold text-white tracking-widest uppercase font-mono">
+                INITIALIZING 3D SPATIAL UNIVERSE
+              </h3>
+            </div>
+            <p className="text-xs text-gray-400 font-mono leading-relaxed">
+              Allocating WebGL GPU context, compiling spatial shaders, and spawning 3D vehicle fleet...
+            </p>
+
+            {/* Glowing progress line */}
+            <div className="w-full bg-[#181B2B] h-1.5 rounded-full overflow-hidden mt-3 border border-white/5">
+              <div className="bg-gradient-to-r from-purple-500 via-cyan-400 to-purple-500 h-full w-full animate-pulse" />
+            </div>
+
+            <div className="flex justify-between text-[10px] text-gray-500 font-mono pt-1">
+              <span>HARDWARE ACCELERATION: ON</span>
+              <span>STANDBY...</span>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

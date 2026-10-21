@@ -15,7 +15,12 @@ import {
   MOCK_NETWORK_GRAPH,
 } from './mockApi.js';
 
-const rawApiUrl = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
+const DEFAULT_PROD_API = 'https://flowtwin-ai-7chg.onrender.com';
+const rawApiUrl = (
+  import.meta.env.VITE_API_URL || 
+  (import.meta.env.PROD ? DEFAULT_PROD_API : '')
+).replace(/\/+$/, '');
+
 export const API_BASE = rawApiUrl
   ? (rawApiUrl.endsWith('/api') ? rawApiUrl : `${rawApiUrl}/api`)
   : '/api';

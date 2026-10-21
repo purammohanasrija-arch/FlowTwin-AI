@@ -11,21 +11,26 @@ import {
   Clock,
 } from 'lucide-react';
 import { api } from '../../lib/api.js';
+import { MOCK_ALERTS } from '../../lib/mockApi.js';
 import { useNavigate } from 'react-router-dom';
 
 export const AlertsPage: React.FC = () => {
   const navigate = useNavigate();
-  const [alerts, setAlerts] = useState<any[]>([]);
+  const [alerts, setAlerts] = useState<any[]>(MOCK_ALERTS);
   const [severityFilter, setSeverityFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [activeNoteAlert, setActiveNoteAlert] = useState<string | null>(null);
   const [noteInput, setNoteInput] = useState('');
 
   const fetchAlerts = () => {
     setIsLoading(true);
     api.get<{ alerts: any[] }>('/alerts')
-      .then(res => setAlerts(res.alerts || []))
+      .then(res => {
+        if (res && Array.isArray(res.alerts)) {
+          setAlerts(res.alerts);
+        }
+      })
       .catch(err => console.error(err))
       .finally(() => setIsLoading(false));
   };

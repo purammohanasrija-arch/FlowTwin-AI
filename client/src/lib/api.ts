@@ -3,12 +3,15 @@ import {
   MOCK_KPIS,
   MOCK_FACILITIES,
   MOCK_VEHICLES,
+  MOCK_ROUTES,
   MOCK_SHIPMENTS,
   MOCK_INCIDENTS,
   MOCK_ALERTS,
   MOCK_SIMULATIONS,
   MOCK_RECOVERY_PLANS,
   MOCK_DOCUMENTS,
+  MOCK_AUDIT_EVENTS,
+  MOCK_USERS,
   MOCK_NETWORK_GRAPH,
 } from './mockApi.js';
 
@@ -26,7 +29,8 @@ let localDocuments: any[] = [...MOCK_DOCUMENTS];
 
 export function handleMockFallback<T>(endpoint: string, options: RequestInit = {}): T {
   const method = (options.method || 'GET').toUpperCase();
-  const cleanUrl = endpoint.split('?')[0];
+  const [cleanUrl, queryString] = endpoint.split('?');
+  const queryParams = new URLSearchParams(queryString || '');
 
   if (cleanUrl === '/dashboard/summary') {
     return MOCK_SUMMARY as unknown as T;
@@ -43,10 +47,10 @@ export function handleMockFallback<T>(endpoint: string, options: RequestInit = {
           shipmentId: payload.shipmentId || `SH-${Math.floor(1000 + Math.random() * 9000)}`,
           orderId: payload.orderId || `ORD-${Math.floor(50000 + Math.random() * 40000)}`,
           customerReference: payload.customerReference || `PO-${Math.floor(1000 + Math.random() * 9000)}`,
-          origin: { name: payload.originName || 'Chicago Central Logistics Park', lat: 41.8781, lng: -87.6298 },
-          destination: { name: payload.destinationName || 'New York Atlantic Gateway', lat: 40.7128, lng: -74.0060 },
+          origin: payload.origin || { name: payload.originName || 'Chicago Central Logistics Park', lat: 41.8781, lng: -87.6298, facilityId: 'FAC-CHI-01' },
+          destination: payload.destination || { name: payload.destinationName || 'New York Atlantic Gateway', lat: 40.7128, lng: -74.0060, facilityId: 'FAC-NYC-02' },
           carrierName: payload.carrierName || 'Apex Freight Dynamics',
-          carrierId: 'CAR-APEX',
+          carrierId: payload.carrierId || 'CAR-APEX',
           cargoDescription: payload.cargoDescription || 'Standard Freight Consignment',
           weightKg: payload.weightKg || 12000,
           status: 'ready_for_dispatch',
@@ -61,7 +65,40 @@ export function handleMockFallback<T>(endpoint: string, options: RequestInit = {
         return { success: true } as unknown as T;
       }
     }
-    return { shipments: localShipments, total: localShipments.length } as unknown as T;
+
+    // Dynamic filtering for GET /shipments?status=...&carrier=...&search=...
+    let filtered = [...localShipments];
+    const statusParam = queryParams.get('status');
+    const carrierParam = queryParams.get('carrier');
+    const searchParam = queryParams.get('search');
+
+    if (statusParam && statusParam !== 'all') {
+      filtered = filtered.filter(s => s.status === statusParam);
+    }
+    if (carrierParam && carrierParam !== 'all') {
+      filtered = filtered.filter(s => s.carrierName === carrierParam);
+    }
+    if (searchParam) {
+      const q = searchParam.toLowerCase();
+      filtered = filtered.filter(s =>
+        (s.shipmentId && s.shipmentId.toLowerCase().includes(q)) ||
+        (s.orderId && s.orderId.toLowerCase().includes(q)) ||
+        (s.customerReference && s.customerReference.toLowerCase().includes(q)) ||
+        (s.origin?.name && s.origin.name.toLowerCase().includes(q)) ||
+        (s.destination?.name && s.destination.name.toLowerCase().includes(q)) ||
+        (s.cargoDescription && s.cargoDescription.toLowerCase().includes(q))
+      );
+    }
+
+    return {
+      shipments: filtered,
+      total: filtered.length,
+      pagination: {
+        total: filtered.length,
+        page: 1,
+        totalPages: 1,
+      },
+    } as unknown as T;
   }
   if (cleanUrl.startsWith('/shipments/')) {
     const id = cleanUrl.replace('/shipments/', '');
@@ -74,10 +111,30 @@ export function handleMockFallback<T>(endpoint: string, options: RequestInit = {
   if (cleanUrl === '/vehicles') {
     return { vehicles: MOCK_VEHICLES } as unknown as T;
   }
+  if (cleanUrl === '/routes') {
+    return { routes: MOCK_ROUTES } as unknown as T;
+  }
   if (cleanUrl === '/incidents') {
     return { incidents: MOCK_INCIDENTS } as unknown as T;
   }
-  if (cleanUrl === '/alerts') {
+  if (cleanUrl === '/alerts' || cleanUrl.startsWith('/alerts')) {
+    if (method === 'PATCH') {
+      try {
+        const id = cleanUrl.replace('/alerts/', '');
+        const payload = JSON.parse(options.body as string);
+        const alert = localAlerts.find(a => a._id === id || a.alertCode === id);
+        if (alert) {
+          if (payload.status) alert.status = payload.status;
+          if (payload.note) {
+            if (!alert.notes) alert.notes = [];
+            alert.notes.push(payload.note);
+          }
+        }
+        return { alert } as unknown as T;
+      } catch {
+        return { success: true } as unknown as T;
+      }
+    }
     return { alerts: localAlerts } as unknown as T;
   }
   if (cleanUrl === '/simulations') {
@@ -141,16 +198,73 @@ export function handleMockFallback<T>(endpoint: string, options: RequestInit = {
   if (cleanUrl === '/recovery-plans' || cleanUrl.startsWith('/recovery-plans')) {
     if (cleanUrl.includes('/approve')) {
       const plan = localRecoveryPlans[0];
-      if (plan) plan.approvalStatus = 'approved';
-      return { success: true, message: 'Recovery plan approved and dispatched to network!' } as unknown as T;
+      if (plan) {
+        plan.approvalStatus = 'approved';
+        plan.approvedBy = 'Marcus Vance';
+        plan.approvedAt = new Date().toISOString();
+      }
+      return { success: true, plan, message: 'Recovery plan approved and dispatched to network!' } as unknown as T;
     }
-    return { recoveryPlans: localRecoveryPlans } as unknown as T;
+    if (cleanUrl.includes('/reject')) {
+      const plan = localRecoveryPlans[0];
+      if (plan) {
+        plan.approvalStatus = 'rejected';
+      }
+      return { success: true, plan, message: 'Recovery plan rejected.' } as unknown as T;
+    }
+    // Return both `plans` and `recoveryPlans` for full client compatibility
+    return { plans: localRecoveryPlans, recoveryPlans: localRecoveryPlans } as unknown as T;
   }
   if (cleanUrl === '/documents' || cleanUrl.startsWith('/documents')) {
+    if (cleanUrl.endsWith('/confirm')) {
+      const id = cleanUrl.split('/')[2];
+      const doc = localDocuments.find(d => d.documentCode === id || d._id === id);
+      if (doc) doc.processingStatus = 'confirmed';
+      const promotedShipment = {
+        _id: `ship-promoted-${Date.now()}`,
+        shipmentId: `SH-${Math.floor(2000 + Math.random() * 8000)}`,
+        orderId: 'ORD-9104',
+        customerReference: `PO-DOC-${doc?.documentCode || '90414'}`,
+        origin: { name: 'Dallas Inland Depot', lat: 32.7767, lng: -96.7970, facilityId: 'FAC-DAL-04' },
+        destination: { name: 'Atlanta Distribution Cross-Dock', lat: 33.7490, lng: -84.3880, facilityId: 'FAC-ATL-05' },
+        carrierName: 'Nexus Global Haulers',
+        carrierId: 'CAR-NEXUS',
+        status: 'ready_for_dispatch',
+        cargoDescription: 'Promoted Verified Consignment',
+        weightKg: 16500,
+        priority: 'high',
+        delayHours: 0,
+        riskScore: 12,
+        milestones: [{ id: 'm1', title: 'Promoted to Dispatch', description: 'Extracted from delivery order', timestamp: new Date().toISOString(), type: 'pickup', status: 'completed' }],
+      };
+      localShipments.unshift(promotedShipment);
+      return {
+        success: true,
+        message: `Document ${doc?.documentCode || id} successfully promoted to live shipment ${promotedShipment.shipmentId}!`,
+        shipment: promotedShipment,
+      } as unknown as T;
+    }
+    if (cleanUrl.endsWith('/fields')) {
+      const id = cleanUrl.split('/')[2];
+      const doc = localDocuments.find(d => d.documentCode === id || d._id === id);
+      if (doc && options.body) {
+        try {
+          const payload = JSON.parse(options.body as string);
+          if (payload.fields) doc.extractedFields = payload.fields;
+        } catch { /* ignore */ }
+      }
+      return { document: doc || localDocuments[0] } as unknown as T;
+    }
     return { documents: localDocuments } as unknown as T;
   }
   if (cleanUrl === '/network') {
     return MOCK_NETWORK_GRAPH as unknown as T;
+  }
+  if (cleanUrl === '/admin/audit-events') {
+    return { events: MOCK_AUDIT_EVENTS } as unknown as T;
+  }
+  if (cleanUrl === '/admin/users') {
+    return { users: MOCK_USERS } as unknown as T;
   }
   if (cleanUrl === '/ai/chat') {
     return {
@@ -162,7 +276,7 @@ export function handleMockFallback<T>(endpoint: string, options: RequestInit = {
       ],
     } as unknown as T;
   }
-  if (cleanUrl === '/auth/login') {
+  if (cleanUrl === '/auth/login' || cleanUrl === '/auth/me') {
     return {
       token: 'demo_token_' + Date.now(),
       user: {
@@ -170,24 +284,12 @@ export function handleMockFallback<T>(endpoint: string, options: RequestInit = {
         name: 'Marcus Vance',
         email: 'manager@flowtwin.ai',
         role: 'Logistics Manager',
-        department: 'Enterprise Logistics',
+        department: 'Supply Chain Resiliency',
         accountStatus: 'active',
       },
     } as unknown as T;
   }
-  if (cleanUrl === '/auth/me') {
-    return {
-      user: {
-        id: 'user-demo-1',
-        name: 'Marcus Vance',
-        email: 'manager@flowtwin.ai',
-        role: 'Logistics Manager',
-        department: 'Enterprise Logistics',
-        accountStatus: 'active',
-      },
-    } as unknown as T;
-  }
-  if (cleanUrl === '/admin/reset-data') {
+  if (cleanUrl === '/admin/reset-data' || cleanUrl === '/demo/reset') {
     localShipments = [...MOCK_SHIPMENTS];
     localSimulations = [...MOCK_SIMULATIONS];
     localRecoveryPlans = [...MOCK_RECOVERY_PLANS];
@@ -218,19 +320,21 @@ export async function request<T>(endpoint: string, options: RequestInit = {}): P
     delete headers['Content-Type'];
   }
 
-  // Check if we are running in a static hosting environment without configured external backend
-  const isVercelStaticWithoutBackend =
-    typeof window !== 'undefined' &&
-    window.location.hostname.includes('vercel.app') &&
-    (!rawApiUrl || rawApiUrl === '/api');
+  // If no backend is configured or if running in static environment where /api rewrites to index.html
+  const hasExternalBackend = rawApiUrl && rawApiUrl !== '/api' && rawApiUrl.startsWith('http');
 
-  if (!isVercelStaticWithoutBackend) {
+  if (hasExternalBackend) {
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 6000); // 6s timeout for cold backend
+
       const response = await fetch(`${API_BASE}${endpoint}`, {
         ...options,
         headers,
+        signal: controller.signal,
       });
 
+      clearTimeout(timeoutId);
       const contentType = response.headers.get('content-type') || '';
       
       // If server returned valid JSON
@@ -244,19 +348,19 @@ export async function request<T>(endpoint: string, options: RequestInit = {}): P
         throw new Error(errorData.error || `HTTP ${response.status}: Request failed`);
       }
 
-      // If response is HTML (e.g. 404 rewrite to index.html), fall through to mock
+      // If response is HTML or 404/502/503 from sleep, fallback to offline store
     } catch (err: any) {
-      // If it's an explicit application error from server, throw it
       if (
         err.message &&
         !err.message.includes('Failed to fetch') &&
         !err.message.includes('NetworkError') &&
         !err.message.includes('Unexpected token') &&
-        !err.message.includes('Load failed')
+        !err.message.includes('Load failed') &&
+        !err.message.includes('aborted')
       ) {
         throw err;
       }
-      console.warn(`[FlowTwin] Backend request to ${endpoint} failed, activating autonomous fallback store.`);
+      console.warn(`[FlowTwin] Backend request to ${endpoint} failed or timed out, activating autonomous fallback store.`);
     }
   }
 

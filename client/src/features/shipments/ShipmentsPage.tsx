@@ -13,6 +13,7 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import { api } from '../../lib/api.js';
+import { MOCK_SHIPMENTS } from '../../lib/mockApi.js';
 import { useAuth } from '../../lib/authContext.js';
 import { ShipmentDetailDrawer } from './ShipmentDetailDrawer.js';
 import { useSearchParams } from 'react-router-dom';
@@ -20,8 +21,8 @@ import { useSearchParams } from 'react-router-dom';
 export const ShipmentsPage: React.FC = () => {
   const { user } = useAuth();
   const [searchParams] = useSearchParams();
-  const [shipments, setShipments] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [shipments, setShipments] = useState<any[]>(MOCK_SHIPMENTS);
+  const [isLoading, setIsLoading] = useState(false);
   const [search, setSearch] = useState(searchParams.get('search') || '');
   const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || 'all');
   const [carrierFilter, setCarrierFilter] = useState('all');
@@ -49,8 +50,14 @@ export const ShipmentsPage: React.FC = () => {
     if (carrierFilter !== 'all') params.append('carrier', carrierFilter);
 
     api.get<any>(`/shipments?${params.toString()}`)
-      .then(res => setShipments(res.shipments || []))
-      .catch(err => console.error('Failed to load shipments:', err))
+      .then(res => {
+        if (res && Array.isArray(res.shipments)) {
+          setShipments(res.shipments);
+        }
+      })
+      .catch(err => {
+        console.error('Failed to load shipments:', err);
+      })
       .finally(() => setIsLoading(false));
   };
 

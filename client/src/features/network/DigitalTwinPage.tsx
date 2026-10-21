@@ -23,6 +23,7 @@ import {
   Box,
 } from 'lucide-react';
 import { api } from '../../lib/api.js';
+import { MOCK_NETWORK_GRAPH } from '../../lib/mockApi.js';
 import { useNavigate } from 'react-router-dom';
 
 // Custom Node for Facilities
@@ -100,16 +101,18 @@ const nodeTypes = {
 
 export const DigitalTwinPage: React.FC = () => {
   const navigate = useNavigate();
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState<any>(MOCK_NETWORK_GRAPH.nodes as any[]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<any>(MOCK_NETWORK_GRAPH.edges as any[]);
   const [selectedNode, setSelectedNode] = useState<any | null>(null);
   const [isBlastRadiusActive, setIsBlastRadiusActive] = useState(false);
 
   useEffect(() => {
     api.get<any>('/network')
       .then(res => {
-        setNodes(res.nodes || []);
-        setEdges(res.edges || []);
+        if (res && res.nodes && res.nodes.length > 0) {
+          setNodes(res.nodes);
+          setEdges(res.edges || []);
+        }
       })
       .catch(err => console.error(err));
   }, []);

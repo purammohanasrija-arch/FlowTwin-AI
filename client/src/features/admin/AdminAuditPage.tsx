@@ -9,24 +9,25 @@ import {
   Lock,
 } from 'lucide-react';
 import { api } from '../../lib/api.js';
+import { MOCK_AUDIT_EVENTS, MOCK_USERS } from '../../lib/mockApi.js';
 import { useAuth } from '../../lib/authContext.js';
 
 export const AdminAuditPage: React.FC = () => {
   const { user } = useAuth();
-  const [users, setUsers] = useState<any[]>([]);
-  const [auditEvents, setAuditEvents] = useState<any[]>([]);
+  const [users, setUsers] = useState<any[]>(MOCK_USERS);
+  const [auditEvents, setAuditEvents] = useState<any[]>(MOCK_AUDIT_EVENTS);
   const [activeTab, setActiveTab] = useState<'audit' | 'users'>('audit');
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     setIsLoading(true);
     Promise.all([
-      api.get<{ events: any[] }>('/admin/audit-events').catch(() => ({ events: [] })),
-      user?.role === 'Administrator' ? api.get<{ users: any[] }>('/admin/users').catch(() => ({ users: [] })) : Promise.resolve({ users: [] }),
+      api.get<{ events: any[] }>('/admin/audit-events').catch(() => ({ events: MOCK_AUDIT_EVENTS })),
+      user?.role === 'Administrator' ? api.get<{ users: any[] }>('/admin/users').catch(() => ({ users: MOCK_USERS })) : Promise.resolve({ users: MOCK_USERS }),
     ])
       .then(([auditRes, usersRes]) => {
-        setAuditEvents(auditRes.events || []);
-        setUsers(usersRes.users || []);
+        if (auditRes.events && auditRes.events.length > 0) setAuditEvents(auditRes.events);
+        if (usersRes.users && usersRes.users.length > 0) setUsers(usersRes.users);
       })
       .finally(() => setIsLoading(false));
   }, [user?.role]);

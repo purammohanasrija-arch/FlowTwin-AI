@@ -25,10 +25,11 @@ import {
   Legend,
 } from 'recharts';
 import { api } from '../../lib/api.js';
+import { MOCK_KPIS, MOCK_SUMMARY } from '../../lib/mockApi.js';
 
 export const AnalyticsStudioPage: React.FC = () => {
-  const [data, setData] = useState<any>(null);
-  const [dashboardData, setDashboardData] = useState<any>(null);
+  const [data, setData] = useState<any>(MOCK_KPIS);
+  const [dashboardData, setDashboardData] = useState<any>(MOCK_SUMMARY);
   const [timeRange, setTimeRange] = useState('7d');
   const [reportModalOpen, setReportModalOpen] = useState(false);
 
@@ -38,8 +39,8 @@ export const AnalyticsStudioPage: React.FC = () => {
       api.get<any>('/dashboard/summary'),
     ])
       .then(([analyticsRes, summaryRes]) => {
-        setData(analyticsRes);
-        setDashboardData(summaryRes);
+        if (analyticsRes) setData(analyticsRes);
+        if (summaryRes) setDashboardData(summaryRes);
       })
       .catch(err => console.error(err));
   }, [timeRange]);

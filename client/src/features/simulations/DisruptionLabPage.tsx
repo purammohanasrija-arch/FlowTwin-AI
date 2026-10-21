@@ -25,12 +25,13 @@ import {
   Legend,
 } from 'recharts';
 import { api } from '../../lib/api.js';
+import { MOCK_SIMULATIONS } from '../../lib/mockApi.js';
 import { useNavigate } from 'react-router-dom';
 
 export const DisruptionLabPage: React.FC = () => {
   const navigate = useNavigate();
-  const [scenarios, setScenarios] = useState<any[]>([]);
-  const [activeScenario, setActiveScenario] = useState<any | null>(null);
+  const [scenarios, setScenarios] = useState<any[]>(MOCK_SIMULATIONS);
+  const [activeScenario, setActiveScenario] = useState<any | null>(MOCK_SIMULATIONS[0]);
   const [isSimulating, setIsSimulating] = useState(false);
 
   // Form State for new simulation
@@ -44,9 +45,9 @@ export const DisruptionLabPage: React.FC = () => {
   const fetchScenarios = () => {
     api.get<{ simulations: any[] }>('/simulations')
       .then(res => {
-        setScenarios(res.simulations || []);
-        if (res.simulations && res.simulations.length > 0 && !activeScenario) {
-          setActiveScenario(res.simulations[0]);
+        if (res && Array.isArray(res.simulations) && res.simulations.length > 0) {
+          setScenarios(res.simulations);
+          setActiveScenario((prev: any) => prev ? (res.simulations.find((s: any) => s._id === prev._id) || res.simulations[0]) : res.simulations[0]);
         }
       })
       .catch(err => console.error(err));

@@ -14,13 +14,14 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import { api } from '../../lib/api.js';
+import { MOCK_RECOVERY_PLANS } from '../../lib/mockApi.js';
 import { useAuth } from '../../lib/authContext.js';
 
 export const RecoveryPlannerPage: React.FC = () => {
   const { user } = useAuth();
-  const [plans, setPlans] = useState<any[]>([]);
-  const [selectedPlan, setSelectedPlan] = useState<any | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [plans, setPlans] = useState<any[]>(MOCK_RECOVERY_PLANS);
+  const [selectedPlan, setSelectedPlan] = useState<any | null>(MOCK_RECOVERY_PLANS[0]);
+  const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [approvalModalOpen, setApprovalModalOpen] = useState(false);
   const [approvalDecision, setApprovalDecision] = useState<'approve' | 'reject'>('approve');
@@ -30,9 +31,9 @@ export const RecoveryPlannerPage: React.FC = () => {
     setIsLoading(true);
     api.get<{ plans: any[] }>('/recovery-plans')
       .then(res => {
-        setPlans(res.plans || []);
-        if (res.plans && res.plans.length > 0 && !selectedPlan) {
-          setSelectedPlan(res.plans[0]);
+        if (res && Array.isArray(res.plans) && res.plans.length > 0) {
+          setPlans(res.plans);
+          setSelectedPlan((prev: any) => prev ? (res.plans.find((p: any) => p.planCode === prev.planCode) || res.plans[0]) : res.plans[0]);
         }
       })
       .catch(err => console.error(err))

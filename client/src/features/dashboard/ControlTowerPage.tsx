@@ -40,9 +40,9 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 export const ControlTowerPage: React.FC = () => {
-  const [data, setData] = useState<any>(null);
-  const [analytics, setAnalytics] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [data, setData] = useState<any>(MOCK_SUMMARY);
+  const [analytics, setAnalytics] = useState<any>(MOCK_KPIS);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {

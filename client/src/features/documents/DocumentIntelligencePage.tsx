@@ -14,6 +14,7 @@ import {
   Layers,
 } from 'lucide-react';
 import { api } from '../../lib/api.js';
+import { MOCK_DOCUMENTS } from '../../lib/mockApi.js';
 import { useAuth } from '../../lib/authContext.js';
 import { useNavigate } from 'react-router-dom';
 
@@ -21,8 +22,8 @@ export const DocumentIntelligencePage: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const [documents, setDocuments] = useState<any[]>([]);
-  const [selectedDoc, setSelectedDoc] = useState<any | null>(null);
+  const [documents, setDocuments] = useState<any[]>(MOCK_DOCUMENTS);
+  const [selectedDoc, setSelectedDoc] = useState<any | null>(MOCK_DOCUMENTS[0]);
   const [isUploading, setIsUploading] = useState(false);
   const [isPromoting, setIsPromoting] = useState(false);
   const [editingFields, setEditingFields] = useState<Record<string, any>>({});
@@ -31,9 +32,9 @@ export const DocumentIntelligencePage: React.FC = () => {
   const fetchDocuments = () => {
     api.get<{ documents: any[] }>('/documents')
       .then(res => {
-        setDocuments(res.documents || []);
-        if (res.documents && res.documents.length > 0 && !selectedDoc) {
-          setSelectedDoc(res.documents[0]);
+        if (res && Array.isArray(res.documents) && res.documents.length > 0) {
+          setDocuments(res.documents);
+          setSelectedDoc((prev: any) => prev ? (res.documents.find((d: any) => d.documentCode === prev.documentCode) || res.documents[0]) : res.documents[0]);
         }
       })
       .catch(err => console.error(err));

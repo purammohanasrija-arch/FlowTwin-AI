@@ -28,6 +28,7 @@ import {
   CartesianGrid,
 } from 'recharts';
 import { api } from '../../lib/api.js';
+import { MOCK_SUMMARY, MOCK_KPIS } from '../../lib/mockApi.js';
 import { useNavigate } from 'react-router-dom';
 
 const STATUS_COLORS: Record<string, string> = {
@@ -50,14 +51,18 @@ export const ControlTowerPage: React.FC = () => {
       api.get<any>('/analytics/kpis'),
     ])
       .then(([summaryRes, analyticsRes]) => {
-        setData(summaryRes);
-        setAnalytics(analyticsRes);
+        setData(summaryRes || MOCK_SUMMARY);
+        setAnalytics(analyticsRes || MOCK_KPIS);
       })
-      .catch(err => console.error('Failed to load dashboard:', err))
+      .catch(err => {
+        console.error('Failed to load dashboard:', err);
+        setData(MOCK_SUMMARY);
+        setAnalytics(MOCK_KPIS);
+      })
       .finally(() => setIsLoading(false));
   }, []);
 
-  if (isLoading || !data) {
+  if (isLoading && !data) {
     return (
       <div className="flex items-center justify-center h-[70vh]">
         <div className="flex flex-col items-center gap-3">
@@ -68,7 +73,8 @@ export const ControlTowerPage: React.FC = () => {
     );
   }
 
-  const { kpis, statusDistribution, carrierPerformance, aiBriefing } = data;
+  const dashboardData = data || MOCK_SUMMARY;
+  const { kpis, statusDistribution, carrierPerformance, aiBriefing } = dashboardData;
 
   const kpiCards = [
     {

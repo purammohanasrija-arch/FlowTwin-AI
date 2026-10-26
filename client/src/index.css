@@ -66,6 +66,43 @@
   box-shadow: 0 0 20px rgba(239, 68, 68, 0.25);
 }
 
+.glow-gold {
+  box-shadow: 0 0 24px rgba(245, 158, 11, 0.35);
+}
+
+.glow-caramel {
+  box-shadow: 0 0 24px rgba(217, 119, 6, 0.35);
+}
+
+.glow-choco {
+  box-shadow: 0 0 30px rgba(120, 53, 15, 0.4);
+}
+
+/* Chocolate glassmorphism utilities */
+.choco-glass-panel {
+  background: rgba(30, 18, 11, 0.82);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(245, 158, 11, 0.16);
+}
+
+.choco-glass-card {
+  background: rgba(41, 24, 14, 0.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(217, 119, 6, 0.14);
+}
+
+.choco-glass-hover {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.choco-glass-hover:hover {
+  background: rgba(56, 33, 20, 0.88);
+  border-color: rgba(245, 158, 11, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px -10px rgba(217, 119, 6, 0.3);
+}
+
 /* Leaflet dark theme customizations */
 .leaflet-container {
   background-color: #0B0D14 !important;

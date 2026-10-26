@@ -18,74 +18,74 @@ export const PlatformPillarsSection: React.FC = () => {
 
   const pillars = [
     {
-      id: 'global-visibility',
-      title: 'Global Visibility',
-      subtitle: 'Real-Time Geospatial Map & Telemetry',
+      id: '3d-factory-twin',
+      title: '3D Chocolate Factory Twin',
+      subtitle: '5 Interactive Production Zones',
       description:
-        'Track multimodal consignments across ocean lanes, air corridors, and freight highways with sub-minute GPS precision and satellite terrain overlays.',
-      icon: Globe2,
-      accentColor: 'from-cyan-500 to-blue-600',
-      badge: 'GIS Satellite & Dark Mode',
-      glow: 'shadow-[0_0_30px_rgba(0,245,255,0.2)]',
-      borderHover: 'hover:border-cyan-400/60',
-      route: '/app/map',
-      features: ['Satellite & Vector Tiles', 'Live GPS Vessel Feeds', 'Port Congestion Heatmaps'],
-    },
-    {
-      id: '3d-digital-twin',
-      title: '3D Digital Twin Universe',
-      subtitle: 'Real-World Spatial Infrastructure',
-      description:
-        'Step directly into 3D operational environments. Inspect container quay cranes, container vessels, and warehouse aprons in real-time spatial fidelity.',
+        'Walk through the full chocolate factory floor. Inspect raw cocoa silos, rotary roasting drums, conching tanks, tempering machines, foil wrapping lines, and cold storage.',
       icon: Box,
-      accentColor: 'from-purple-500 to-indigo-600',
-      badge: 'Interactive 3D Engine',
-      glow: 'shadow-[0_0_30px_rgba(139,92,246,0.2)]',
-      borderHover: 'hover:border-purple-400/60',
+      accentColor: 'from-amber-600 to-amber-800',
+      badge: 'Interactive WebGL 3D',
+      glow: 'shadow-[0_0_30px_rgba(217,119,6,0.2)]',
+      borderHover: 'hover:border-amber-400/60',
       route: '/app/twin-3d',
-      features: ['Quay Crane Telemetry', 'Vessel Berth Spatial Models', 'Real-Time Camera Orbit'],
+      features: ['Orbit Camera & Zone Jumps', 'Real-Time Machine Inspector', '2D Schematic Fallback Blueprint'],
     },
     {
-      id: 'ai-prediction',
-      title: 'AI-Powered Prediction',
-      subtitle: 'Autonomous Disruption Forecasts',
+      id: 'production-workflow',
+      title: '7-Stage Production Pipeline',
+      subtitle: 'From Cocoa Bean to Packaged Bar',
       description:
-        'Graph neural networks and multi-agent predictors detect port bottlenecks, customs delays, and severe weather up to 72 hours before impact.',
-      icon: BrainCircuit,
-      accentColor: 'from-emerald-500 to-teal-600',
-      badge: 'Multi-Agent Neural Engine',
-      glow: 'shadow-[0_0_30px_rgba(16,185,129,0.2)]',
-      borderHover: 'hover:border-emerald-400/60',
-      route: '/app/dashboard',
-      features: ['72-Hour Anomaly Prediction', 'Downstream Impact Scoring', 'Continuous Fleet Learning'],
-    },
-    {
-      id: 'scenario-simulation',
-      title: 'Scenario Simulation Lab',
-      subtitle: 'Deterministic What-If Testing',
-      description:
-        'Simulate macro shocks — canal blockages, category 5 typhoons, or dockworker strikes. Test alternate futures without risking real cargo.',
+        'Visualise every step of the chocolate manufacturing process. Start, pause, or resume batch runs and monitor ingredient conversion in real time.',
       icon: SlidersHorizontal,
-      accentColor: 'from-amber-500 to-orange-600',
-      badge: 'Shock Simulator',
+      accentColor: 'from-amber-500 to-yellow-600',
+      badge: 'Visual Workflow Engine',
       glow: 'shadow-[0_0_30px_rgba(245,158,11,0.2)]',
       borderHover: 'hover:border-amber-400/60',
-      route: '/app/simulations',
-      features: ['Hurricane & Strike Scenarios', 'Inventory Ripple Calculations', 'Cost-to-Serve Projections'],
+      route: '/app/production',
+      features: ['Start / Pause / Resume Controls', 'Live Batch Completion %', 'Machine Operating Telemetry'],
     },
     {
-      id: 'autonomous-recovery',
-      title: 'Autonomous Recovery Engine',
-      subtitle: 'AI Agent Mitigation & Governance Signoff',
+      id: 'problem-simulator',
+      title: 'Factory Problem Simulator',
+      subtitle: '7 Operational Stress Scenarios',
       description:
-        'When disruptions strike, intelligent agents calculate optimal rerouting, book backup multimodal carriers, and present validated action plans for human sign-off.',
+        'Simulate cocoa shortages, conche breakdowns, warm storage rooms, and delivery delays. Compare factory performance before and after executing managerial playbooks.',
       icon: ShieldCheck,
-      accentColor: 'from-fuchsia-500 to-pink-600',
-      badge: 'Human-in-the-Loop Signoff',
-      glow: 'shadow-[0_0_30px_rgba(217,70,239,0.2)]',
-      borderHover: 'hover:border-fuchsia-400/60',
-      route: '/app/recovery',
-      features: ['Instant Dynamic Rerouting', 'Demurrage Cost Minimizer', 'One-Click Governance Approval'],
+      accentColor: 'from-red-600 to-amber-700',
+      badge: 'Problem & Resolution Engine',
+      glow: 'shadow-[0_0_30px_rgba(239,68,68,0.2)]',
+      borderHover: 'hover:border-red-400/60',
+      route: '/app/problems',
+      features: ['Before vs After Performance', 'Root Cause Explanations', 'Actionable Manager Playbooks'],
+    },
+    {
+      id: 'compare-plans',
+      title: 'Compare Factory Plans',
+      subtitle: 'Plans A, B, and C Side-by-Side',
+      description:
+        'Evaluate 3 possible futures: Normal Production (Plan A), Machine Breakdown (Plan B), and High Customer Demand Surge (Plan C) with cost and output graphs.',
+      icon: BrainCircuit,
+      accentColor: 'from-amber-700 to-orange-800',
+      badge: 'Plan Decision Studio',
+      glow: 'shadow-[0_0_30px_rgba(180,83,9,0.2)]',
+      borderHover: 'hover:border-amber-500/60',
+      route: '/app/plans',
+      features: ['Side-by-Side Comparison Cards', 'Output & Operating Cost Charts', 'One-Click Condition Apply'],
+    },
+    {
+      id: 'quality-and-fleet',
+      title: 'Quality Scanner & Logistics Fleet',
+      subtitle: 'Cold-Chain Delivery & Batch Assurance',
+      description:
+        'Scan chocolate batches with our optical defect inspector and dispatch temperature-controlled refrigerated delivery trucks to regional customer hubs.',
+      icon: Globe2,
+      accentColor: 'from-yellow-600 to-amber-700',
+      badge: 'Inspection & Fleet Control',
+      glow: 'shadow-[0_0_30px_rgba(202,138,4,0.2)]',
+      borderHover: 'hover:border-yellow-400/60',
+      route: '/app/quality',
+      features: ['Optical Defect Scanner Station', 'Valid Status Fleet Transitions', 'Stock Replenishment Controls'],
     },
   ];
 
@@ -93,19 +93,19 @@ export const PlatformPillarsSection: React.FC = () => {
     <section className="relative py-20 px-4 sm:px-8 lg:px-12 max-w-[1440px] mx-auto z-20">
       {/* Section Header */}
       <div className="text-center max-w-3xl mx-auto space-y-4 mb-14">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-950/40 border border-cyan-500/30 text-cyan-300 text-xs font-mono font-bold uppercase tracking-wider">
-          <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-          <span>Core Platform Architecture</span>
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-950/40 border border-amber-500/30 text-amber-300 text-xs font-mono font-bold uppercase tracking-wider">
+          <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+          <span>Smart Chocolate Factory Digital Twin</span>
         </div>
         <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight">
           Everything You Need to Run{' '}
-          <span className="bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">
-            Autonomous Logistics
+          <span className="bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-500 bg-clip-text text-transparent">
+            ChocoFlow AI 🍫
           </span>
         </h2>
-        <p className="text-gray-400 text-sm sm:text-base leading-relaxed">
-          From global geospatial monitoring to microscopic 3D berth twins, FlowTwin AI unites
-          real-time sensor telemetry with multi-agent intelligence to safeguard your supply chain.
+        <p className="text-amber-100/70 text-sm sm:text-base leading-relaxed">
+          From 3D confectionery machinery and ingredient stoichiometry to refrigerated truck routing,
+          ChocoFlow AI empowers students, factory workers, and managers to simulate every chocolate decision.
         </p>
       </div>
 

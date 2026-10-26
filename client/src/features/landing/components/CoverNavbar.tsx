@@ -49,64 +49,85 @@ export const CoverNavbar: React.FC<CoverNavbarProps> = ({ onOpenSearch, onOpenTo
         >
           {/* Glowing Hexagon Icon */}
           <div className="relative w-10 h-10 flex items-center justify-center">
-            {/* Ambient neon bloom */}
-            <span className="absolute inset-0 rounded-xl bg-gradient-to-tr from-cyan-500 via-indigo-500 to-purple-600 opacity-75 blur-md group-hover:opacity-100 transition-opacity" />
-            <div className="relative w-full h-full rounded-xl bg-[#090D1E] border border-cyan-500/40 p-0.5 shadow-xl flex items-center justify-center">
-              <div className="w-full h-full rounded-[10px] bg-gradient-to-br from-[#0F142D] to-[#0A0D1F] flex items-center justify-center">
-                <Layers className="w-5 h-5 text-cyan-400 group-hover:scale-110 group-hover:text-cyan-300 transition-all" />
-              </div>
+            <span className="absolute inset-0 rounded-xl bg-gradient-to-tr from-amber-500 via-amber-400 to-amber-600 opacity-75 blur-md group-hover:opacity-100 transition-opacity" />
+            <div className="relative w-full h-full rounded-xl bg-[#1A0E08] border border-amber-500/40 p-0.5 shadow-xl flex items-center justify-center text-lg">
+              🍫
             </div>
           </div>
 
           {/* Brand Typography */}
           <div className="flex flex-col">
             <div className="flex items-center gap-1.5 leading-none">
-              <span className="text-lg font-extrabold tracking-tight text-white group-hover:text-cyan-200 transition-colors">
-                FlowTwin
+              <span className="text-lg font-extrabold tracking-tight text-white group-hover:text-amber-200 transition-colors">
+                ChocoFlow
               </span>
-              <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-sm shadow-purple-600/40 border border-purple-400/30">
+              <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">
                 AI
               </span>
             </div>
-            <span className="text-[8px] font-mono font-bold tracking-[0.2em] text-cyan-400/80 uppercase pt-0.5">
-              Digital Supply Twin
+            <span className="text-[8px] font-mono font-bold tracking-[0.2em] text-amber-300/80 uppercase pt-0.5">
+              Smart Chocolate Twin
             </span>
           </div>
         </div>
 
         {/* Center: Navigation Links */}
-        <nav className="hidden lg:flex items-center gap-8 text-xs font-medium font-sans">
+        <nav className="hidden lg:flex items-center gap-6 text-xs font-medium font-sans">
           <button
             onClick={() => navigate('/app/dashboard')}
-            className="relative text-gray-300 hover:text-white transition-colors group py-1"
+            className="relative text-amber-100/80 hover:text-white transition-colors group py-1"
           >
-            <span>Products</span>
-            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-500 group-hover:w-full transition-all duration-200" />
-          </button>
-
-          <button
-            onClick={() => navigate('/app/simulations')}
-            className="relative text-gray-300 hover:text-white transition-colors group py-1"
-          >
-            <span>Solutions</span>
-            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-cyan-400 to-blue-500 group-hover:w-full transition-all duration-200" />
+            <span>Overview</span>
+            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-400 group-hover:w-full transition-all duration-200" />
           </button>
 
           <button
             onClick={() => navigate('/app/twin-3d')}
-            className="relative flex items-center gap-1 text-cyan-300 hover:text-cyan-200 transition-colors group py-1 font-semibold"
+            className="relative flex items-center gap-1 text-amber-300 hover:text-amber-200 transition-colors group py-1 font-semibold"
           >
-            <Box className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
-            <span>3D Digital Twin</span>
-            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-cyan-400 group-hover:w-full transition-all duration-200" />
+            <Box className="w-3.5 h-3.5 text-amber-400 animate-pulse" />
+            <span>3D Factory</span>
+            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-400 group-hover:w-full transition-all duration-200" />
           </button>
 
           <button
-            onClick={() => navigate('/app/analytics')}
-            className="relative text-gray-300 hover:text-white transition-colors group py-1"
+            onClick={() => navigate('/app/production')}
+            className="relative text-amber-100/80 hover:text-white transition-colors group py-1"
           >
-            <span>AI & Analytics</span>
-            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-400 to-cyan-400 group-hover:w-full transition-all duration-200" />
+            <span>Production Workflow</span>
+            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-400 group-hover:w-full transition-all duration-200" />
+          </button>
+
+          <button
+            onClick={() => navigate('/app/parameters')}
+            className="relative text-amber-100/80 hover:text-white transition-colors group py-1"
+          >
+            <span>Parameters</span>
+            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-400 group-hover:w-full transition-all duration-200" />
+          </button>
+
+          <button
+            onClick={() => navigate('/app/problems')}
+            className="relative text-amber-100/80 hover:text-white transition-colors group py-1"
+          >
+            <span>Problem Simulator</span>
+            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-400 group-hover:w-full transition-all duration-200" />
+          </button>
+
+          <button
+            onClick={() => navigate('/app/quality')}
+            className="relative text-amber-100/80 hover:text-white transition-colors group py-1"
+          >
+            <span>Quality Scanner</span>
+            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-400 group-hover:w-full transition-all duration-200" />
+          </button>
+
+          <button
+            onClick={() => navigate('/app/deliveries')}
+            className="relative text-amber-100/80 hover:text-white transition-colors group py-1"
+          >
+            <span>Deliveries</span>
+            <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-400 group-hover:w-full transition-all duration-200" />
           </button>
 
           <button
@@ -148,13 +169,13 @@ export const CoverNavbar: React.FC<CoverNavbarProps> = ({ onOpenSearch, onOpenTo
             Sign In
           </button>
 
-          {/* Enter Command Center CTA */}
+          {/* Enter Factory CTA */}
           <button
             type="button"
             onClick={() => navigate('/app/dashboard')}
-            className="group relative inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-cyan-500 via-blue-600 to-purple-600 hover:from-cyan-400 hover:via-blue-500 hover:to-purple-500 shadow-[0_0_25px_rgba(0,245,255,0.3)] hover:shadow-[0_0_35px_rgba(0,245,255,0.5)] transition-all transform hover:-translate-y-0.5 cursor-pointer"
+            className="group relative inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-[#1A0E08] bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-300 hover:to-yellow-400 shadow-[0_0_25px_rgba(245,158,11,0.35)] hover:shadow-[0_0_35px_rgba(245,158,11,0.55)] transition-all transform hover:-translate-y-0.5 cursor-pointer"
           >
-            <span>Enter Command Center</span>
+            <span>Enter Factory 🍫</span>
             <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
           </button>
         </div>

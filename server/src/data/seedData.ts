@@ -252,13 +252,13 @@ export async function seedDemoWorkspace(forceReset: boolean = true) {
   ];
 
   const cargoTypes = [
-    { desc: 'Industrial Automation Sensors & PLCs', temp: false, weight: 12400 },
-    { desc: 'Cold-Chain Pharmaceutical Vaccines', temp: true, weight: 6800 },
-    { desc: 'EV Lithium Battery Packs (UN 3480)', temp: false, weight: 18900 },
-    { desc: 'Aerospace Composite Panels', temp: false, weight: 8200 },
-    { desc: 'Specialty Semiconductor Wafers', temp: true, weight: 4500 },
-    { desc: 'Commercial HVAC Compressors', temp: false, weight: 16400 },
-    { desc: 'Retail Consumer Electronics', temp: false, weight: 14200 },
+    { desc: 'Dark Chocolate 70% Confectionery Bars (100g Retail Cases)', temp: true, weight: 12400 },
+    { desc: 'Refrigerated Milk Chocolate Pralines (Temperature Controlled 18°C)', temp: true, weight: 6800 },
+    { desc: 'Single-Origin Ecuadorian Cocoa Butter Drums', temp: false, weight: 18900 },
+    { desc: 'Organic Cane Sugar Bulk Pallets (Food Grade)', temp: false, weight: 14200 },
+    { desc: 'Artisan Hazelnut Truffle Holiday Gift Boxes', temp: true, weight: 4500 },
+    { desc: 'Bulk Sweet Condensed Milk Food-Grade Tankers', temp: true, weight: 16400 },
+    { desc: 'Gold Foil Flow-Wrapped Chocolate Snack Bars', temp: false, weight: 11200 },
   ];
 
   const carriers = [

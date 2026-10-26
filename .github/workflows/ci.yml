@@ -1,4 +1,4 @@
-name: ChocoFlow AI CI & Build Verification
+name: FlowTwin AI CI & Build Verification
 
 on:
   push:

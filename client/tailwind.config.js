@@ -9,26 +9,6 @@ export default {
   theme: {
     extend: {
       colors: {
-        choco: {
-          bg: '#0E0805',
-          dark: '#160D08',
-          panel: '#1E120B',
-          card: '#29180E',
-          cardHover: '#382114',
-          border: 'rgba(245, 158, 11, 0.18)',
-          borderSubtle: 'rgba(217, 119, 6, 0.12)',
-          gold: '#F59E0B',
-          goldLight: '#FDE68A',
-          caramel: '#D97706',
-          caramelDark: '#B45309',
-          cocoa: '#78350F',
-          cocoaLight: '#92400E',
-          cream: '#FFFBEB',
-          creamMuted: '#FEF3C7',
-          success: '#10B981',
-          warning: '#F59E0B',
-          danger: '#EF4444',
-        },
         twin: {
           bg: '#090A10',
           panel: '#10121C',

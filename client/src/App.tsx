@@ -5,46 +5,25 @@ import { AuthProvider } from './lib/authContext.js';
 import { AppShell } from './components/layout/AppShell.js';
 import { LandingPage } from './features/landing/LandingPage.js';
 import { LoginPage } from './features/auth/LoginPage.js';
+import { ControlTowerPage } from './features/dashboard/ControlTowerPage.js';
+import { ShipmentsPage } from './features/shipments/ShipmentsPage.js';
+import { DocumentIntelligencePage } from './features/documents/DocumentIntelligencePage.js';
 
-// ChocoFlow AI Core Modules
-import { ChocolateOverviewPage } from './features/factory/ChocolateOverviewPage.js';
-import { ProductionWorkflowPage } from './features/factory/ProductionWorkflowPage.js';
-import { RawMaterialsPage } from './features/factory/RawMaterialsPage.js';
-import { QualityScannerPage } from './features/factory/QualityScannerPage.js';
-import { WarehouseStoragePage } from './features/factory/WarehouseStoragePage.js';
-import { FactoryDeliveriesPage } from './features/factory/FactoryDeliveriesPage.js';
-import { ProblemSimulatorPage } from './features/factory/ProblemSimulatorPage.js';
-import { ComparePlansPage } from './features/factory/ComparePlansPage.js';
-import { AskChocoFlowPage } from './features/factory/AskChocoFlowPage.js';
-import { FactoryParametersPage } from './features/factory/FactoryParametersPage.js';
-
-// Code-split 3D Factory Canvas
-const ChocolateFactoryCanvas = lazy(() => import('./features/factory/3d/ChocolateFactoryCanvas.js'));
-
-// Preserved Logistics Subsystems
-const LogisticsMapPage = lazy(() =>
-  import('./features/map/LogisticsMapPage.js').then(m => ({ default: m.LogisticsMapPage }))
-);
-const ShipmentsPage = lazy(() =>
-  import('./features/shipments/ShipmentsPage.js').then(m => ({ default: m.ShipmentsPage }))
-);
-const AlertsPage = lazy(() =>
-  import('./features/alerts/AlertsPage.js').then(m => ({ default: m.AlertsPage }))
-);
-const AnalyticsStudioPage = lazy(() =>
-  import('./features/analytics/AnalyticsStudioPage.js').then(m => ({ default: m.AnalyticsStudioPage }))
-);
-const AdminAuditPage = lazy(() =>
-  import('./features/admin/AdminAuditPage.js').then(m => ({ default: m.AdminAuditPage }))
-);
+// Heavy modules code-split on demand for lightning-fast initial load
+const LogisticsDigitalTwin3D = lazy(() => import('./features/digitaltwin3d/LogisticsDigitalTwin3D.js'));
+const LogisticsMapPage = lazy(() => import('./features/map/LogisticsMapPage.js').then(m => ({ default: m.LogisticsMapPage })));
+const DigitalTwinPage = lazy(() => import('./features/network/DigitalTwinPage.js').then(m => ({ default: m.DigitalTwinPage })));
+const DisruptionLabPage = lazy(() => import('./features/simulations/DisruptionLabPage.js').then(m => ({ default: m.DisruptionLabPage })));
+const RecoveryPlannerPage = lazy(() => import('./features/recovery/RecoveryPlannerPage.js').then(m => ({ default: m.RecoveryPlannerPage })));
+const AlertsPage = lazy(() => import('./features/alerts/AlertsPage.js').then(m => ({ default: m.AlertsPage })));
+const AnalyticsStudioPage = lazy(() => import('./features/analytics/AnalyticsStudioPage.js').then(m => ({ default: m.AnalyticsStudioPage })));
+const AdminAuditPage = lazy(() => import('./features/admin/AdminAuditPage.js').then(m => ({ default: m.AdminAuditPage })));
 
 const ViewLoadingFallback = () => (
   <div className="flex items-center justify-center h-[70vh]">
     <div className="flex flex-col items-center gap-3">
-      <div className="w-10 h-10 border-2 border-amber-500 border-t-amber-300 rounded-full animate-spin" />
-      <span className="text-xs text-amber-200/80 font-mono tracking-wider">
-        LOADING CHOCOFLOW FACTORY TELEMETRY...
-      </span>
+      <div className="w-8 h-8 border-2 border-purple-500 border-t-cyan-400 rounded-full animate-spin" />
+      <span className="text-xs text-gray-400 font-mono tracking-wider">LOADING TELEMETRY VIEW...</span>
     </div>
   </div>
 );
@@ -61,31 +40,22 @@ export const App: React.FC = () => {
             <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
 
-            {/* Authenticated ChocoFlow Application Shell */}
+            {/* Authenticated Application Shell */}
             <Route path="/app" element={<AppShell />}>
               <Route index element={<Navigate to="/app/dashboard" replace />} />
-              
-              {/* Main Factory Navigation */}
-              <Route path="dashboard" element={<ChocolateOverviewPage />} />
+              <Route path="dashboard" element={<ControlTowerPage />} />
+              <Route path="shipments" element={<ShipmentsPage />} />
+              <Route path="documents" element={<DocumentIntelligencePage />} />
+
+              {/* Code-split routes wrapped in Suspense */}
               <Route
                 path="twin-3d"
                 element={
                   <Suspense fallback={<ViewLoadingFallback />}>
-                    <ChocolateFactoryCanvas />
+                    <LogisticsDigitalTwin3D />
                   </Suspense>
                 }
               />
-              <Route path="production" element={<ProductionWorkflowPage />} />
-              <Route path="materials" element={<RawMaterialsPage />} />
-              <Route path="quality" element={<QualityScannerPage />} />
-              <Route path="warehouse" element={<WarehouseStoragePage />} />
-              <Route path="deliveries" element={<FactoryDeliveriesPage />} />
-              <Route path="problems" element={<ProblemSimulatorPage />} />
-              <Route path="plans" element={<ComparePlansPage />} />
-              <Route path="ask" element={<AskChocoFlowPage />} />
-              <Route path="parameters" element={<FactoryParametersPage />} />
-
-              {/* Preserved Logistics Views */}
               <Route
                 path="map"
                 element={
@@ -95,10 +65,26 @@ export const App: React.FC = () => {
                 }
               />
               <Route
-                path="shipments"
+                path="network"
                 element={
                   <Suspense fallback={<ViewLoadingFallback />}>
-                    <ShipmentsPage />
+                    <DigitalTwinPage />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="simulations"
+                element={
+                  <Suspense fallback={<ViewLoadingFallback />}>
+                    <DisruptionLabPage />
+                  </Suspense>
+                }
+              />
+              <Route
+                path="recovery"
+                element={
+                  <Suspense fallback={<ViewLoadingFallback />}>
+                    <RecoveryPlannerPage />
                   </Suspense>
                 }
               />
@@ -126,10 +112,6 @@ export const App: React.FC = () => {
                   </Suspense>
                 }
               />
-
-              {/* Backward-compatibility aliases */}
-              <Route path="simulations" element={<Navigate to="/app/problems" replace />} />
-              <Route path="recovery" element={<Navigate to="/app/plans" replace />} />
             </Route>
 
             {/* Fallback */}
@@ -140,5 +122,3 @@ export const App: React.FC = () => {
     </QueryClientProvider>
   );
 };
-
-export default App;

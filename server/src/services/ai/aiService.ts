@@ -120,42 +120,11 @@ export class AiService {
       providerStatus = 'unconfigured';
     }
 
-    // 2. Deterministic Intelligence Engine (Always reliable, grounded in DB records & chocolate factory rules)
+    // 2. Deterministic Logistics Intelligence Engine (Always reliable, grounded in DB records)
     if (!content) {
-      // 2A-0. Chocolate Factory Specific Questions
-      if (lowerQuery.includes('production low') || (lowerQuery.includes('why') && lowerQuery.includes('production'))) {
-        agentName = 'ReportingAgent';
-        content = `### Chocolate Production Diagnostic\n\n**Root Cause Analysis for Low Production**:\n• **Raw Material Bottleneck**: Cocoa bean stock is at a critical threshold (1,200 kg remaining), constraining recipe batch allocation.\n• **Tempering Unit Calibration**: Machine TEM-301 is running at 72% reduced throughput during crystallisation tuning.\n• **Conveyor Flow**: 2,400 bars/hr actual output vs 3,000 bars/hr baseline target.\n\n**Actionable Recommendations**:\n1. Replenish bulk cocoa beans immediately to satisfy today's 14,000 bar order queue.\n2. Complete tempering unit recalibration or switch to secondary mould line.\n3. Increase line speed once chocolate viscosity stabilizes.`;
-        metricsHighlight = { label: 'Production Deficit', value: '-20% vs Target', trend: 'down' };
-      }
-      else if (lowerQuery.includes('enough cocoa') || (lowerQuery.includes('cocoa') && lowerQuery.includes('stock'))) {
-        agentName = 'ReportingAgent';
-        content = `### Cocoa Ingredient Inventory Audit\n\n• **Current Cocoa Stock**: **1,200 kg** available on site.\n• **Daily Order Requirement**: Producing **14,000 bars** (100g each @ 50% cocoa) requires **700 kg** of cocoa.\n• **Stock Sufficiency**: **YES**, current on-hand cocoa is sufficient for today's orders (700 kg needed, 500 kg buffer remaining).\n• **Warning**: Tomorrow's forecast of 16,500 bars will deplete reserves unless an inbound shipment arrives by 08:00.\n\n*Action*: Submit a cocoa replenishment purchase order to avoid production starvation tomorrow.`;
-        metricsHighlight = { label: 'Cocoa Coverage', value: '1.7 Days Buffer', trend: 'stable' };
-      }
-      else if (lowerQuery.includes('which machine') || (lowerQuery.includes('machine') && (lowerQuery.includes('attention') || lowerQuery.includes('service') || lowerQuery.includes('breakdown')))) {
-        agentName = 'ReportingAgent';
-        content = `### Machine Telemetry & Maintenance Alert\n\n• **Primary Flagged Unit**: **Tempering Machine (TEM-301)**\n• **Issue**: Temperature drift detected (+1.8°C above 31.5°C Beta-V target), causing uneven crystal formation.\n• **Secondary Unit**: Conche Tank (CNC-202) running at 76% motor load due to high-viscosity dark mass.\n• **Healthy Units**: Cocoa Roaster (ROAST-101) and Flow Wrapper (WRAP-501) operating at 98% nominal efficiency.\n\n*Recommendation*: Dispatch maintenance technician to inspect cooling water flow in Tempering Zone B before filling moulds.`;
-        metricsHighlight = { label: 'Flagged Unit', value: 'TEM-301 (Tempering)', trend: 'up' };
-      }
-      else if (lowerQuery.includes('reduce chocolate waste') || lowerQuery.includes('waste') || lowerQuery.includes('rejection')) {
-        agentName = 'ReportingAgent';
-        content = `### Waste Reduction & Yield Optimization Plan\n\n• **Current Rejection Rate**: **2.4%** (~336 bars per 14,000 bar production run).\n• **Top Defect Types**:\n  1. Surface fat bloom from tempering temperature spikes (54% of rejects)\n  2. Incomplete mould cavity filling and air pocket bubbles (31% of rejects)\n  3. Foil misalignments on flow wrapper (15% of rejects)\n\n**Actionable Waste Reduction Steps**:\n• Lock tempering vessel cooling PID loop between 31.0°C and 32.0°C.\n• Increase mould vibration table amplitude from 35 Hz to 48 Hz to de-aerate viscous mass.\n• Route un-packaged defect chocolate back into the rework melter for 100% material recovery.`;
-        metricsHighlight = { label: 'Rejection Rate', value: '2.4% (Goal: <1.5%)', trend: 'down' };
-      }
-      else if (lowerQuery.includes('20%') || lowerQuery.includes('surge') || lowerQuery.includes('orders increase')) {
-        agentName = 'ReportingAgent';
-        content = `### 20% Order Surge Impact Simulation\n\n• **New Order Demand**: **16,800 bars/day** (+2,800 bars over 14,000 baseline).\n• **Ingredient Impact**:\n  - Cocoa: Requires **840 kg** (+140 kg)\n  - Sugar: Requires **504 kg** (+84 kg)\n  - Milk: Requires **336 L** (+56 L)\n• **Machine Capacity**: At 3,000 bars/hr capacity and 85% efficiency (2,550 bars/hr actual), the factory requires **6.6 hours** of continuous running to fulfill demand.\n• **Delivery Fleet**: Requires **5 refrigerated delivery trucks** (currently 4 available; 1 additional truck needed or second round-trip required).\n\n*Verdict*: Factory can fulfill surge orders if cocoa buffer is confirmed and one extra truck delivery route is scheduled.`;
-        metricsHighlight = { label: 'Surge Capacity', value: 'Feasible (6.6 hrs run)', trend: 'up' };
-      }
-      else if (lowerQuery.includes('warm') || (lowerQuery.includes('storage') && lowerQuery.includes('room')) || lowerQuery.includes('temperature too high')) {
-        agentName = 'ReportingAgent';
-        content = `### Cold Storage Emergency Protocol (Warm Room Advisory)\n\n• **Alarm**: Chocolate warehouse temperature measured at **21.5°C** (Safe threshold: 15°C – 18°C).\n• **Product Risk**: Risk of cocoa butter softening, fat migration, and unsightly surface bloom on finished boxed chocolates.\n• **Immediate Actions Required**:\n  1. Switch secondary HVAC refrigeration compressor unit to emergency overdrive.\n  2. Close loading dock roller doors immediately to seal refrigerated envelope.\n  3. Relocate top-rack Dark 70% cartons away from ceiling warm pockets to floor level pallets.\n  4. Postpone loading into un-chilled truck trailers until container reaches 16°C.`;
-        metricsHighlight = { label: 'Storage Temp', value: '21.5°C (CRITICAL)', trend: 'up' };
-      }
       // 2A. Specific Shipment queries: check for SH-XXXX pattern
-      else if (lowerQuery.match(/\b(sh-\d+)\b/i)) {
-        const shipmentMatch = lowerQuery.match(/\b(sh-\d+)\b/i)!;
+      const shipmentMatch = lowerQuery.match(/\b(sh-\d+)\b/i);
+      if (shipmentMatch) {
         const queriedId = shipmentMatch[1].toUpperCase();
         const target = activeShipments.find(s => s.shipmentId.toUpperCase() === queriedId);
         agentName = 'ShipmentRiskAnalysis';
@@ -373,12 +342,12 @@ export class AiService {
     try {
       const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
-      const systemInstruction = `You are ChocoFlow AI Assistant, the intelligent chocolate factory & logistics digital twin assistant.
-Answer user inquiries using chocolate factory production metrics, machinery status, raw materials (cocoa, sugar, milk), cold storage temperatures, quality control, and factory deliveries.
-Use simple, clear English that college students, factory workers, and non-technical managers can immediately understand.
-Cite specific batch numbers, machine IDs (e.g., ROAST-101, CNC-202, TEM-301), storage conditions, or truck fleet statuses.
-Never invent impossible metrics. Maintain an encouraging, practical, and helpful tone.
-Format responses using markdown headers (###), bold values (**text**), and bullet points (•).`;
+      const systemInstruction = `You are FlowTwin AI Logistics Copilot, an autonomous supply chain digital twin intelligence assistant.
+Answer user inquiries using ONLY the provided real operational context.
+Always cite specific Shipment IDs (e.g., SH-1042), Facility Codes (e.g., FAC-CHI-01), delay hours, and verified metrics.
+Never invent imaginary shipments or guarantee perfect outcomes. Maintain an authoritative, concise, and professional tone.
+Format responses using markdown headers (###), bold values (**text**), and bullet points (•).
+If the user asks to perform an action like approving a recovery plan or re-routing a vehicle, clearly describe the action and note that manager confirmation is required.`;
 
       const body = {
         contents: [

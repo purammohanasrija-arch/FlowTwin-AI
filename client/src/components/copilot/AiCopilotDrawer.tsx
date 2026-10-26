@@ -138,35 +138,6 @@ function generateLocalLogisticsResponse(query: string, userRole: string = 'Logis
 } {
   const q = (query || '').trim().toLowerCase();
 
-  // Chocolate Factory Inquiries
-  if (q.includes('production low') || q.includes('why is production low')) {
-    return {
-      reply: `### ChocoFlow AI — Production Analysis 🍫\n\n• **Current Throughput**: Operating at approximately **4,120 to 5,400 chocolate bars/day**.\n• **Tempering crystallization**: Beta-V stable crystals maintained at **31.5°C**.\n• **Active Constraints**: If machine efficiency drops or raw cocoa reserves fall below 1,500 kg, output is automatically throttled by the digital twin to maintain confectionery texture standards.\n\n*Action*: Inspect the **3D Chocolate Factory** or adjust machine capacity sliders in **Factory Parameters**.`,
-      agentName: 'ReportingAgent',
-    };
-  }
-
-  if (q.includes('cocoa') || q.includes('enough cocoa')) {
-    return {
-      reply: `### Raw Cocoa Inventory Telemetry 🍫\n\n• **Cocoa Beans Reserve**: **3,500 kg** on hand in dry nitrogen-blanketed silos.\n• **Recipe Ratio**: 50g organic cocoa beans per 100g chocolate bar (50% cocoa solids).\n• **Daily Order Requirement**: Standard 5,000 bars consume **250 kg/day**.\n• **Stock Runway**: Over **14 days of supply** under standard operating parameters.\n\n*Recommendation*: Cocoa stocks are healthy. No emergency replenishment required today.`,
-      agentName: 'ReportingAgent',
-    };
-  }
-
-  if (q.includes('warm storage') || q.includes('storage room') || q.includes('temperature too high')) {
-    return {
-      reply: `### Cold Storage Climate Advisory ❄️\n\n• **Warehouse Status**: Cold storage is designed to operate strictly between **16.0°C and 19.0°C**.\n• **Fat Bloom Risk**: If temperature exceeds **22°C**, cocoa butter crystals melt, leading to whitish surface discoloration and loss of brittle snap.\n\n*Action*: Verify auxiliary HVAC chillers in the **Warehouse** tab and ensure loading bay inflatable seals are engaged.`,
-      agentName: 'DisruptionAnalysis',
-    };
-  }
-
-  if (q.includes('waste') || q.includes('reduce chocolate waste')) {
-    return {
-      reply: `### Confectionery Yield & Waste Minimization 🍫\n\n• **Current Rejection Rate**: **1.8%** of total bars demoulded.\n• **Sanitary Recovery Loop**: All clean bars flagged for minor foil folds or surface haze are routed directly to the **sanitary remelt kettle** and blended into subsequent batches.\n\n*Recommendation*: Calibrate flow wrapper foil tension to **14.2 N** and keep tempering Zone 3 at **31.5°C** to push rejections below 1.5%.`,
-      agentName: 'ReportingAgent',
-    };
-  }
-
   // 1. Specific shipment inquiries (e.g. SH-1042 or non-existent SH-9999)
   const shipmentMatch = q.match(/\b(sh-\d+)\b/i);
   if (shipmentMatch) {
@@ -346,12 +317,11 @@ export const AiCopilotDrawer: React.FC<AiCopilotDrawerProps> = ({ isOpen, onClos
   }, [messages]);
 
   const quickPrompts = [
-    'Why is production low today?',
-    'Do we have enough cocoa for today’s orders?',
-    'Which machine needs attention?',
-    'Why are deliveries delayed?',
-    'What should I do about a warm storage room?',
     'Which shipments are currently delayed?',
+    'Why is shipment SH-1042 at risk?',
+    'What is the impact of a 10-hour road closure on I-80?',
+    'Which warehouse has the highest utilization?',
+    'Which vehicles are available for reassignment?',
   ];
 
   // Fetch real agent telemetry
@@ -534,15 +504,15 @@ export const AiCopilotDrawer: React.FC<AiCopilotDrawerProps> = ({ isOpen, onClos
       {/* Drawer Header */}
       <div className="p-4 border-b border-[#24283E] flex items-center justify-between bg-[#121422]">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/30 flex items-center justify-center text-sm">
-            🍫
+          <div className="w-8 h-8 rounded-lg bg-purple-600/20 border border-purple-500/30 flex items-center justify-center">
+            <Sparkles className="w-4 h-4 text-purple-400" />
           </div>
           <div>
             <h2 className="text-sm font-semibold text-white flex items-center gap-2">
-              ChocoFlow Assistant
+              FlowTwin Copilot
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" title="Telemetry Live" />
             </h2>
-            <p className="text-[10px] text-amber-200/70 font-mono">SMART CHOCOLATE FACTORY INTELLIGENCE</p>
+            <p className="text-[10px] text-gray-400 font-mono">MULTI-AGENT SUPPLY CHAIN INTELLIGENCE</p>
           </div>
         </div>
         <div className="flex items-center gap-1">

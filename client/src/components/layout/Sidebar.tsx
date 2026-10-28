@@ -48,17 +48,17 @@ export const Sidebar: React.FC = () => {
       {/* Brand Header */}
       <div className="h-16 px-5 flex items-center justify-between border-b border-[#1E2238]">
         <NavLink to="/" className="flex items-center gap-2.5 group">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 via-indigo-600 to-emerald-400 p-0.5 shadow-lg shadow-purple-500/20 group-hover:shadow-purple-500/40 transition-all">
-            <div className="w-full h-full bg-[#0E101B] rounded-[10px] flex items-center justify-center">
-              <Layers className="w-5 h-5 text-purple-400" />
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 via-amber-400 to-purple-600 p-0.5 shadow-lg shadow-amber-500/20 group-hover:shadow-amber-500/40 transition-all">
+            <div className="w-full h-full bg-[#160D08] rounded-[10px] flex items-center justify-center text-base">
+              🍫
             </div>
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="font-bold text-base tracking-tight text-white">FlowTwin</span>
-              <span className="px-1.5 py-0.2 text-[10px] font-semibold bg-purple-500/20 text-purple-300 border border-purple-500/30 rounded">AI</span>
+              <span className="font-bold text-base tracking-tight text-white group-hover:text-amber-200 transition-colors">ChocoTwin</span>
+              <span className="px-1.5 py-0.2 text-[10px] font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/40 rounded">AI</span>
             </div>
-            <p className="text-[10px] text-gray-400 font-medium tracking-wide">DIGITAL SUPPLY TWIN</p>
+            <p className="text-[10px] text-amber-400/80 font-medium tracking-wide">SMART CHOCOLATE TWIN</p>
           </div>
         </NavLink>
       </div>

@@ -104,8 +104,8 @@ export const PlatformPillarsSection: React.FC = () => {
           </span>
         </h2>
         <p className="text-gray-400 text-sm sm:text-base leading-relaxed">
-          From global geospatial monitoring to microscopic 3D berth twins, FlowTwin AI unites
-          real-time sensor telemetry with multi-agent intelligence to safeguard your supply chain.
+          From global ingredient monitoring to 3D chocolate factory twins, ChocoTwin AI unites
+          real-time sensor telemetry with multi-agent intelligence to safeguard your production chain.
         </p>
       </div>
 

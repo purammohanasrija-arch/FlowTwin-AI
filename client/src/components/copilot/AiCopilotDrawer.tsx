@@ -509,10 +509,10 @@ export const AiCopilotDrawer: React.FC<AiCopilotDrawerProps> = ({ isOpen, onClos
           </div>
           <div>
             <h2 className="text-sm font-semibold text-white flex items-center gap-2">
-              FlowTwin Copilot
+              ChocoTwin Copilot
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" title="Telemetry Live" />
             </h2>
-            <p className="text-[10px] text-gray-400 font-mono">MULTI-AGENT SUPPLY CHAIN INTELLIGENCE</p>
+            <p className="text-[10px] text-amber-400/80 font-mono">MULTI-AGENT CHOCOLATE FACTORY TWIN</p>
           </div>
         </div>
         <div className="flex items-center gap-1">
@@ -800,7 +800,7 @@ export const AiCopilotDrawer: React.FC<AiCopilotDrawerProps> = ({ isOpen, onClos
             <textarea
               ref={textareaRef}
               rows={1}
-              placeholder="Ask FlowTwin Copilot... (Enter to send, Shift+Enter for newline)"
+              placeholder="Ask ChocoTwin Copilot... (Enter to send, Shift+Enter for newline)"
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => {

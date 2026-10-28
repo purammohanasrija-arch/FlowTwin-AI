@@ -74,8 +74,8 @@ export const ResilienceWorkflowSection: React.FC = () => {
           Operates
         </h2>
         <p className="text-gray-400 text-sm sm:text-base leading-relaxed">
-          From the initial sensor ping to automated freight rerouting, observe how FlowTwin AI protects
-          your supply chain from end to end.
+          From the initial sensor ping to automated batch optimization, observe how ChocoTwin AI protects
+          your chocolate manufacturing from end to end.
         </p>
       </div>
 

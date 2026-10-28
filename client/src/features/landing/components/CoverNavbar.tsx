@@ -42,18 +42,18 @@ export const CoverNavbar: React.FC<CoverNavbarProps> = ({ onOpenSearch, onOpenTo
       }`}
     >
       <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-8 lg:px-12 flex items-center justify-between">
-        {/* Left Side: Geometric Layered Hexagon Logo */}
+        {/* Left Side: Geometric Layered Logo */}
         <div
           onClick={() => navigate('/')}
           className="flex items-center gap-3 cursor-pointer group select-none"
         >
-          {/* Glowing Hexagon Icon */}
+          {/* Glowing Chocolate Icon */}
           <div className="relative w-10 h-10 flex items-center justify-center">
             {/* Ambient neon bloom */}
-            <span className="absolute inset-0 rounded-xl bg-gradient-to-tr from-cyan-500 via-indigo-500 to-purple-600 opacity-75 blur-md group-hover:opacity-100 transition-opacity" />
-            <div className="relative w-full h-full rounded-xl bg-[#090D1E] border border-cyan-500/40 p-0.5 shadow-xl flex items-center justify-center">
-              <div className="w-full h-full rounded-[10px] bg-gradient-to-br from-[#0F142D] to-[#0A0D1F] flex items-center justify-center">
-                <Layers className="w-5 h-5 text-cyan-400 group-hover:scale-110 group-hover:text-cyan-300 transition-all" />
+            <span className="absolute inset-0 rounded-xl bg-gradient-to-tr from-amber-500 via-amber-400 to-purple-600 opacity-75 blur-md group-hover:opacity-100 transition-opacity" />
+            <div className="relative w-full h-full rounded-xl bg-[#1A0E08] border border-amber-500/40 p-0.5 shadow-xl flex items-center justify-center">
+              <div className="w-full h-full rounded-[10px] bg-gradient-to-br from-[#2D160A] to-[#140B07] flex items-center justify-center text-lg">
+                🍫
               </div>
             </div>
           </div>
@@ -61,15 +61,15 @@ export const CoverNavbar: React.FC<CoverNavbarProps> = ({ onOpenSearch, onOpenTo
           {/* Brand Typography */}
           <div className="flex flex-col">
             <div className="flex items-center gap-1.5 leading-none">
-              <span className="text-lg font-extrabold tracking-tight text-white group-hover:text-cyan-200 transition-colors">
-                FlowTwin
+              <span className="text-lg font-extrabold tracking-tight text-white group-hover:text-amber-200 transition-colors">
+                ChocoTwin
               </span>
-              <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-sm shadow-purple-600/40 border border-purple-400/30">
+              <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-bold bg-gradient-to-r from-amber-600 via-amber-500 to-purple-600 text-white shadow-sm shadow-amber-600/40 border border-amber-400/30">
                 AI
               </span>
             </div>
-            <span className="text-[8px] font-mono font-bold tracking-[0.2em] text-cyan-400/80 uppercase pt-0.5">
-              Digital Supply Twin
+            <span className="text-[8px] font-mono font-bold tracking-[0.2em] text-amber-400/90 uppercase pt-0.5">
+              Smart Chocolate Twin
             </span>
           </div>
         </div>

@@ -125,7 +125,7 @@ export const SpotlightSearchModal: React.FC<SpotlightSearchModalProps> = ({
         {/* Footer shortcuts */}
         <div className="px-4 py-2 border-t border-[#1E2648] bg-[#070A1A] flex items-center justify-between text-[10px] font-mono text-gray-500">
           <span>Press ESC to close</span>
-          <span>Click any entity to inspect in FlowTwin AI</span>
+          <span>Click any entity to inspect in ChocoTwin AI</span>
         </div>
       </div>
     </div>

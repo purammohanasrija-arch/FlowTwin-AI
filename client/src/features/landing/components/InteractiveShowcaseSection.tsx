@@ -38,7 +38,7 @@ export const InteractiveShowcaseSection: React.FC = () => {
           <span>Interactive System Showcase</span>
         </div>
         <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight">
-          Experience FlowTwin AI in{' '}
+          Experience ChocoTwin AI in{' '}
           <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
             Real Operations
           </span>

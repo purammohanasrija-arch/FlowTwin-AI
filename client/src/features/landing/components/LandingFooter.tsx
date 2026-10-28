@@ -19,16 +19,16 @@ export const LandingFooter: React.FC = () => {
                 <Layers className="w-4 h-4 text-cyan-400" />
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="text-base font-extrabold text-white">FlowTwin</span>
-                <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-purple-600 text-white">
+                <span className="text-base font-extrabold text-white">ChocoTwin</span>
+                <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-amber-600 text-white">
                   AI
                 </span>
               </div>
             </div>
 
             <p className="text-xs text-gray-400 leading-relaxed max-w-sm">
-              The autonomous digital supply chain twin. Powered by multi-agent predictive intelligence,
-              geospatial telemetry, and real-time 3D physics modeling.
+              The smart chocolate factory digital twin. Powered by multi-agent predictive intelligence,
+              3D SCADA process telemetry, and automated batch optimization.
             </p>
 
             {/* System Status Indicator */}
@@ -148,7 +148,7 @@ export const LandingFooter: React.FC = () => {
         {/* Bottom copyright row */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-gray-500 font-mono text-[11px]">
           <div>
-            © {new Date().getFullYear()} FlowTwin AI Technologies, Inc. All rights reserved.
+            © {new Date().getFullYear()} ChocoTwin AI Technologies, Inc. All rights reserved.
           </div>
           <div className="flex items-center gap-6">
             <span className="hover:text-gray-300 cursor-pointer">Privacy Policy</span>

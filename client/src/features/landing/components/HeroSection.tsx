@@ -17,14 +17,14 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenTour }) => {
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: 'easeOut' }}
-        className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#080D24]/85 border border-cyan-500/40 backdrop-blur-xl shadow-[0_0_20px_rgba(0,245,255,0.15)]"
+        className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#080D24]/85 border border-amber-500/40 backdrop-blur-xl shadow-[0_0_20px_rgba(245,158,11,0.15)]"
       >
         <span className="relative flex h-2 w-2">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
           <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
         </span>
-        <span className="text-[10px] sm:text-xs font-mono font-bold tracking-widest text-cyan-300 uppercase">
-          REAL-TIME INSIGHTS. SMARTER DECISIONS. STRONGER SUPPLY CHAINS.
+        <span className="text-[10px] sm:text-xs font-mono font-bold tracking-widest text-amber-300 uppercase">
+          REAL-TIME INSIGHTS. SMARTER DECISIONS. STRONGER CHOCOLATE TWIN.
         </span>
       </motion.div>
 
@@ -40,24 +40,24 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenTour }) => {
           THE FUTURE OF
         </motion.div>
 
-        {/* Line 2: White-to-Cyan Gradient */}
+        {/* Line 2: White-to-Amber Gradient */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.7, delay: 0.2 }}
-          className="bg-gradient-to-r from-white via-cyan-200 to-cyan-400 bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(0,245,255,0.35)]"
+          className="bg-gradient-to-r from-white via-amber-200 to-amber-400 bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(245,158,11,0.35)]"
         >
-          LOGISTICS IS
+          SMART CHOCOLATE IS
         </motion.div>
 
-        {/* Line 3: Cyan-to-Violet-to-Magenta Gradient */}
+        {/* Line 3: Amber-to-Violet-to-Magenta Gradient */}
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.7, delay: 0.3 }}
-          className="bg-gradient-to-r from-cyan-400 via-indigo-400 via-purple-400 to-fuchsia-500 bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(217,70,239,0.35)]"
+          className="bg-gradient-to-r from-amber-400 via-yellow-400 via-purple-400 to-fuchsia-500 bg-clip-text text-transparent drop-shadow-[0_0_35px_rgba(217,70,239,0.35)]"
         >
-          ALREADY MOVING.
+          ALREADY FLOWING.
         </motion.div>
       </div>
 
@@ -68,8 +68,8 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onOpenTour }) => {
         transition={{ duration: 0.7, delay: 0.4 }}
         className="text-sm sm:text-base text-gray-300/90 leading-relaxed max-w-[480px] font-sans drop-shadow-md"
       >
-        Explore an intelligent digital twin that predicts disruptions, simulates alternate futures,
-        and orchestrates smarter supply chains.
+        Explore ChocoTwin AI — an intelligent 3D digital twin that monitors roasting, conching, tempering,
+        and packaging, predicts batch disruptions, and orchestrates optimal chocolate manufacturing.
       </motion.p>
 
       {/* 4. Hero Action Buttons */}

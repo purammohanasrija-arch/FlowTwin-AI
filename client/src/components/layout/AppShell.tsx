@@ -31,7 +31,7 @@ export const AppShell: React.FC = () => {
           className="fixed bottom-6 right-6 px-4 py-2.5 rounded-full bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-600 text-white font-semibold text-xs shadow-xl shadow-purple-600/30 hover:shadow-purple-600/50 hover:scale-105 transition-all z-30 flex items-center gap-2 border border-purple-400/30"
         >
           <Sparkles className="w-4 h-4 text-purple-200 animate-pulse" />
-          <span>Ask FlowTwin Copilot</span>
+          <span>Ask ChocoTwin Copilot</span>
         </button>
       )}
 

@@ -18,12 +18,12 @@ export const LandingCtaBanner: React.FC = () => {
         </div>
 
         <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight max-w-3xl mx-auto leading-tight">
-          Ready to Orchestrate Autonomous Supply Chains?
+          Ready to Orchestrate Smart Chocolate Manufacturing?
         </h2>
 
         <p className="text-gray-300 text-sm sm:text-base max-w-2xl mx-auto leading-relaxed">
-          Launch FlowTwin AI today. Inspect live global shipments, explore the interactive 3D spatial twin,
-          or test catastrophic disruption scenarios with zero configuration required.
+          Launch ChocoTwin AI today. Inspect live batch telemetry, explore the interactive 3D spatial twin,
+          or test tempering and viscosity disruption scenarios with zero configuration required.
         </p>
 
         <div className="flex flex-wrap items-center justify-center gap-4 pt-4">

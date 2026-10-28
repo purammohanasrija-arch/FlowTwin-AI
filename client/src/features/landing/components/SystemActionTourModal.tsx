@@ -104,7 +104,7 @@ export const SystemActionTourModal: React.FC<SystemActionTourModalProps> = ({
             </span>
             <div>
               <h3 className="text-sm font-bold text-white">
-                FlowTwin AI — Guided System Tour
+                ChocoTwin AI — Guided System Tour
               </h3>
               <p className="text-[10px] font-mono text-cyan-300">
                 Interactive Architecture Overview

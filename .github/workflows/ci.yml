@@ -30,6 +30,9 @@ jobs:
       - name: Build Server
         run: npm run build --prefix server
 
+      - name: Run Unit Tests
+        run: npm test
+
       - name: Build Client (Vite Production Distribution)
         run: npm run build --prefix client
 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useDigitalTwinStore } from './DigitalTwinStore.js';
 import { QualityPreset, WeatherPreset, CameraMode, ViewLayer } from './types.js';
+import { CHOCOLATE_PROCESS_STAGES } from './initialData.js';
 import {
   Compass,
   Layers,
@@ -29,6 +30,10 @@ import {
   Filter,
   Share2,
   Zap,
+  BookOpen,
+  Thermometer,
+  Droplets,
+  X,
 } from 'lucide-react';
 import { WorldMinimap } from './WorldMinimap.js';
 import { WorldTimeline } from './WorldTimeline.js';
@@ -67,6 +72,7 @@ export const SpatialHUD: React.FC = () => {
   const followedVehicleId = useDigitalTwinStore(s => s.followedVehicleId);
   const followVehicle = useDigitalTwinStore(s => s.followVehicle);
   const selectedEntity = useDigitalTwinStore(s => s.selectedEntity);
+  const focusOnFacility = useDigitalTwinStore(s => s.focusOnFacility);
 
   // Local state for drawers & modals
   const [searchQuery, setSearchQuery] = useState('');
@@ -74,6 +80,7 @@ export const SpatialHUD: React.FC = () => {
   const [weatherOpen, setWeatherOpen] = useState(false);
   const [aiPrompt, setAiPrompt] = useState('');
   const [disruptionModalOpen, setDisruptionModalOpen] = useState(false);
+  const [guideModalOpen, setGuideModalOpen] = useState(false);
 
   // Search filter
   const handleSearch = (e: React.FormEvent) => {
@@ -82,10 +89,15 @@ export const SpatialHUD: React.FC = () => {
     const q = searchQuery.toLowerCase();
 
     const fac = facilities.find(
-      f => f.name.toLowerCase().includes(q) || f.facilityCode.toLowerCase().includes(q)
+      f =>
+        f.name.toLowerCase().includes(q) ||
+        f.facilityCode.toLowerCase().includes(q) ||
+        (f.chocolateFacilityName && f.chocolateFacilityName.toLowerCase().includes(q)) ||
+        (f.processStageName && f.processStageName.toLowerCase().includes(q)) ||
+        (f.processDescription && f.processDescription.toLowerCase().includes(q))
     );
     if (fac) {
-      selectEntity({ type: 'facility', id: fac.facilityCode, data: fac });
+      focusOnFacility(fac.facilityCode);
       setSearchQuery('');
       return;
     }
@@ -129,25 +141,25 @@ export const SpatialHUD: React.FC = () => {
       {/* 1. TOP SPATIAL NAVIGATION BAR */}
       <div className="flex items-center justify-between gap-4 pointer-events-auto relative z-30">
         {/* Left Branding & Mode Indicator */}
-        <div className="flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-[#090D1E]/90 border border-[#232B4E] backdrop-blur-xl shadow-2xl">
+        <div className="flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-[#090D1E]/90 border border-amber-500/40 backdrop-blur-xl shadow-2xl">
           <div className="relative">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-cyan-500 to-purple-600 flex items-center justify-center shadow-[0_0_15px_rgba(0,245,255,0.5)]">
-              <Compass className="w-5 h-5 text-white" />
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-500 via-orange-500 to-amber-700 flex items-center justify-center shadow-[0_0_15px_rgba(245,158,11,0.5)]">
+              <span className="text-base select-none">🍫</span>
             </div>
             <span className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-emerald-400 border-2 border-[#090D1E] animate-pulse" />
           </div>
 
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="font-mono font-extrabold text-sm tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-purple-300 to-white">
+              <h1 className="font-mono font-extrabold text-sm tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-amber-100 to-amber-500">
                 FLOWTWIN AI
               </h1>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-purple-950/80 text-purple-300 border border-purple-500/40 font-bold">
-                ULTRA 3D
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-950/90 text-amber-300 border border-amber-500/50 font-bold flex items-center gap-1 shadow-[0_0_10px_rgba(245,158,11,0.3)]">
+                CHOCOLATE FACTORY TWIN
               </span>
             </div>
-            <p className="text-[10px] font-mono text-gray-400">
-              Autonomous Logistics Universe & Digital Twin
+            <p className="text-[10px] font-mono text-amber-200/70">
+              Artisan Bean-to-Bar Process Control, Viscosity & Temperature 3D Twin
             </p>
           </div>
         </div>
@@ -155,14 +167,14 @@ export const SpatialHUD: React.FC = () => {
         {/* Center Search Bar */}
         <form
           onSubmit={handleSearch}
-          className="flex-1 max-w-md hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#0D1226]/85 border border-[#232B4E] backdrop-blur-lg focus-within:border-cyan-400 transition-colors shadow-lg"
+          className="flex-1 max-w-md hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#0D1226]/85 border border-[#232B4E] backdrop-blur-lg focus-within:border-amber-400 transition-colors shadow-lg"
         >
-          <Search className="w-4 h-4 text-gray-400" />
+          <Search className="w-4 h-4 text-amber-400" />
           <input
             type="text"
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            placeholder="Search facility, vehicle (TRK-101), or incident..."
+            placeholder="Search chocolate process (Conching, Tempering, Roasting, Cocoa Butter)..."
             className="w-full bg-transparent text-xs text-white placeholder-gray-500 focus:outline-none font-mono"
           />
         </form>
@@ -255,6 +267,73 @@ export const SpatialHUD: React.FC = () => {
             <Maximize2 className="w-4 h-4" />
           </button>
         </div>
+      </div>
+
+      {/* 1.2 CHOCOLATE PROCESS FLOW STAGES BREADCRUMB BAR */}
+      <div className="w-full mt-2 px-3 py-2 rounded-2xl bg-[#090D1E]/95 border border-amber-500/40 backdrop-blur-xl shadow-[0_4px_25px_rgba(245,158,11,0.15)] pointer-events-auto flex items-center justify-between gap-3 text-xs font-mono overflow-x-auto scrollbar-thin">
+        {/* Left Label */}
+        <div className="flex items-center gap-2 shrink-0 pr-2 border-r border-[#232B4E]">
+          <span className="text-base">🍫</span>
+          <div>
+            <div className="text-[10px] font-bold uppercase tracking-wider text-amber-400">
+              Bean-to-Bar Process Flow
+            </div>
+            <div className="text-[9px] text-gray-400">
+              10 Precision Manufacturing Stages
+            </div>
+          </div>
+        </div>
+
+        {/* 10 Interactive Stages */}
+        <div className="flex items-center gap-1.5 overflow-x-auto py-0.5 no-scrollbar">
+          {CHOCOLATE_PROCESS_STAGES.map((stage, idx) => {
+            const isSelected = selectedEntity?.type === 'facility' && selectedEntity.id === stage.facilityCode;
+            return (
+              <React.Fragment key={stage.code}>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    focusOnFacility(stage.facilityCode);
+                  }}
+                  className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-[11px] font-bold shrink-0 transition-all cursor-pointer ${
+                    isSelected
+                      ? 'bg-gradient-to-r from-amber-600 to-amber-700 border-amber-300 text-white shadow-[0_0_15px_rgba(245,158,11,0.6)] scale-105'
+                      : 'bg-[#0D1226]/80 border-[#232B4E] text-gray-300 hover:text-amber-300 hover:border-amber-500/60 hover:bg-amber-950/30'
+                  }`}
+                  title={`${stage.name} • ${stage.facilityCode} (${stage.operatingTempCelsius}°C)`}
+                >
+                  <span className="text-xs">{stage.icon}</span>
+                  <span className="text-[10px] text-amber-400/90 font-mono">
+                    {stage.stageNumber}.
+                  </span>
+                  <span className="truncate max-w-[130px] font-sans text-xs">
+                    {stage.name}
+                  </span>
+                  <span className="text-[9px] font-mono px-1 py-0.5 rounded bg-black/40 text-amber-200">
+                    {stage.operatingTempCelsius}°C
+                  </span>
+                </button>
+                {idx < CHOCOLATE_PROCESS_STAGES.length - 1 && (
+                  <span className="text-amber-500/40 text-[10px] select-none">→</span>
+                )}
+              </React.Fragment>
+            );
+          })}
+        </div>
+
+        {/* Process Guide Button */}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            setGuideModalOpen(true);
+          }}
+          className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-400/50 text-amber-300 hover:text-white hover:bg-amber-500/30 transition-all text-xs font-bold cursor-pointer shadow-sm"
+        >
+          <BookOpen className="w-3.5 h-3.5" />
+          <span>Process Guide</span>
+        </button>
       </div>
 
       {/* 1.5 3D LAYOUT & EXPLODED CONTROLLER BAR */}
@@ -580,15 +659,15 @@ export const SpatialHUD: React.FC = () => {
             onClick={(e) => {
               e.stopPropagation();
               triggerDisruption({
-                title: 'I-80 Blizzard Emergency Roadblock',
-                affectedCorridor: 'I-80',
+                title: 'Jacketed Line Section 4 Thermal Freeze',
+                affectedCorridor: 'ROUTE-I80-MW',
                 severity: 'critical',
               });
             }}
-            className="p-2.5 rounded-xl text-red-400 hover:bg-red-950/60 transition-all flex items-center justify-center cursor-pointer"
-            title="Disruption Sandbox: Trigger Incident"
+            className="p-2.5 rounded-xl text-amber-400 hover:bg-amber-950/60 transition-all flex items-center justify-center cursor-pointer"
+            title="Simulate Pipe Freeze (Jacket Heating Failure & Solidification)"
           >
-            <AlertTriangle className="w-5 h-5 animate-pulse" />
+            <AlertTriangle className="w-5 h-5 animate-pulse text-amber-400" />
           </button>
 
           {/* Scenario Comparison Ghost Overlay */}
@@ -629,14 +708,14 @@ export const SpatialHUD: React.FC = () => {
                 </span>
                 {(
                   [
-                    ['facilities', 'Warehouses & Ports'],
-                    ['routes', 'Corridors & Splines'],
-                    ['vehicles', 'Fleet Vehicles'],
-                    ['cargo', 'Cargo & Pallets'],
-                    ['particles', 'Flow Particles'],
-                    ['incidents', 'Disruptions & Hazmat'],
-                    ['labels', 'Spatial HUD Labels'],
-                    ['capacity_towers', '3D Capacity Towers'],
+                    ['facilities', 'Warehouses & Plants'],
+                    ['routes', 'Jacketed Pipe Corridors'],
+                    ['vehicles', 'Tankers & AGV Shuttles'],
+                    ['cargo', 'Chocolate Pallets & Bar Trays'],
+                    ['particles', 'Molten Flow Particles'],
+                    ['incidents', 'Thermal Freeze Faults'],
+                    ['labels', 'Stage & Process Labels'],
+                    ['capacity_towers', '3D Tank Load Towers'],
                     ['risk_heatmap', 'Ground Risk Heatmap'],
                     ['ai_nodes', 'AI Agent Neural Mesh'],
                   ] as [ViewLayer, string][]
@@ -671,9 +750,9 @@ export const SpatialHUD: React.FC = () => {
       {/* 3. BOTTOM SECTION: AI COPILOT BAR + TIMELINE + MINIMAP */}
       <div className="flex flex-col gap-2 pointer-events-auto relative z-30">
         {/* AI Command Copilot Dispatch Bar */}
-        <div className="w-full max-w-4xl mx-auto flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-[#090D1E]/90 border border-purple-500/40 backdrop-blur-xl shadow-[0_0_25px_rgba(168,85,247,0.25)]">
-          <div className="flex items-center gap-1.5 text-purple-400 font-mono text-xs font-bold shrink-0">
-            <Bot className="w-4 h-4 text-purple-400 animate-pulse" />
+        <div className="w-full max-w-4xl mx-auto flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-[#090D1E]/90 border border-amber-500/40 backdrop-blur-xl shadow-[0_0_25px_rgba(245,158,11,0.2)]">
+          <div className="flex items-center gap-1.5 text-amber-400 font-mono text-xs font-bold shrink-0">
+            <Bot className="w-4 h-4 text-amber-400 animate-pulse" />
             <span>AI COPILOT:</span>
           </div>
 
@@ -682,13 +761,13 @@ export const SpatialHUD: React.FC = () => {
               type="text"
               value={aiPrompt}
               onChange={e => setAiPrompt(e.target.value)}
-              placeholder="Ask Copilot: 'Find highest-risk shipments', 'Warehouse cutaway', 'Reroute around blizzard', 'Supply chain exploded graph'..."
+              placeholder="Ask Copilot: 'Check conching vat viscosity', 'Tempering crystal curve', 'Warehouse interior cutaway', 'Bypass frozen jacketed line'..."
               className="w-full bg-transparent text-xs text-white placeholder-gray-500 focus:outline-none font-mono"
             />
             <button
               type="submit"
               disabled={aiCopilot.isProcessing}
-              className="p-1.5 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold transition-colors disabled:opacity-50 cursor-pointer"
+              className="p-1.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold transition-colors disabled:opacity-50 cursor-pointer shadow-[0_0_10px_rgba(245,158,11,0.4)]"
             >
               <Send className="w-3.5 h-3.5" />
             </button>
@@ -700,11 +779,21 @@ export const SpatialHUD: React.FC = () => {
               type="button"
               onClick={(e) => {
                 e.stopPropagation();
-                executeAICommand('Find highest risk');
+                executeAICommand('Check conching vat viscosity and temperature');
               }}
-              className="px-2 py-0.5 rounded-lg bg-red-950/60 border border-red-500/40 text-red-300 hover:bg-red-900/60 cursor-pointer transition-all hover:scale-105 active:scale-95"
+              className="px-2 py-0.5 rounded-lg bg-amber-950/70 border border-amber-500/50 text-amber-300 hover:bg-amber-900/70 cursor-pointer transition-all hover:scale-105 active:scale-95"
             >
-              Highest Risk
+              🍫 Conche Viscosity
+            </button>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                executeAICommand('Check tempering beta crystals');
+              }}
+              className="px-2 py-0.5 rounded-lg bg-orange-950/70 border border-orange-500/50 text-orange-300 hover:bg-orange-900/70 cursor-pointer transition-all hover:scale-105 active:scale-95"
+            >
+              🌡️ Tempering Check
             </button>
             <button
               type="button"
@@ -714,7 +803,7 @@ export const SpatialHUD: React.FC = () => {
               }}
               className="px-2 py-0.5 rounded-lg bg-cyan-950/60 border border-cyan-500/40 text-cyan-300 hover:bg-cyan-900/60 cursor-pointer transition-all hover:scale-105 active:scale-95"
             >
-              Cutaway
+              🏢 Factory Cutaway
             </button>
             <button
               type="button"
@@ -722,9 +811,29 @@ export const SpatialHUD: React.FC = () => {
                 e.stopPropagation();
                 executeAICommand('Recovery reroute around blizzard');
               }}
-              className="px-2 py-0.5 rounded-lg bg-purple-950/60 border border-purple-500/40 text-purple-300 hover:bg-purple-900/60 cursor-pointer transition-all hover:scale-105 active:scale-95"
+              className="px-2 py-0.5 rounded-lg bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 hover:bg-emerald-900/60 cursor-pointer transition-all hover:scale-105 active:scale-95"
             >
-              Reroute
+              🔄 Jacketed Bypass
+            </button>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                executeAICommand('Trace pipeline freeze hazard');
+              }}
+              className="px-2 py-0.5 rounded-lg bg-red-950/60 border border-red-500/40 text-red-300 hover:bg-red-900/60 cursor-pointer transition-all hover:scale-105 active:scale-95"
+            >
+              ⚠️ Freeze Fault
+            </button>
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                executeAICommand('Show all chocolate production stages');
+              }}
+              className="px-2 py-0.5 rounded-lg bg-yellow-950/60 border border-yellow-500/40 text-yellow-300 hover:bg-yellow-900/60 cursor-pointer transition-all hover:scale-105 active:scale-95"
+            >
+              📖 10 Stages
             </button>
             <button
               type="button"
@@ -736,44 +845,14 @@ export const SpatialHUD: React.FC = () => {
             >
               7-Layer Stack
             </button>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                executeAICommand('Radial orbit layout');
-              }}
-              className="px-2 py-0.5 rounded-lg bg-pink-950/60 border border-pink-500/40 text-pink-300 hover:bg-pink-900/60 cursor-pointer transition-all hover:scale-105 active:scale-95"
-            >
-              Radial 3D
-            </button>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                executeAICommand('DAG tree flow layout');
-              }}
-              className="px-2 py-0.5 rounded-lg bg-emerald-950/60 border border-emerald-500/40 text-emerald-300 hover:bg-emerald-900/60 cursor-pointer transition-all hover:scale-105 active:scale-95"
-            >
-              DAG Tree
-            </button>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                executeAICommand('Trace blast radius');
-              }}
-              className="px-2 py-0.5 rounded-lg bg-rose-950/60 border border-rose-500/40 text-rose-300 hover:bg-rose-900/60 cursor-pointer transition-all hover:scale-105 active:scale-95"
-            >
-              Blast Radius
-            </button>
           </div>
         </div>
 
         {/* AI Copilot Last Response Banner (if available) */}
         {aiCopilot.lastResponse && (
-          <div className="w-full max-w-4xl mx-auto px-4 py-1.5 rounded-xl bg-purple-950/80 border border-purple-500/30 text-purple-200 text-[11px] font-mono flex items-center justify-between">
+          <div className="w-full max-w-4xl mx-auto px-4 py-1.5 rounded-xl bg-amber-950/80 border border-amber-500/40 text-amber-200 text-[11px] font-mono flex items-center justify-between shadow-lg">
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-purple-400 animate-ping" />
+              <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
               <span>{aiCopilot.lastResponse}</span>
             </div>
             <button
@@ -782,7 +861,7 @@ export const SpatialHUD: React.FC = () => {
                 e.stopPropagation();
                 executeAICommand('Reset view to network overview');
               }}
-              className="text-[10px] text-cyan-400 hover:underline cursor-pointer"
+              className="text-[10px] text-amber-300 hover:underline cursor-pointer"
             >
               Recenter Overview
             </button>
@@ -800,6 +879,140 @@ export const SpatialHUD: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* 4. CHOCOLATE PROCESS FLOW GUIDE MODAL */}
+      {guideModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl pointer-events-auto"
+          onClick={() => setGuideModalOpen(false)}
+        >
+          <div
+            className="w-full max-w-5xl max-h-[90vh] bg-[#0A0E23] border border-amber-500/40 rounded-3xl shadow-[0_0_60px_rgba(245,158,11,0.25)] flex flex-col overflow-hidden text-white font-sans"
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[#232B4E] bg-[#070A1A]">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-amber-600 to-amber-700 flex items-center justify-center shadow-lg text-xl">
+                  🍫
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                    <span>Artisan Bean-to-Bar Chocolate Manufacturing</span>
+                    <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-950 border border-amber-500/50 text-amber-300 font-mono">
+                      10 Process Stages
+                    </span>
+                  </h2>
+                  <p className="text-xs text-gray-400 font-mono">
+                    Complete industrial recipe specification, temperature tolerances, and stage telemetry
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setGuideModalOpen(false)}
+                className="p-2 rounded-xl bg-gray-900/80 border border-gray-700 hover:bg-gray-800 text-gray-400 hover:text-white transition-colors cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Stages Grid Container */}
+            <div className="flex-1 overflow-y-auto p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+              {CHOCOLATE_PROCESS_STAGES.map(stage => {
+                const fac = facilities.find(f => f.facilityCode === stage.facilityCode);
+                return (
+                  <div
+                    key={stage.code}
+                    className="p-4 rounded-2xl bg-[#0D122B]/90 border border-[#232B4E] hover:border-amber-500/50 transition-all flex flex-col justify-between gap-3 shadow-md group hover:bg-[#111738]"
+                  >
+                    <div>
+                      {/* Top Bar */}
+                      <div className="flex items-center justify-between gap-2 mb-2">
+                        <div className="flex items-center gap-2.5">
+                          <span className="text-2xl p-1.5 rounded-xl bg-[#080B1E] border border-amber-500/30">
+                            {stage.icon}
+                          </span>
+                          <div>
+                            <span className="text-[10px] font-mono text-amber-400 font-bold block uppercase tracking-wider">
+                              STAGE {stage.stageNumber} • {stage.code}
+                            </span>
+                            <h3 className="font-bold text-sm text-white group-hover:text-amber-200 transition-colors">
+                              {stage.name}
+                            </h3>
+                          </div>
+                        </div>
+
+                        <span className="px-2.5 py-1 rounded-xl bg-amber-950/80 border border-amber-500/40 text-amber-300 text-xs font-mono font-bold">
+                          {stage.operatingTempCelsius}°C
+                        </span>
+                      </div>
+
+                      {/* Description */}
+                      <p className="text-xs text-gray-300 leading-relaxed mb-3">
+                        {stage.description}
+                      </p>
+
+                      {/* Metadata Chips */}
+                      <div className="grid grid-cols-2 gap-2 text-[11px] font-mono pt-2 border-t border-[#1C2344]">
+                        <div className="bg-[#070A1E] px-2.5 py-1.5 rounded-xl border border-[#1F274E]">
+                          <span className="text-gray-400 block text-[9px]">FACILITY & CODE</span>
+                          <span className="text-white font-bold">{stage.facilityCode}</span>
+                        </div>
+                        <div className="bg-[#070A1E] px-2.5 py-1.5 rounded-xl border border-[#1F274E]">
+                          <span className="text-gray-400 block text-[9px]">OUTPUT PRODUCT</span>
+                          <span className="text-amber-300 font-bold truncate block">{stage.outputProduct}</span>
+                        </div>
+                        {stage.targetViscosityCp && (
+                          <div className="bg-[#070A1E] px-2.5 py-1.5 rounded-xl border border-[#1F274E]">
+                            <span className="text-gray-400 block text-[9px]">TARGET VISCOSITY</span>
+                            <span className="text-cyan-300 font-bold">{stage.targetViscosityCp} cP</span>
+                          </div>
+                        )}
+                        {fac && (
+                          <div className="bg-[#070A1E] px-2.5 py-1.5 rounded-xl border border-[#1F274E]">
+                            <span className="text-gray-400 block text-[9px]">TANK LOAD / UTILIZATION</span>
+                            <span className="text-emerald-400 font-bold">{fac.utilizationPercentage}%</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Action button */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        focusOnFacility(stage.facilityCode);
+                        setGuideModalOpen(false);
+                      }}
+                      className="w-full mt-2 py-2 px-3 rounded-xl bg-gradient-to-r from-amber-600/80 to-amber-700/80 hover:from-amber-500 hover:to-amber-600 border border-amber-400/50 text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm group-hover:shadow-[0_0_15px_rgba(245,158,11,0.3)]"
+                    >
+                      <span>Fly to 3D Stage Plant</span>
+                      <span className="text-amber-200">→</span>
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Footer */}
+            <div className="px-6 py-3 border-t border-[#232B4E] bg-[#070A1A] flex items-center justify-between text-xs font-mono text-gray-400">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span>All 10 processing stages synchronized with active 3D twin physical mesh.</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setGuideModalOpen(false)}
+                className="px-4 py-1.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-white font-bold cursor-pointer"
+              >
+                Close Guide
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

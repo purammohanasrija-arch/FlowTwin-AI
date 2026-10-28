@@ -27,7 +27,7 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { name: 'Control Tower', to: '/app/dashboard', icon: LayoutDashboard },
-  { name: '3D Logistics Universe', to: '/app/twin-3d', icon: Box, badge: 'ULTRA 3D' },
+  { name: '3D Chocolate Twin', to: '/app/twin-3d', icon: Box, badge: 'CHOCOLATE' },
   { name: 'Live Logistics Map', to: '/app/map', icon: MapPin },
   { name: 'Shipments', to: '/app/shipments', icon: Package, badge: '34' },
   { name: 'Document Intelligence', to: '/app/documents', icon: FileText, badge: 'OCR' },

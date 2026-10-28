@@ -76,22 +76,62 @@ export const SelectedEntityDrawer: React.FC = () => {
         {type === 'facility' && (
           <>
             <div>
-              <span className="text-gray-400 block text-[10px]">FACILITY NAME</span>
-              <p className="font-sans font-bold text-sm text-gray-100">{data.name}</p>
+              <div className="flex items-center gap-2 mb-1">
+                {data.processStageNumber && (
+                  <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-bold">
+                    STAGE {data.processStageNumber}
+                  </span>
+                )}
+                <span className="text-[10px] text-gray-400 uppercase tracking-wider font-mono">
+                  {data.processStageName || 'Chocolate Process Unit'}
+                </span>
+              </div>
+              <p className="font-sans font-bold text-base text-amber-100">
+                {data.chocolateFacilityName || data.name}
+              </p>
+              {data.processDescription && (
+                <p className="text-[11px] text-gray-300 mt-1.5 leading-relaxed bg-[#12172E]/70 p-2.5 rounded-xl border border-[#1E2648]">
+                  {data.processDescription}
+                </p>
+              )}
             </div>
 
-            <div className="grid grid-cols-2 gap-2 p-2 rounded-xl bg-[#12172E] border border-[#1E2648]">
+            <div className="grid grid-cols-2 gap-2 p-2.5 rounded-xl bg-[#12172E] border border-[#1E2648]">
               <div>
-                <span className="text-gray-400 text-[10px]">UTILIZATION</span>
+                <span className="text-gray-400 text-[10px]">TANK LOAD</span>
                 <p className="text-sm font-bold text-amber-400">{data.utilizationPercentage}%</p>
               </div>
               <div>
                 <span className="text-gray-400 text-[10px]">THROUGHPUT</span>
-                <p className="text-sm font-bold text-cyan-300">{data.throughputPerHour} units/h</p>
+                <p className="text-sm font-bold text-cyan-300">{data.throughputPerHour} kg/h</p>
               </div>
+              {data.temperatureCelsius !== undefined && (
+                <div>
+                  <span className="text-gray-400 text-[10px]">OPERATING TEMP</span>
+                  <p className="text-sm font-bold text-rose-300">{data.temperatureCelsius}°C</p>
+                </div>
+              )}
+              {data.viscosityCp !== undefined && (
+                <div>
+                  <span className="text-gray-400 text-[10px]">VISCOSITY</span>
+                  <p className="text-sm font-bold text-amber-300">{data.viscosityCp.toLocaleString()} cP</p>
+                </div>
+              )}
+              {data.cocoaSolidsPercent !== undefined && (
+                <div>
+                  <span className="text-gray-400 text-[10px]">COCOA SOLIDS</span>
+                  <p className="text-sm font-bold text-emerald-300">{data.cocoaSolidsPercent}% Dark Mass</p>
+                </div>
+              )}
+              {data.qualityGrade && (
+                <div>
+                  <span className="text-gray-400 text-[10px]">QUALITY GRADE</span>
+                  <p className="text-[11px] font-bold text-purple-300 truncate">{data.qualityGrade}</p>
+                </div>
+              )}
               <div>
-                <span className="text-gray-400 text-[10px]">ACTIVE SHIPMENTS</span>
-                <p className="text-sm font-bold text-gray-200">{data.activeShipmentCount}</p>
+                <span className="text-gray-400 text-[10px]">ACTIVE BATCHES</span>
+                <p className="text-sm font-bold text-gray-200">{data.activeBatches || data.activeShipmentCount || 18}</p>
               </div>
               <div>
                 <span className="text-gray-400 text-[10px]">STATUS</span>
@@ -117,12 +157,12 @@ export const SelectedEntityDrawer: React.FC = () => {
                   e.stopPropagation();
                   toggleWarehouseCutaway(data.facilityCode || id);
                 }}
-                className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 font-bold flex items-center justify-center gap-2 shadow-lg text-white cursor-pointer relative z-10 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-amber-600 via-orange-600 to-amber-700 hover:from-amber-500 hover:to-orange-500 font-bold flex items-center justify-center gap-2 shadow-lg text-white cursor-pointer relative z-10 transition-all hover:scale-[1.02] active:scale-[0.98]"
               >
                 <Eye className="w-4 h-4" />
                 {warehouseCutaway.active && warehouseCutaway.facilityCode === (data.facilityCode || id)
-                  ? 'Exit Cutaway View'
-                  : 'Exploded Cutaway View'}
+                  ? 'Exit Factory Interior'
+                  : 'Inspect Factory Interior Cutaway'}
               </button>
             </div>
           </>
@@ -132,10 +172,10 @@ export const SelectedEntityDrawer: React.FC = () => {
         {type === 'vehicle' && (
           <>
             <div>
-              <span className="text-gray-400 block text-[10px]">CARRIER & MODEL</span>
-              <p className="font-sans font-bold text-sm text-gray-100">{data.carrierName}</p>
+              <span className="text-gray-400 block text-[10px]">CONFECTIONERY CARRIER</span>
+              <p className="font-sans font-bold text-sm text-amber-200">{data.carrierName}</p>
               <p className="text-[11px] text-gray-400">
-                Plate: {data.licensePlate} | Type: {data.vehicleModelType || data.type}
+                Code: {data.vehicleCode || id} | Type: {data.vehicleModelType || data.type}
               </p>
             </div>
 
@@ -145,7 +185,7 @@ export const SelectedEntityDrawer: React.FC = () => {
                 <p className="text-sm font-bold text-cyan-300">{data.currentSpeedKmh || data.speedKmh} km/h</p>
               </div>
               <div>
-                <span className="text-gray-400 text-[10px]">LOAD WEIGHT</span>
+                <span className="text-gray-400 text-[10px]">PAYLOAD CAPACITY</span>
                 <p className="text-sm font-bold text-gray-200">
                   {((data.currentWeightKg || 12000) / 1000).toFixed(1)} / {((data.maxWeightKg || 20000) / 1000).toFixed(1)} t
                 </p>
@@ -159,13 +199,13 @@ export const SelectedEntityDrawer: React.FC = () => {
                       : 'text-emerald-400'
                   }`}
                 >
-                  {data.isDelayedByDisruption ? 'DELAYED (I-80)' : data.status?.toUpperCase()}
+                  {data.isDelayedByDisruption ? 'VISCOSITY DELAY' : data.status?.toUpperCase()}
                 </p>
               </div>
               <div>
-                <span className="text-gray-400 text-[10px]">CORRIDOR</span>
+                <span className="text-gray-400 text-[10px]">PIPELINE / CORRIDOR</span>
                 <p className="text-sm font-bold text-purple-300">
-                  {data.assignedRouteCode || 'I-80'}
+                  {data.assignedRouteCode || 'PIPE-CHOC-01'}
                 </p>
               </div>
             </div>
@@ -183,7 +223,7 @@ export const SelectedEntityDrawer: React.FC = () => {
                 <Navigation className="w-4 h-4" />
                 {cameraMode === 'follow_vehicle' && followedVehicleId === (data.vehicleCode || id)
                   ? 'Unfollow Vehicle Camera'
-                  : 'Follow Vehicle Camera'}
+                  : 'Follow Carrier Camera'}
               </button>
 
               {data.isDelayedByDisruption && (
@@ -196,7 +236,7 @@ export const SelectedEntityDrawer: React.FC = () => {
                   className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 font-bold flex items-center justify-center gap-2 text-white shadow-lg cursor-pointer relative z-10 transition-all hover:scale-[1.02] active:scale-[0.98]"
                 >
                   <ShieldCheck className="w-4 h-4" />
-                  Reroute to I-70 Bypass
+                  Reroute to Thermal Recirculation Bypass
                 </button>
               )}
             </div>
@@ -207,53 +247,70 @@ export const SelectedEntityDrawer: React.FC = () => {
         {type === 'route' && (
           <>
             <div>
-              <span className="text-gray-400 block text-[10px]">CORRIDOR / CONNECTION</span>
-              <p className="font-sans font-bold text-sm text-gray-100">{data.name || data.label || id}</p>
-              {data.sourceName && data.targetName && (
-                <p className="text-[11px] text-cyan-300 mt-0.5">
-                  {data.sourceName} <ArrowRight className="w-3 h-3 inline mx-1 text-gray-400" /> {data.targetName}
+              <span className="text-gray-400 block text-[10px]">JACKETED PROCESS PIPELINE</span>
+              <p className="font-sans font-bold text-base text-amber-200">
+                {data.chocolatePipelineName || data.name || data.label || id}
+              </p>
+              {data.ingredientFlow && (
+                <p className="text-[11px] text-amber-300 mt-0.5 bg-amber-950/40 p-2 rounded-lg border border-amber-500/30">
+                  <span className="text-gray-400">Flow Ingredient: </span>
+                  <span className="font-semibold text-amber-100">{data.ingredientFlow}</span>
                 </p>
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-2 p-2 rounded-xl bg-[#12172E] border border-[#1E2648]">
-              {data.distanceKm !== undefined ? (
+            <div className="grid grid-cols-2 gap-2 p-2.5 rounded-xl bg-[#12172E] border border-[#1E2648]">
+              {data.pipeTemperatureCelsius !== undefined ? (
+                <div>
+                  <span className="text-gray-400 text-[10px]">PIPE TEMPERATURE</span>
+                  <p className={`text-sm font-bold ${data.pipeTemperatureCelsius < 32 ? 'text-red-400 animate-pulse' : 'text-cyan-300'}`}>
+                    {data.pipeTemperatureCelsius}°C {data.pipeTemperatureCelsius < 32 ? '(Crystallizing!)' : '(Optimal)'}
+                  </p>
+                </div>
+              ) : (
                 <div>
                   <span className="text-gray-400 text-[10px]">DISTANCE</span>
                   <p className="text-sm font-bold text-cyan-300">{data.distanceKm} km</p>
                 </div>
-              ) : (
-                <div>
-                  <span className="text-gray-400 text-[10px]">LINK TYPE</span>
-                  <p className="text-sm font-bold text-cyan-300">
-                    {data.isDisrupted ? 'Hazard Alert' : data.isBypass ? 'Recovery Bypass' : 'Active Dispatch'}
-                  </p>
-                </div>
               )}
-              {data.estimatedDurationHours !== undefined ? (
+              {data.pipePressureBar !== undefined ? (
                 <div>
-                  <span className="text-gray-400 text-[10px]">EST. DURATION</span>
-                  <p className="text-sm font-bold text-gray-200">{data.estimatedDurationHours} hours</p>
+                  <span className="text-gray-400 text-[10px]">LINE PRESSURE</span>
+                  <p className="text-sm font-bold text-gray-200">{data.pipePressureBar} Bar</p>
                 </div>
               ) : (
                 <div>
-                  <span className="text-gray-400 text-[10px]">TELEMETRY FLOW</span>
-                  <p className="text-sm font-bold text-purple-300">Synchronized (Live)</p>
+                  <span className="text-gray-400 text-[10px]">FLOW SPEED</span>
+                  <p className="text-sm font-bold text-purple-300">{data.flowSpeed || 0.45} m/s</p>
                 </div>
               )}
               <div>
                 <span className="text-gray-400 text-[10px]">STATUS</span>
                 <p className={`text-sm font-bold ${data.isClosed || data.isDisrupted ? 'text-red-400' : 'text-emerald-400'}`}>
-                  {data.isClosed ? 'ROADBLOCK CLOSED' : data.isDisrupted ? 'HAZARD IMPACT' : data.isBypass ? 'BYPASS ACTIVE' : 'OPTIMAL FLOW'}
+                  {data.chocolateStatusText || (data.isClosed ? 'JACKET FAULT' : 'OPTIMAL FLOW')}
                 </p>
               </div>
               <div>
-                <span className="text-gray-400 text-[10px]">CORRIDOR</span>
+                <span className="text-gray-400 text-[10px]">CORRIDOR ID</span>
                 <p className="text-sm font-bold text-purple-300">
-                  {data.roadCorridor || (data.isBypass ? 'I-70 Bypass' : data.isDisrupted ? 'I-80 Alert' : 'Intermodal')}
+                  {data.roadCorridor || 'LINE-CHOC-01'}
                 </p>
               </div>
             </div>
+
+            {data.isClosed && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  applyRecoveryPlan('PLAN-REC-01');
+                }}
+                className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 font-bold flex items-center justify-center gap-2 text-white shadow-lg cursor-pointer relative z-10 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              >
+                <ShieldCheck className="w-4 h-4" />
+                Activate Thermal Recirculation Bypass Loop
+              </button>
+            )}
           </>
         )}
 

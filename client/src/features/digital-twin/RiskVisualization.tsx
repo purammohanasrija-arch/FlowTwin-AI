@@ -101,16 +101,16 @@ export const RiskVisualization: React.FC = () => {
                     className="pointer-events-none select-none"
                   >
                     <div
-                      className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-bold border backdrop-blur-md whitespace-nowrap transition-transform ${
-                        isSelected ? 'scale-110 shadow-lg' : ''
+                      className={`px-2 py-0.5 rounded-lg text-[10px] font-mono font-extrabold border backdrop-blur-xl whitespace-nowrap transition-transform shadow-lg ${
+                        isSelected ? 'scale-125 shadow-amber-500/50' : ''
                       }`}
                       style={{
-                        backgroundColor: `${color}20`,
+                        backgroundColor: `${color}25`,
                         borderColor: color,
                         color: color,
                       }}
                     >
-                      {utilPct}% CAP
+                      {utilPct}% TANK LOAD
                     </div>
                   </Html>
                 </group>

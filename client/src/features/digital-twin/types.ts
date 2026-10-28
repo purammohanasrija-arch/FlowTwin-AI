@@ -106,6 +106,18 @@ export interface IncidentRecord3D {
   affectedShipments?: string[];
 }
 
+export interface ChocolateProcessStage {
+  stageNumber: number;
+  code: string;
+  name: string;
+  facilityCode: string;
+  icon: string;
+  description: string;
+  operatingTempCelsius: number;
+  targetViscosityCp?: number;
+  outputProduct: string;
+}
+
 export interface FacilityNode3D extends FacilityRecord {
   position3D: [number, number, number];
   rotationY?: number;
@@ -121,6 +133,18 @@ export interface FacilityNode3D extends FacilityRecord {
     | 'supplier_facility';
   buildingColor?: string;
   dockDoorsCount?: number;
+
+  // Chocolate Factory Specialization
+  processStageNumber?: number;
+  processStageName?: string;
+  chocolateFacilityName?: string;
+  processDescription?: string;
+  temperatureCelsius?: number;
+  viscosityCp?: number;
+  batchCapacityLiters?: number;
+  activeBatches?: number;
+  cocoaSolidsPercent?: number;
+  qualityGrade?: string;
 }
 
 export interface RouteCorridor3D extends RouteRecord {
@@ -130,6 +154,13 @@ export interface RouteCorridor3D extends RouteRecord {
   flowSpeed: number;
   congestionLevel: number; // 0 to 1
   isBypassAlternative?: boolean;
+
+  // Chocolate Factory Specialization
+  chocolatePipelineName?: string;
+  ingredientFlow?: string;
+  pipeTemperatureCelsius?: number;
+  pipePressureBar?: number;
+  chocolateStatusText?: string;
 }
 
 export interface VehicleSimulationState extends Omit<VehicleRecord, 'status'> {

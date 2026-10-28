@@ -123,6 +123,10 @@ interface DigitalTwinState {
   setBlastRadiusNode: (nodeId: string | null) => void;
   setScenarioComparison: (state: Partial<ScenarioComparisonState>) => void;
   executeAICommand: (command: string) => Promise<string>;
+  twinMode: 'chocolate' | 'logistics';
+  setTwinMode: (mode: 'chocolate' | 'logistics') => void;
+  focusOnFacility: (facilityCode: string) => void;
+
   toggleRouteEditing: (routeCode?: string) => void;
   resetScene: () => void;
   syncBackendData: (data: {
@@ -232,6 +236,21 @@ export const useDigitalTwinStore = create<DigitalTwinState>((set, get) => ({
     active: false,
     selectedRouteCode: null,
     previewAlternative: false,
+  },
+
+  twinMode: 'chocolate',
+  setTwinMode: mode => set({ twinMode: mode }),
+
+  focusOnFacility: facilityCode => {
+    const fac = get().facilities.find(f => f.facilityCode === facilityCode);
+    if (fac) {
+      set({
+        selectedEntity: { type: 'facility', id: fac.facilityCode, data: fac },
+        cameraTarget: [fac.position3D[0] - 8, fac.position3D[1] + 16, fac.position3D[2] + 24],
+        cameraLookAt: fac.position3D,
+        cameraMode: 'overview',
+      });
+    }
   },
 
   // Actions
@@ -613,14 +632,26 @@ export const useDigitalTwinStore = create<DigitalTwinState>((set, get) => ({
 
     let response = '';
 
-    if (text.includes('radial') || text.includes('cylinder') || text.includes('orbit')) {
+    if (text.includes('conche') || text.includes('conching') || text.includes('viscosity')) {
+      get().focusOnFacility('FAC-CHI-01');
+      response = `Navigated to Stage 6: Grand Conching & Refining Mega-Plant. Current batch: 72% Dark Couverture at 72.4°C, viscosity 3,450 cP, tank load 86.4%. Agitation running smoothly.`;
+    } else if (text.includes('temper') || text.includes('tempering') || text.includes('crystal')) {
+      get().focusOnFacility('FAC-ATL-05');
+      response = `Navigated to Stage 7: Precision Tempering Hub. Continuous 3-stage thermal tempering curve active (45°C -> 27°C -> 31.5°C). Form-V Beta Crystal formation verified at 99.8% purity.`;
+    } else if (text.includes('roast') || text.includes('drum')) {
+      get().focusOnFacility('FAC-DAL-04');
+      response = `Navigated to Stage 2: Continuous Thermal Drum Roasting. Convective hot air running at 135.0°C. Maillard browning active on Criollo beans.`;
+    } else if (text.includes('butter') || text.includes('press')) {
+      get().focusOnFacility('FAC-SUPP-10');
+      response = `Navigated to Stage 4: Cocoa Butter Hydraulic Press Depot. 500-bar hydraulic rams operating at 85.0°C, extracting pure deodorized golden cocoa butter.`;
+    } else if (text.includes('radial') || text.includes('cylinder') || text.includes('orbit')) {
       if (!state.explodedGraph.active) get().toggleExplodedGraph();
       get().setExplodedLayoutMode('radial');
       response = `Switched 3D layout to Radial Cylindrical Orbit. Concentric tiers arranged around core nexus.`;
-    } else if (text.includes('dag') || text.includes('tree') || text.includes('hierarch') || text.includes('flow layout')) {
+    } else if (text.includes('dag') || text.includes('tree') || text.includes('hierarch') || text.includes('flow layout') || text.includes('stages') || text.includes('process')) {
       if (!state.explodedGraph.active) get().toggleExplodedGraph();
       get().setExplodedLayoutMode('dag_tree');
-      response = `Switched 3D layout to Hierarchical Flow DAG Tree. Left-to-right upstream-to-downstream dependency stream active.`;
+      response = `Switched 3D layout to Chocolate Process Flow DAG: 1. Raw Silos -> 2. Roasting -> 3. Winnowing -> 4. Butter Press -> 5. Dairy Blend -> 6. Conching -> 7. Tempering -> 8. Bulk Rail -> 9. Enrobing -> 10. Packaging.`;
     } else if (text.includes('force') || text.includes('cluster') || text.includes('mesh layout')) {
       if (!state.explodedGraph.active) get().toggleExplodedGraph();
       get().setExplodedLayoutMode('force');
@@ -632,7 +663,7 @@ export const useDigitalTwinStore = create<DigitalTwinState>((set, get) => ({
     } else if (text.includes('blast radius') || text.includes('trace blast') || text.includes('impact chain')) {
       if (!state.explodedGraph.active) get().toggleExplodedGraph();
       get().setBlastRadiusNode('INC-BLIZZ-01');
-      response = `Tracing Disruption Blast Radius: Highlighting critical path from I-80 Blizzard to affected consignments and vaccines.`;
+      response = `Tracing Disruption Blast Radius: Highlighting critical path from Main Jacketed Pipe trip to downstream tempering and enrobing lines.`;
     } else if (text.includes('risk') || text.includes('highest risk')) {
       const topRiskVeh = state.vehicles.find(v => v.isDelayedByDisruption) || state.vehicles[0];
       set({
@@ -640,38 +671,38 @@ export const useDigitalTwinStore = create<DigitalTwinState>((set, get) => ({
         cameraMode: 'follow_vehicle',
         followedVehicleId: topRiskVeh.vehicleCode,
       });
-      response = `Highlighted vehicle ${topRiskVeh.vehicleCode} carrying critical cold-chain cargo delayed on I-80. Projected delay: 14.2h.`;
-    } else if (text.includes('disruption') || text.includes('blizzard') || text.includes('closure')) {
+      response = `Highlighted vehicle ${topRiskVeh.vehicleCode} carrying molten chocolate mass. Jacketed pipe failure causing viscosity freeze delay (+16.5h).`;
+    } else if (text.includes('disruption') || text.includes('blizzard') || text.includes('closure') || text.includes('jacket') || text.includes('freeze')) {
       const inc = state.incidents[0];
       if (inc) {
         set({
           selectedEntity: { type: 'incident', id: inc.incidentCode, data: inc },
           cameraMode: 'incident_focus',
         });
-        response = `Focused on active incident: ${inc.title}. Impact corridor: ${inc.affectedCorridor}.`;
+        response = `Focused on active incident: ${inc.title}. Jacketed heater failure on main transfer line Section 4.`;
       }
-    } else if (text.includes('recovery') || text.includes('reroute') || text.includes('alternative')) {
+    } else if (text.includes('recovery') || text.includes('reroute') || text.includes('alternative') || text.includes('bypass')) {
       get().applyRecoveryPlan('PLAN-REC-01');
-      response = `Recovery Plan Applied: I-70 Southern Bypass Corridor activated. 17 shipments rerouted, saving an estimated 11.4h avg delay.`;
-    } else if (text.includes('warehouse') || text.includes('cutaway') || text.includes('interior')) {
+      response = `Thermal Recovery Plan Applied: Jacketed Recirculation Bypass Loop activated at 32°C. 17 batches protected, saving 11.4h avg solidification downtime.`;
+    } else if (text.includes('warehouse') || text.includes('cutaway') || text.includes('interior') || text.includes('factory')) {
       get().toggleWarehouseCutaway('FAC-CHI-01');
-      response = `Activated high-bay warehouse cutaway inspection for Chicago Central Logistics Park (FAC-CHI-01).`;
+      response = `Activated Chocolate Factory Interior Cutaway: Conching tanks, agitators, and continuous chocolate mold conveyors inspected.`;
     } else if (text.includes('exploded') || text.includes('graph') || text.includes('dependency')) {
       get().toggleExplodedGraph('SH-1042');
-      response = `Activated 7-Layer 3D Supply Chain Exploded View. Isolating shipment SH-1042 upstream suppliers and downstream consignees.`;
+      response = `Activated 7-Layer 3D Supply Chain Exploded View. Isolating shipment SH-1042 (Artisan 72% Dark Couverture).`;
     } else if (text.includes('compare') || text.includes('future') || text.includes('scenarios')) {
       set(s => ({
         scenarioComparison: { ...s.scenarioComparison, active: true },
       }));
-      response = `Multi-future comparison enabled. Baseline vs I-70 Bypass Plan overlay displayed.`;
-    } else if (text.includes('port') || text.includes('ship')) {
+      response = `Multi-future comparison enabled. Baseline freezing scenario vs Recirculation Bypass Loop displayed.`;
+    } else if (text.includes('port') || text.includes('ship') || text.includes('bean') || text.includes('silo')) {
       const port = state.facilities.find(f => f.facilityCategory === 'coastal_port') || state.facilities[0];
       get().focusOnPosition(port.position3D, port.position3D);
       set({ selectedEntity: { type: 'facility', id: port.facilityCode, data: port } });
-      response = `Navigated to Pacific Maritime Port & Container Berth (FAC-LAX-03).`;
+      response = `Navigated to Pacific Cocoa Bean Deepwater Harbor (FAC-LAX-03). Single-origin bean sacks stored at 21°C.`;
     } else {
       set({ cameraMode: 'overview' });
-      response = `Command parsed: Network overview calibrated. Telemetry synchronized across 10 operational hubs.`;
+      response = `Command parsed: Chocolate Factory Overview calibrated. Telemetry synchronized across 10 processing stages.`;
     }
 
     set(s => ({
@@ -728,14 +759,36 @@ export const useDigitalTwinStore = create<DigitalTwinState>((set, get) => ({
       const newFacilities = data.facilities
         ? state.facilities.map(sf => {
             const match = data.facilities!.find((f: any) => f.facilityCode === sf.facilityCode);
-            return match ? { ...sf, ...match } : sf;
+            if (!match) return sf;
+            return {
+              ...sf,
+              ...match,
+              name: sf.name,
+              processStageNumber: sf.processStageNumber,
+              processStageName: sf.processStageName,
+              chocolateFacilityName: sf.chocolateFacilityName,
+              processDescription: sf.processDescription,
+              temperatureCelsius: sf.temperatureCelsius,
+              viscosityCp: sf.viscosityCp,
+              cocoaSolidsPercent: sf.cocoaSolidsPercent,
+            };
           })
         : state.facilities;
 
       const newRoutes = data.routes
         ? state.routes.map(sr => {
             const match = data.routes!.find((r: any) => r.routeCode === sr.routeCode);
-            return match ? { ...sr, ...match } : sr;
+            if (!match) return sr;
+            return {
+              ...sr,
+              ...match,
+              name: sr.name,
+              chocolatePipelineName: sr.chocolatePipelineName,
+              ingredientFlow: sr.ingredientFlow,
+              pipeTemperatureCelsius: sr.pipeTemperatureCelsius,
+              pipePressureBar: sr.pipePressureBar,
+              chocolateStatusText: sr.chocolateStatusText,
+            };
           })
         : state.routes;
 

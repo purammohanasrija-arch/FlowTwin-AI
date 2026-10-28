@@ -34,95 +34,212 @@ interface FacilityLabelProps {
   onSelect: () => void;
 }
 
+const STATUS_COLOR_MAP = {
+  green: {
+    dot: 'bg-emerald-400',
+    border: 'border-emerald-500/50',
+    glow: 'shadow-[0_0_24px_rgba(16,185,129,0.35)]',
+    text: 'text-emerald-400',
+    badgeBg: 'bg-emerald-500/15',
+    badgeBorder: 'border-emerald-500/30',
+  },
+  amber: {
+    dot: 'bg-amber-400',
+    border: 'border-amber-500/60',
+    glow: 'shadow-[0_0_24px_rgba(245,158,11,0.4)]',
+    text: 'text-amber-400',
+    badgeBg: 'bg-amber-500/15',
+    badgeBorder: 'border-amber-500/30',
+  },
+  red: {
+    dot: 'bg-rose-500',
+    border: 'border-rose-500/70',
+    glow: 'shadow-[0_0_28px_rgba(239,68,68,0.5)]',
+    text: 'text-rose-400',
+    badgeBg: 'bg-rose-500/20',
+    badgeBorder: 'border-rose-500/40',
+  },
+  purple: {
+    dot: 'bg-purple-400',
+    border: 'border-purple-500/60',
+    glow: 'shadow-[0_0_24px_rgba(168,85,247,0.4)]',
+    text: 'text-purple-300',
+    badgeBg: 'bg-purple-500/15',
+    badgeBorder: 'border-purple-500/30',
+  },
+  cyan: {
+    dot: 'bg-cyan-400',
+    border: 'border-cyan-500/60',
+    glow: 'shadow-[0_0_24px_rgba(6,182,212,0.4)]',
+    text: 'text-cyan-300',
+    badgeBg: 'bg-cyan-500/15',
+    badgeBorder: 'border-cyan-500/30',
+  },
+};
+
 const FacilityLabelItem: React.FC<FacilityLabelProps> = ({ facility, isSelected, onSelect }) => {
   const [isHovered, setIsHovered] = React.useState(false);
   const stageNum = facility.processStageNumber;
   const shortName = stageNum ? STAGE_SHORT_NAMES[stageNum] || facility.name : facility.name;
   const icon = stageNum ? STAGE_ICONS[stageNum] || '🏭' : '🏭';
-  const processName = facility.processStageName || facility.chocolateFacilityName || facility.name;
 
-  const statusColor =
-    facility.status === 'optimal'
-      ? 'bg-emerald-400'
-      : facility.status === 'congested'
-      ? 'bg-amber-400'
-      : 'bg-rose-400';
+  const telemetry = facility.liveMapTelemetry;
+  const machineParams = facility.machineParams;
+  const statusKey =
+    telemetry?.secondaryMetric?.statusColor ||
+    (facility.status === 'congested' ? 'amber' : facility.status === 'optimal' ? 'green' : 'red');
 
-  // Stagger height to prevent vertical collisions between adjacent plants
-  const heightOffset = facility.facilityCode === 'FAC-RAIL-08' ? 12.0 : 9.5;
+  const theme = STATUS_COLOR_MAP[statusKey as keyof typeof STATUS_COLOR_MAP] || STATUS_COLOR_MAP.green;
+
+  // Stagger height to avoid vertical overlap across production zones
+  const heightOffset =
+    facility.facilityCode === 'FAC-RAIL-08'
+      ? 12.8
+      : facility.facilityCode === 'FAC-CHI-01'
+      ? 11.5
+      : facility.facilityCode === 'FAC-NYC-02'
+      ? 11.0
+      : 9.8;
 
   return (
     <group position={[facility.position3D[0], facility.position3D[1] + heightOffset, facility.position3D[2]]}>
-      <Html center distanceFactor={44} zIndexRange={[12, 0]} className="pointer-events-auto select-none">
+      <Html center distanceFactor={42} zIndexRange={[20, 0]} className="pointer-events-auto select-none">
         <div
           onClick={onSelect}
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
           className={`cursor-pointer transition-all duration-200 ${
-            isSelected || isHovered ? 'z-50' : 'z-10'
+            isSelected || isHovered ? 'scale-105 z-50' : 'z-10'
           }`}
         >
           {isSelected || isHovered ? (
-            /* Expanded detailed state on hover or selection */
-            <div className="px-3.5 py-2 rounded-2xl bg-[#140E0A]/95 border-2 border-amber-400 text-amber-100 shadow-[0_0_28px_rgba(245,158,11,0.55)] scale-105 font-mono whitespace-nowrap">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-base">{icon}</span>
-                {stageNum && (
-                  <span className="px-1.5 py-0.2 rounded bg-amber-500/30 text-amber-300 border border-amber-400/40 text-[9px] font-bold">
-                    STAGE {stageNum}
-                  </span>
-                )}
-                <span className="font-extrabold text-xs text-white tracking-wide">
-                  {processName}
-                </span>
-                <span className={`w-2 h-2 rounded-full shrink-0 ${statusColor} ${facility.status === 'congested' ? 'animate-pulse' : ''}`} />
+            /* ============================================================ */
+            /* 1. EXPANDED LIVE SENSOR CARD (Hover or Selected)              */
+            /* ============================================================ */
+            <div
+              className={`p-3.5 rounded-2xl bg-[#090D1E]/95 border-2 ${theme.border} text-white ${theme.glow} font-sans min-w-[240px] backdrop-blur-xl shadow-2xl`}
+            >
+              {/* Header: Machine Code & Name + Status Dot */}
+              <div className="flex items-center justify-between gap-2 pb-2 mb-2 border-b border-white/10">
+                <div className="flex items-center gap-2">
+                  <span className="text-base p-1 rounded-lg bg-black/40 border border-white/10">{icon}</span>
+                  <div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-mono font-extrabold text-xs text-amber-200 tracking-wider">
+                        {telemetry?.machineTag || `${facility.facilityCode} · ${shortName}`}
+                      </span>
+                    </div>
+                    <span className="text-[10px] text-gray-400 block font-mono">
+                      Stage {stageNum} · {facility.chocolateFacilityName || facility.processStageName}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span
+                    className={`w-2.5 h-2.5 rounded-full ${theme.dot} ${
+                      facility.status === 'congested' ? 'animate-pulse' : ''
+                    }`}
+                  />
+                </div>
               </div>
 
-              <div className="flex items-center gap-2 text-[10px] text-gray-300 pl-4 border-t border-amber-500/20 pt-1">
-                <span className="text-amber-400/90 font-medium">{facility.facilityCode}</span>
-                <span className="text-gray-600">•</span>
-                <span className="text-emerald-400 font-bold">{facility.utilizationPercentage}% Tank</span>
+              {/* Primary Live Value (Section 3 Spec) */}
+              <div className="grid grid-cols-2 gap-2 mb-2 font-mono">
+                <div className="p-2 rounded-xl bg-black/50 border border-white/5">
+                  <span className="text-[9px] text-gray-400 uppercase tracking-wider block">
+                    {telemetry?.primaryMetric?.label || 'TEMPERATURE'}
+                  </span>
+                  <div className="text-xl font-extrabold text-white tracking-tight mt-0.5">
+                    {telemetry?.primaryMetric?.value || `${facility.temperatureCelsius ?? 24}°C`}
+                  </div>
+                  <span className="text-[9px] text-cyan-300 font-bold block mt-0.5">
+                    {telemetry?.primaryMetric?.label || 'Temperature'}
+                  </span>
+                </div>
+
+                {/* Secondary Live Value (Section 3 Spec) */}
+                <div className="p-2 rounded-xl bg-black/50 border border-white/5">
+                  <span className="text-[9px] text-gray-400 uppercase tracking-wider block">
+                    {telemetry?.secondaryMetric?.badge || 'CAPACITY'}
+                  </span>
+                  <div className={`text-xl font-extrabold ${theme.text} tracking-tight mt-0.5`}>
+                    {telemetry?.secondaryMetric?.value || `${facility.utilizationPercentage}%`}
+                  </div>
+                  <span className="text-[9px] text-gray-400 block truncate mt-0.5" title={telemetry?.secondaryMetric?.statusNote}>
+                    {telemetry?.secondaryMetric?.statusNote || 'Operating normally'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Extra Telemetry Chips */}
+              <div className="grid grid-cols-2 gap-1.5 text-[10px] font-mono border-t border-white/10 pt-2">
+                {telemetry?.extraMetrics?.map((metric: any, idx: number) => (
+                  <div key={idx} className="flex items-center justify-between px-2 py-1 rounded-lg bg-black/30 border border-white/5">
+                    <span className="text-gray-400">{metric.label}:</span>
+                    <span className="font-bold text-gray-200">{metric.value}</span>
+                  </div>
+                ))}
+                {machineParams?.maintenanceCondition && (
+                  <div className="flex items-center justify-between px-2 py-1 rounded-lg bg-black/30 border border-white/5">
+                    <span className="text-gray-400">Condition:</span>
+                    <span className="font-bold text-emerald-300">{machineParams.maintenanceCondition}</span>
+                  </div>
+                )}
                 {facility.chocolateVolumeTons !== undefined && (
-                  <>
-                    <span className="text-gray-600">•</span>
-                    <span className="text-amber-300 font-bold">🍫 {facility.chocolateVolumeTons} MT</span>
-                  </>
+                  <div className="flex items-center justify-between px-2 py-1 rounded-lg bg-black/30 border border-white/5">
+                    <span className="text-gray-400">Volume:</span>
+                    <span className="font-bold text-amber-300">{facility.chocolateVolumeTons} MT</span>
+                  </div>
                 )}
-                {facility.rawMaterialStockTons !== undefined && (
-                  <>
-                    <span className="text-gray-600">•</span>
-                    <span className="text-emerald-300 font-bold">🌾 {facility.rawMaterialStockTons} MT</span>
-                  </>
-                )}
-                {facility.thermalShockIndex !== undefined && (
-                  <>
-                    <span className="text-gray-600">•</span>
-                    <span className={`font-bold ${facility.thermalShockIndex > 2.0 ? 'text-rose-400 animate-pulse' : 'text-cyan-300'}`}>
-                      ⚡ {facility.thermalShockIndex}°C/min
-                    </span>
-                  </>
-                )}
-                {facility.temperatureCelsius && (
-                  <>
-                    <span className="text-gray-600">•</span>
-                    <span className="text-rose-300 font-bold">{facility.temperatureCelsius}°C</span>
-                  </>
-                )}
+              </div>
+
+              {/* Click prompt */}
+              <div className="mt-2.5 pt-1.5 border-t border-white/10 flex items-center justify-between text-[9px] font-mono text-gray-400">
+                <span className="flex items-center gap-1 text-amber-300 font-semibold">
+                  <span>👆</span> Click to inspect full machine parameters
+                </span>
+                <span className="px-1.5 py-0.2 rounded bg-white/10 text-white font-bold">15 KPIs</span>
               </div>
             </div>
           ) : (
-            /* Minimal, sleek capsule badge when idle */
-            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#090C19]/90 border border-[#232B4E] hover:border-amber-400/80 text-gray-200 shadow-md backdrop-blur-md whitespace-nowrap font-sans hover:bg-[#15121E] transition-all">
-              <span className="text-xs">{icon}</span>
-              <span className="text-xs font-bold text-white tracking-tight">
-                {stageNum ? `${stageNum}. ${shortName}` : facility.name}
-              </span>
-              {facility.temperatureCelsius && (
-                <span className="text-[10px] font-mono text-cyan-300 px-1 py-0.2 rounded bg-black/40">
-                  {facility.temperatureCelsius}°C
-                </span>
-              )}
-              <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${statusColor}`} />
+            /* ============================================================ */
+            /* 2. FLOATING SENSOR BADGE (Default Idle on 3D Map)            */
+            /* Matches Section 3 specifications: Machine, Temp, Capacity/KPI*/
+            /* ============================================================ */
+            <div
+              className={`p-2 rounded-2xl bg-[#090D1E]/90 border ${theme.border} text-white shadow-xl backdrop-blur-md min-w-[155px] font-sans hover:${theme.border} transition-all`}
+            >
+              {/* Machine Header */}
+              <div className="flex items-center justify-between gap-1.5 pb-1 mb-1 border-b border-white/10">
+                <div className="flex items-center gap-1">
+                  <span className="text-xs">{icon}</span>
+                  <span className="text-[11px] font-mono font-extrabold text-amber-200 tracking-tight truncate max-w-[125px]">
+                    {telemetry?.machineTag?.split(' · ')[0] || facility.facilityCode} · {shortName}
+                  </span>
+                </div>
+                <span className={`w-2 h-2 rounded-full shrink-0 ${theme.dot} ${facility.status === 'congested' ? 'animate-pulse' : ''}`} />
+              </div>
+
+              {/* 3-5 Key Values Display */}
+              <div className="flex items-baseline justify-between gap-2 mt-0.5">
+                <div>
+                  <div className="text-sm font-extrabold font-mono text-white tracking-tight leading-none">
+                    {telemetry?.primaryMetric?.value || `${facility.temperatureCelsius ?? 24}°C`}
+                  </div>
+                  <span className="text-[9px] text-gray-400 font-mono block mt-0.5">
+                    {telemetry?.primaryMetric?.label || 'Temperature'}
+                  </span>
+                </div>
+
+                <div className="text-right">
+                  <div className={`text-xs font-bold font-mono ${theme.text} leading-none`}>
+                    {telemetry?.secondaryMetric?.badge || 'CAPACITY'} {telemetry?.secondaryMetric?.value || `${facility.utilizationPercentage}%`}
+                  </div>
+                  <span className="text-[8px] text-gray-400 font-mono block mt-0.5 truncate max-w-[85px]" title={telemetry?.secondaryMetric?.statusNote}>
+                    {telemetry?.secondaryMetric?.statusNote || 'Operating normally'}
+                  </span>
+                </div>
+              </div>
             </div>
           )}
         </div>

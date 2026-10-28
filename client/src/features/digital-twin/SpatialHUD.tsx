@@ -73,6 +73,7 @@ export const SpatialHUD: React.FC = () => {
   const followVehicle = useDigitalTwinStore(s => s.followVehicle);
   const selectedEntity = useDigitalTwinStore(s => s.selectedEntity);
   const focusOnFacility = useDigitalTwinStore(s => s.focusOnFacility);
+  const factoryKPIs = useDigitalTwinStore(s => s.factoryKPIs);
 
   // Local state for drawers & modals
   const [searchQuery, setSearchQuery] = useState('');
@@ -82,6 +83,7 @@ export const SpatialHUD: React.FC = () => {
   const [disruptionModalOpen, setDisruptionModalOpen] = useState(false);
   const [guideModalOpen, setGuideModalOpen] = useState(false);
   const [responseDismissed, setResponseDismissed] = useState(false);
+  const [kpiBarVisible, setKpiBarVisible] = useState(true);
 
   useEffect(() => {
     if (aiCopilot.lastResponse) {
@@ -218,6 +220,24 @@ export const SpatialHUD: React.FC = () => {
             <BookOpen className="w-3.5 h-3.5" />
             <span className="hidden md:inline text-[11px]">Guide</span>
           </button>
+
+          {/* 10 Factory KPIs Toggle Button */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setKpiBarVisible(!kpiBarVisible);
+            }}
+            className={`flex items-center gap-1 px-2.5 py-1 rounded-lg border text-xs font-mono font-bold shrink-0 cursor-pointer transition-all ${
+              kpiBarVisible
+                ? 'bg-amber-500/25 border-amber-400 text-amber-200 shadow-[0_0_10px_rgba(245,158,11,0.3)]'
+                : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'
+            }`}
+            title="Toggle Factory-Wide KPI Telemetry Bar (Section 4)"
+          >
+            <Activity className="w-3.5 h-3.5 text-amber-400" />
+            <span className="hidden md:inline text-[11px]">10 KPIs</span>
+          </button>
         </div>
 
         {/* Right Scene Quick Controls (Search, Camera, Weather, Quality, Reset, Fullscreen) */}
@@ -320,6 +340,167 @@ export const SpatialHUD: React.FC = () => {
           </button>
         </div>
       </div>
+
+      {/* 1.2 FACTORY-WIDE KPI TELEMETRY BAR (Section 4 Specification) */}
+      {kpiBarVisible && (
+        <div className="w-full mt-2 pointer-events-auto transition-all animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="flex items-center justify-between px-3.5 py-1.5 rounded-2xl bg-[#090D1E]/92 border border-amber-500/30 backdrop-blur-xl shadow-2xl">
+            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5 w-full">
+              <div className="flex items-center gap-1.5 shrink-0 pr-2 border-r border-white/10">
+                <span className="text-xs">📊</span>
+                <span className="text-[10px] font-mono font-bold text-amber-300 uppercase tracking-wider">
+                  Factory KPIs
+                </span>
+              </div>
+
+              {/* 1. Total Production */}
+              <div
+                className="px-2.5 py-1 rounded-xl bg-black/50 border border-white/5 shrink-0 flex flex-col justify-center min-w-[110px]"
+                title="Chocolate produced today in kg"
+              >
+                <span className="text-[8px] font-mono text-gray-400 uppercase tracking-wider">Total Output</span>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-xs font-bold font-mono text-amber-200">
+                    {factoryKPIs?.totalProductionTodayKg?.toLocaleString() ?? '28,450'}
+                  </span>
+                  <span className="text-[8px] text-gray-400 font-mono">kg</span>
+                </div>
+              </div>
+
+              {/* 2. Production Efficiency */}
+              <div
+                className="px-2.5 py-1 rounded-xl bg-black/50 border border-white/5 shrink-0 flex flex-col justify-center min-w-[100px]"
+                title="Actual output compared with planned output"
+              >
+                <span className="text-[8px] font-mono text-gray-400 uppercase tracking-wider">Efficiency</span>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-xs font-bold font-mono text-emerald-400">
+                    {factoryKPIs?.productionEfficiencyPct ?? 94.2}%
+                  </span>
+                  <span className="text-[8px] text-emerald-500/80 font-mono">vs Plan</span>
+                </div>
+              </div>
+
+              {/* 3. Machine Availability */}
+              <div
+                className="px-2.5 py-1 rounded-xl bg-black/50 border border-white/5 shrink-0 flex flex-col justify-center min-w-[105px]"
+                title="Percentage of time machines are available"
+              >
+                <span className="text-[8px] font-mono text-gray-400 uppercase tracking-wider">Availability</span>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-xs font-bold font-mono text-cyan-300">
+                    {factoryKPIs?.machineAvailabilityPct ?? 98.1}%
+                  </span>
+                  <span className="text-[8px] text-cyan-500/80 font-mono">Uptime</span>
+                </div>
+              </div>
+
+              {/* 4. Quality Rate */}
+              <div
+                className="px-2.5 py-1 rounded-xl bg-black/50 border border-white/5 shrink-0 flex flex-col justify-center min-w-[95px]"
+                title="Percentage of products meeting quality criteria"
+              >
+                <span className="text-[8px] font-mono text-gray-400 uppercase tracking-wider">Quality Rate</span>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-xs font-bold font-mono text-emerald-300">
+                    {factoryKPIs?.qualityRatePct ?? 99.4}%
+                  </span>
+                  <span className="text-[8px] text-gray-500 font-mono">Pass</span>
+                </div>
+              </div>
+
+              {/* 5. Energy Consumption */}
+              <div
+                className="px-2.5 py-1 rounded-xl bg-black/50 border border-white/5 shrink-0 flex flex-col justify-center min-w-[105px]"
+                title="Electricity consumed in kWh"
+              >
+                <span className="text-[8px] font-mono text-gray-400 uppercase tracking-wider">Energy</span>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-xs font-bold font-mono text-yellow-300">
+                    {factoryKPIs?.energyConsumptionKwh?.toLocaleString() ?? '4,820'}
+                  </span>
+                  <span className="text-[8px] text-gray-400 font-mono">kWh</span>
+                </div>
+              </div>
+
+              {/* 6. Downtime */}
+              <div
+                className="px-2.5 py-1 rounded-xl bg-black/50 border border-white/5 shrink-0 flex flex-col justify-center min-w-[95px]"
+                title="Minutes lost due to machine stoppages"
+              >
+                <span className="text-[8px] font-mono text-gray-400 uppercase tracking-wider">Downtime</span>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-xs font-bold font-mono text-rose-300">
+                    {factoryKPIs?.downtimeMinutes ?? 14}
+                  </span>
+                  <span className="text-[8px] text-gray-400 font-mono">min lost</span>
+                </div>
+              </div>
+
+              {/* 7. Inventory Level */}
+              <div
+                className="px-2.5 py-1 rounded-xl bg-black/50 border border-white/5 shrink-0 flex flex-col justify-center min-w-[125px]"
+                title="Available raw materials and finished goods"
+              >
+                <span className="text-[8px] font-mono text-gray-400 uppercase tracking-wider">Inventory</span>
+                <div className="flex items-baseline gap-1 text-[11px] font-mono font-bold">
+                  <span className="text-amber-300">{factoryKPIs?.rawMaterialInventoryTonnes ?? 210.5}T Raw</span>
+                  <span className="text-gray-500">/</span>
+                  <span className="text-emerald-300">{factoryKPIs?.finishedGoodsTonnes ?? 48.2}T Fin</span>
+                </div>
+              </div>
+
+              {/* 8. Order Fulfillment */}
+              <div
+                className="px-2.5 py-1 rounded-xl bg-black/50 border border-white/5 shrink-0 flex flex-col justify-center min-w-[105px]"
+                title="Percentage of orders completed on time"
+              >
+                <span className="text-[8px] font-mono text-gray-400 uppercase tracking-wider">Fulfillment</span>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-xs font-bold font-mono text-purple-300">
+                    {factoryKPIs?.orderFulfillmentPct ?? 98.8}%
+                  </span>
+                  <span className="text-[8px] text-purple-400/80 font-mono">On-Time</span>
+                </div>
+              </div>
+
+              {/* 9. Waste Percentage */}
+              <div
+                className="px-2.5 py-1 rounded-xl bg-black/50 border border-white/5 shrink-0 flex flex-col justify-center min-w-[85px]"
+                title="Material lost during production"
+              >
+                <span className="text-[8px] font-mono text-gray-400 uppercase tracking-wider">Waste</span>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-xs font-bold font-mono text-teal-300">
+                    {factoryKPIs?.wastePercentage ?? 0.8}%
+                  </span>
+                  <span className="text-[8px] text-gray-500 font-mono">Loss</span>
+                </div>
+              </div>
+
+              {/* 10. AI Risk Score */}
+              <div
+                className="px-2.5 py-1 rounded-xl bg-black/50 border border-white/5 shrink-0 flex flex-col justify-center min-w-[95px]"
+                title="Estimated production disruption risk"
+              >
+                <span className="text-[8px] font-mono text-gray-400 uppercase tracking-wider">AI Risk</span>
+                <div className="flex items-baseline gap-1">
+                  <span
+                    className={`text-xs font-bold font-mono ${
+                      (factoryKPIs?.aiRiskScore ?? 12) > 50
+                        ? 'text-rose-400 animate-pulse'
+                        : 'text-emerald-300'
+                    }`}
+                  >
+                    {factoryKPIs?.aiRiskScore ?? 12}/100
+                  </span>
+                  <span className="text-[8px] text-emerald-500/80 font-mono">Low</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 1.5 3D LAYOUT & EXPLODED CONTROLLER BAR */}
       {explodedGraph.active && (

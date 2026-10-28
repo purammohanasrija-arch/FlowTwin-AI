@@ -15,6 +15,7 @@ import {
   GraphLayoutMode,
   ExplodedGraphState,
   ExplodedLayerId,
+  FactoryWideKPIs,
 } from './types.js';
 import {
   INITIAL_FACILITIES_3D,
@@ -23,6 +24,7 @@ import {
   INITIAL_CARGO_3D,
   INITIAL_INCIDENTS_3D,
   INITIAL_AI_AGENTS_3D,
+  INITIAL_FACTORY_KPIS,
 } from './initialData.js';
 
 interface DigitalTwinState {
@@ -94,6 +96,10 @@ interface DigitalTwinState {
     selectedRouteCode: string | null;
     previewAlternative: boolean;
   };
+
+  // Factory-Wide Smart Twin KPIs
+  factoryKPIs: FactoryWideKPIs;
+  setFactoryKPIs: (kpis: Partial<FactoryWideKPIs>) => void;
 
   // Actions
   setQuality: (quality: QualityPreset) => void;
@@ -237,6 +243,9 @@ export const useDigitalTwinStore = create<DigitalTwinState>((set, get) => ({
     selectedRouteCode: null,
     previewAlternative: false,
   },
+
+  factoryKPIs: INITIAL_FACTORY_KPIS,
+  setFactoryKPIs: kpis => set(s => ({ factoryKPIs: { ...s.factoryKPIs, ...kpis } })),
 
   twinMode: 'chocolate',
   setTwinMode: mode => set({ twinMode: mode }),

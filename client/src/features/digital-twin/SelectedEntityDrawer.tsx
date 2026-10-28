@@ -17,6 +17,93 @@ import {
   Navigation,
 } from 'lucide-react';
 
+const ZONE_MONITORED_PARAMETERS: Record<
+  number,
+  { zoneName: string; parameters: { label: string; value: string }[] }
+> = {
+  1: {
+    zoneName: 'Raw Material Storage',
+    parameters: [
+      { label: 'Stock Quantity', value: '280,000 kg (Criollo & Trinitario)' },
+      { label: 'Storage Temperature', value: '20.0°C (Controlled)' },
+      { label: 'Humidity', value: '58% RH (Safe < 65%)' },
+    ],
+  },
+  2: {
+    zoneName: 'Cocoa Roasting',
+    parameters: [
+      { label: 'Temperature', value: '135.0°C (Hot-Air Convective)' },
+      { label: 'Roasting Time', value: '45 min (Maillard Optimum)' },
+      { label: 'Machine Speed', value: '32 RPM (Rotary Drum)' },
+    ],
+  },
+  3: {
+    zoneName: 'Grinding & Milling',
+    parameters: [
+      { label: 'Motor Speed', value: '1,450 RPM (Impact Mill)' },
+      { label: 'Power Consumption', value: '42 kW (High Torque)' },
+      { label: 'Processing Time', value: '35 min (Continuous Flow)' },
+    ],
+  },
+  4: {
+    zoneName: 'Cocoa Butter Press',
+    parameters: [
+      { label: 'Temperature', value: '85.0°C (Press Chamber)' },
+      { label: 'Hydraulic Pressure', value: '500 bar (Hydraulic)' },
+      { label: 'Cycle Time', value: '28 min (Yield: 55% Butter)' },
+    ],
+  },
+  5: {
+    zoneName: 'Dairy & Sugar Blending',
+    parameters: [
+      { label: 'Room Temperature', value: '22.0°C (Dehumidified)' },
+      { label: 'Pneumatic Speed', value: '18 m/s (Dry Fluidization)' },
+      { label: 'Recipe Ratio Adherence', value: '99.8% (Target Ratio)' },
+    ],
+  },
+  6: {
+    zoneName: 'Mixing and Conching',
+    parameters: [
+      { label: 'Temperature', value: '48.0°C (72.4°C Peak Conche)' },
+      { label: 'Mixing Speed', value: '72 RPM (Twin Agitator)' },
+      { label: 'Duration', value: '48 hours (Thermal Aeration)' },
+      { label: 'Viscosity', value: '3,450 cP (Velvet Shear)' },
+    ],
+  },
+  7: {
+    zoneName: 'Tempering',
+    parameters: [
+      { label: 'Chocolate Temperature', value: '31.5°C (Working Zone)' },
+      { label: 'Cooling Rate', value: '2.1°C/min (Seeding Curve)' },
+      { label: 'Tempering Status', value: 'Beta Form-V Optimal (99.2%)' },
+    ],
+  },
+  8: {
+    zoneName: 'Cooling Tunnel',
+    parameters: [
+      { label: 'Temperature', value: '12.0°C (Chilled Air Flow)' },
+      { label: 'Humidity', value: '42% RH (Anti-Condensation)' },
+      { label: 'Cooling Duration', value: '16 min (Gradual Retraction)' },
+    ],
+  },
+  9: {
+    zoneName: 'Molding & Enrobing',
+    parameters: [
+      { label: 'Mold Temperature', value: '28.0°C (Pre-Heated)' },
+      { label: 'Fill Level', value: '92% (Volumetric Precision)' },
+      { label: 'Production Rate', value: '3,200 bars/hour' },
+    ],
+  },
+  10: {
+    zoneName: 'Packaging & Dispatch',
+    parameters: [
+      { label: 'Wrapping Speed', value: '120 packages/min (Hermetic)' },
+      { label: 'Defect Count', value: '22 units (1.2% Reject Rate)' },
+      { label: 'Vault Dispatch Temp', value: '18.0°C (Cold Chain Verified)' },
+    ],
+  },
+};
+
 export const SelectedEntityDrawer: React.FC = () => {
   const selectedEntity = useDigitalTwinStore(s => s.selectedEntity);
   const selectEntity = useDigitalTwinStore(s => s.selectEntity);
@@ -96,96 +183,228 @@ export const SelectedEntityDrawer: React.FC = () => {
               )}
             </div>
 
-            {/* 1. KEY PRODUCTION PARAMETERS */}
-            <div className="grid grid-cols-2 gap-2 p-2.5 rounded-xl bg-[#12172E] border border-[#1E2648]">
-              <div>
-                <span className="text-gray-400 text-[10px]">TANK LOAD</span>
-                <p className="text-sm font-bold text-amber-400">{data.utilizationPercentage}%</p>
-              </div>
-              <div>
-                <span className="text-gray-400 text-[10px]">THROUGHPUT</span>
-                <p className="text-sm font-bold text-cyan-300">{data.throughputPerHour} kg/h</p>
-              </div>
-              {data.temperatureCelsius !== undefined && (
-                <div>
-                  <span className="text-gray-400 text-[10px]">OPERATING TEMP</span>
-                  <p className="text-sm font-bold text-rose-300">{data.temperatureCelsius}°C</p>
+            {/* 1. MACHINE & OPERATING PARAMETERS */}
+            <div className="p-2.5 rounded-xl bg-[#12172E] border border-[#1E2648]">
+              <div className="flex items-center justify-between mb-2 pb-1.5 border-b border-white/10">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] font-bold text-cyan-300 font-mono uppercase tracking-wider">
+                    ⚙️ Machine Telemetry
+                  </span>
+                  <span className="px-1.5 py-0.2 rounded bg-cyan-950 text-cyan-300 border border-cyan-500/40 text-[9px] font-bold font-mono">
+                    {data.machineParams?.machineCode || data.facilityCode}
+                  </span>
                 </div>
-              )}
-              {data.viscosityCp !== undefined && (
-                <div>
-                  <span className="text-gray-400 text-[10px]">VISCOSITY</span>
-                  <p className="text-sm font-bold text-amber-300">{data.viscosityCp.toLocaleString()} cP</p>
-                </div>
-              )}
-              {data.cocoaSolidsPercent !== undefined && (
-                <div>
-                  <span className="text-gray-400 text-[10px]">COCOA SOLIDS</span>
-                  <p className="text-sm font-bold text-emerald-300">{data.cocoaSolidsPercent}% Dark Mass</p>
-                </div>
-              )}
-              <div>
-                <span className="text-gray-400 text-[10px]">STATUS</span>
-                <p
-                  className={`text-sm font-bold ${
-                    data.status === 'optimal'
-                      ? 'text-emerald-400'
-                      : data.status === 'congested'
-                      ? 'text-amber-400'
-                      : 'text-red-400'
+                <span
+                  className={`text-[9px] font-mono px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${
+                    data.machineParams?.operatingStatus === 'normal' || data.status === 'optimal'
+                      ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                      : data.machineParams?.operatingStatus === 'warning' || data.status === 'congested'
+                      ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                      : 'bg-rose-500/20 text-rose-300 border border-rose-500/30'
                   }`}
                 >
-                  {data.status?.toUpperCase()}
-                </p>
+                  ● {data.machineParams?.operatingStatus || (data.status === 'optimal' ? 'NORMAL' : 'CONGESTED')}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 font-mono text-[11px]">
+                <div className="bg-[#090D1E]/80 p-2 rounded-lg border border-white/5">
+                  <span className="text-gray-400 text-[9px] block">MACHINE SPEED</span>
+                  <span className="text-sm font-bold text-white">
+                    {data.machineParams?.machineSpeedRpm ?? (data.processStageNumber === 2 ? 32 : data.processStageNumber === 6 ? 72 : 120)}{' '}
+                    <span className="text-[10px] font-normal text-gray-400">RPM</span>
+                  </span>
+                </div>
+                <div className="bg-[#090D1E]/80 p-2 rounded-lg border border-white/5">
+                  <span className="text-gray-400 text-[9px] block">CAPACITY UTILIZATION</span>
+                  <span className="text-sm font-bold text-amber-300">
+                    {data.machineParams?.capacityUtilizationPct ?? data.utilizationPercentage}%
+                  </span>
+                </div>
+                <div className="bg-[#090D1E]/80 p-2 rounded-lg border border-white/5">
+                  <span className="text-gray-400 text-[9px] block">DOWNTIME (LOST)</span>
+                  <span className="text-sm font-bold text-emerald-400">
+                    {data.machineParams?.downtimeMinutes ?? 0}{' '}
+                    <span className="text-[10px] font-normal text-gray-400">min</span>
+                  </span>
+                </div>
+                <div className="bg-[#090D1E]/80 p-2 rounded-lg border border-white/5">
+                  <span className="text-gray-400 text-[9px] block">MAINTENANCE STATUS</span>
+                  <span className="text-sm font-bold text-cyan-300">
+                    {data.machineParams?.maintenanceCondition || 'Optimal'}
+                  </span>
+                </div>
               </div>
             </div>
 
-            {/* 2. HOW MUCH CHOCOLATE (Volume & Output) */}
+            {/* 2. TEMPERATURE PARAMETERS */}
+            <div className="p-2.5 rounded-xl bg-rose-950/25 border border-rose-500/40">
+              <div className="flex items-center justify-between mb-2 pb-1.5 border-b border-rose-500/20">
+                <span className="text-[10px] font-bold text-rose-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <span>🌡️</span> Temperature Parameters
+                </span>
+                <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-rose-500/20 text-rose-200 border border-rose-500/30 font-bold">
+                  Units: °C
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 text-[11px] font-mono">
+                <div className="bg-[#090D1E]/80 p-2 rounded-lg border border-rose-500/20">
+                  <span className="text-gray-400 text-[9px] block">ZONE TEMPERATURE</span>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-sm font-bold text-rose-200">
+                      {data.temperatureParams?.currentTempCelsius ?? data.temperatureCelsius ?? 22}°C
+                    </span>
+                    <span className="text-[9px] text-gray-500">
+                      (Target: {data.temperatureParams?.targetTempCelsius ?? data.temperatureCelsius ?? 22}°C)
+                    </span>
+                  </div>
+                </div>
+
+                <div className="bg-[#090D1E]/80 p-2 rounded-lg border border-rose-500/20">
+                  <span className="text-gray-400 text-[9px] block">
+                    {data.processStageNumber === 2
+                      ? 'ROASTING TEMP'
+                      : data.processStageNumber === 6
+                      ? 'MIXING TEMP'
+                      : data.processStageNumber === 7
+                      ? 'TEMPERING TEMP'
+                      : data.processStageNumber === 8 || data.processStageNumber === 9
+                      ? 'COOLING TEMP'
+                      : 'ROOM TEMP'}
+                  </span>
+                  <span className="text-sm font-bold text-amber-300">
+                    {data.temperatureParams?.roastingTempCelsius
+                      ? `${data.temperatureParams.roastingTempCelsius}°C`
+                      : data.temperatureParams?.mixingTempCelsius
+                      ? `${data.temperatureParams.mixingTempCelsius}°C`
+                      : data.temperatureParams?.temperingTempCelsius
+                      ? `${data.temperatureParams.temperingTempCelsius}°C`
+                      : data.temperatureParams?.coolingTempCelsius
+                      ? `${data.temperatureParams.coolingTempCelsius}°C`
+                      : `${data.temperatureCelsius ?? 22}°C`}
+                  </span>
+                </div>
+
+                {data.viscosityCp !== undefined && (
+                  <div className="bg-[#090D1E]/80 p-2 rounded-lg border border-rose-500/20 col-span-2 flex items-center justify-between">
+                    <span className="text-gray-400 text-[10px]">VISCOSITY (RHEOLOGY):</span>
+                    <span className="text-amber-300 font-bold">{data.viscosityCp.toLocaleString()} cP</span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* 3. PRODUCTION PARAMETERS */}
             <div className="p-2.5 rounded-xl bg-amber-950/30 border border-amber-500/40">
-              <div className="flex items-center justify-between mb-1.5">
+              <div className="flex items-center justify-between mb-1.5 pb-1.5 border-b border-amber-500/20">
                 <span className="text-[10px] font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
-                  <span>🍫</span> Chocolate Output & Volume
+                  <span>🍫</span> Production Parameters
                 </span>
                 <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-200 border border-amber-500/30 font-bold">
-                  {data.chocolateVolumeTons ?? 0} MT Active
+                  kg/h • units/h
                 </span>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 text-[11px] font-mono mt-2">
+              <div className="grid grid-cols-2 gap-2 text-[11px] font-mono mt-1">
                 <div className="bg-[#090D1E]/80 p-2 rounded-lg border border-amber-500/20">
-                  <span className="text-gray-400 text-[9px] block">IN-PROCESS CHOCOLATE</span>
+                  <span className="text-gray-400 text-[9px] block">CHOCOLATE OUTPUT</span>
                   <span className="text-sm font-bold text-amber-200">
-                    {data.chocolateVolumeTons ?? 0} <span className="text-[10px] font-normal text-gray-400">Tons</span>
+                    {data.productionParams?.chocolateOutputKgPerHour
+                      ? `${data.productionParams.chocolateOutputKgPerHour.toLocaleString()} kg/h`
+                      : `${((data.chocolateVolumeTons ?? 22) * 50).toLocaleString()} kg/h`}
                   </span>
                 </div>
                 <div className="bg-[#090D1E]/80 p-2 rounded-lg border border-amber-500/20">
-                  <span className="text-gray-400 text-[9px] block">FINISHED GOODS</span>
-                  <span className="text-sm font-bold text-emerald-300">
-                    {data.finishedChocolateTons ? `${data.finishedChocolateTons} Tons` : 'Intermediate'}
+                  <span className="text-gray-400 text-[9px] block">BATCH SIZE</span>
+                  <span className="text-sm font-bold text-cyan-300">
+                    {data.productionParams?.batchSizeKg
+                      ? `${data.productionParams.batchSizeKg.toLocaleString()} kg/batch`
+                      : `${((data.batchCapacityLiters ?? 40000) * 0.2).toLocaleString()} kg/batch`}
                   </span>
                 </div>
-                <div className="bg-[#090D1E]/80 p-2 rounded-lg border border-amber-500/20 col-span-2 flex items-center justify-between">
-                  <span className="text-gray-400 text-[10px]">BATCH VESSEL CAPACITY:</span>
-                  <span className="text-cyan-300 font-bold">{data.batchCapacityLiters?.toLocaleString()} Liters</span>
+                <div className="bg-[#090D1E]/80 p-2 rounded-lg border border-amber-500/20">
+                  <span className="text-gray-400 text-[9px] block">PRODUCTION RATE</span>
+                  <span className="text-sm font-bold text-emerald-300">
+                    {data.productionParams?.productionRateUnitsPerHour
+                      ? `${data.productionParams.productionRateUnitsPerHour.toLocaleString()} units/h`
+                      : '3,200 units/h'}
+                  </span>
+                </div>
+                <div className="bg-[#090D1E]/80 p-2 rounded-lg border border-amber-500/20">
+                  <span className="text-gray-400 text-[9px] block">REJECTED PRODUCTS</span>
+                  <span className="text-sm font-bold text-rose-300">
+                    {data.productionParams?.rejectedProductsPct ?? 0.6}%{' '}
+                    <span className="text-[9px] font-normal text-gray-500">
+                      ({data.productionParams?.defectCount ?? 8} defects)
+                    </span>
+                  </span>
+                </div>
+                {data.productionParams?.packagesPerMinute !== undefined && (
+                  <div className="bg-[#090D1E]/80 p-2 rounded-lg border border-amber-500/20 col-span-2 flex items-center justify-between">
+                    <span className="text-gray-400 text-[10px]">PACKAGING COUNT & RATE:</span>
+                    <span className="text-white font-bold">
+                      {data.productionParams.packagesPerMinute} packages/min • {data.productionParams.packagingCountTotal.toLocaleString()} total
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* 4. ENVIRONMENTAL PARAMETERS */}
+            <div className="p-2.5 rounded-xl bg-cyan-950/25 border border-cyan-500/40">
+              <div className="flex items-center justify-between mb-1.5 pb-1.5 border-b border-cyan-500/20">
+                <span className="text-[10px] font-bold text-cyan-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <span>🌿</span> Environmental Parameters
+                </span>
+                <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-200 border border-cyan-500/30 font-bold">
+                  %RH • °C • kWh
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 text-[11px] font-mono mt-1">
+                <div className="bg-[#090D1E]/80 p-2 rounded-lg border border-cyan-500/20">
+                  <span className="text-gray-400 text-[9px] block">FACTORY HUMIDITY</span>
+                  <span className="text-sm font-bold text-cyan-200">
+                    {data.environmentalParams?.factoryHumidityRh ?? 42}% RH
+                  </span>
+                </div>
+                <div className="bg-[#090D1E]/80 p-2 rounded-lg border border-cyan-500/20">
+                  <span className="text-gray-400 text-[9px] block">ROOM TEMPERATURE</span>
+                  <span className="text-sm font-bold text-white">
+                    {data.environmentalParams?.roomTempCelsius ?? 21.0}°C
+                  </span>
+                </div>
+                <div className="bg-[#090D1E]/80 p-2 rounded-lg border border-cyan-500/20">
+                  <span className="text-gray-400 text-[9px] block">COOLING-WATER TEMP</span>
+                  <span className="text-sm font-bold text-blue-300">
+                    {data.environmentalParams?.coolingWaterTempCelsius ?? 14.5}°C
+                  </span>
+                </div>
+                <div className="bg-[#090D1E]/80 p-2 rounded-lg border border-cyan-500/20">
+                  <span className="text-gray-400 text-[9px] block">ENERGY CONSUMPTION</span>
+                  <span className="text-sm font-bold text-yellow-300">
+                    {data.environmentalParams?.energyConsumptionKwh ?? 420} kWh
+                  </span>
                 </div>
               </div>
             </div>
 
-            {/* 3. RAW MATERIALS INVENTORY & BUFFER */}
+            {/* 5. INVENTORY PARAMETERS */}
             <div className="p-2.5 rounded-xl bg-emerald-950/30 border border-emerald-500/40">
-              <div className="flex items-center justify-between mb-1.5">
+              <div className="flex items-center justify-between mb-1.5 pb-1.5 border-b border-emerald-500/20">
                 <span className="text-[10px] font-bold text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
-                  <span>🌾</span> Raw Materials Stock
+                  <span>🌾</span> Inventory Parameters
                 </span>
                 <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-200 border border-emerald-500/30 font-bold">
-                  {data.rawMaterialBufferDays ?? 14}d Reserve
+                  {data.rawMaterialBufferDays ?? 14}d Reserve Buffer
                 </span>
               </div>
 
               <div className="bg-[#090D1E]/80 p-2 rounded-lg border border-emerald-500/20 mb-2">
-                <div className="flex items-center justify-between text-[11px]">
+                <div className="flex items-center justify-between text-[11px] font-mono">
                   <span className="text-gray-400">Total Raw Stock:</span>
-                  <span className="text-emerald-300 font-bold text-xs">{data.rawMaterialStockTons ?? 0} MT</span>
+                  <span className="text-emerald-300 font-bold text-xs">{data.rawMaterialStockTons ?? 0} Tonnes</span>
                 </div>
                 {data.recipeRatio && (
                   <p className="text-[10px] text-amber-200/90 mt-1 italic border-t border-emerald-500/10 pt-1">
@@ -195,46 +414,32 @@ export const SelectedEntityDrawer: React.FC = () => {
               </div>
 
               {/* Material Breakdown Tags */}
-              {data.rawMaterialsBreakdown && (
-                <div className="grid grid-cols-2 gap-1.5 text-[10px] font-mono">
-                  {data.rawMaterialsBreakdown.cocoaBeans !== undefined && data.rawMaterialsBreakdown.cocoaBeans > 0 && (
-                    <div className="px-2 py-1 rounded bg-[#090D1E] border border-white/5 flex justify-between">
-                      <span className="text-gray-400">Cocoa Beans:</span>
-                      <span className="text-white font-bold">{data.rawMaterialsBreakdown.cocoaBeans} MT</span>
-                    </div>
-                  )}
-                  {data.rawMaterialsBreakdown.cocoaButter !== undefined && data.rawMaterialsBreakdown.cocoaButter > 0 && (
-                    <div className="px-2 py-1 rounded bg-[#090D1E] border border-white/5 flex justify-between">
-                      <span className="text-gray-400">Cocoa Butter:</span>
-                      <span className="text-amber-300 font-bold">{data.rawMaterialsBreakdown.cocoaButter} MT</span>
-                    </div>
-                  )}
-                  {data.rawMaterialsBreakdown.caneSugar !== undefined && data.rawMaterialsBreakdown.caneSugar > 0 && (
-                    <div className="px-2 py-1 rounded bg-[#090D1E] border border-white/5 flex justify-between">
-                      <span className="text-gray-400">Cane Sugar:</span>
-                      <span className="text-cyan-300 font-bold">{data.rawMaterialsBreakdown.caneSugar} MT</span>
-                    </div>
-                  )}
-                  {data.rawMaterialsBreakdown.milkPowder !== undefined && data.rawMaterialsBreakdown.milkPowder > 0 && (
-                    <div className="px-2 py-1 rounded bg-[#090D1E] border border-white/5 flex justify-between">
-                      <span className="text-gray-400">Milk Solids:</span>
-                      <span className="text-purple-300 font-bold">{data.rawMaterialsBreakdown.milkPowder} MT</span>
-                    </div>
-                  )}
-                  {data.rawMaterialsBreakdown.vanillaLecithinKg !== undefined && data.rawMaterialsBreakdown.vanillaLecithinKg > 0 && (
-                    <div className="px-2 py-1 rounded bg-[#090D1E] border border-white/5 flex justify-between">
-                      <span className="text-gray-400">Vanilla & Lecithin:</span>
-                      <span className="text-rose-300 font-bold">{data.rawMaterialsBreakdown.vanillaLecithinKg} kg</span>
-                    </div>
-                  )}
-                  {data.rawMaterialsBreakdown.pralineCaramelTons !== undefined && data.rawMaterialsBreakdown.pralineCaramelTons > 0 && (
-                    <div className="px-2 py-1 rounded bg-[#090D1E] border border-white/5 flex justify-between">
-                      <span className="text-gray-400">Praline/Caramel:</span>
-                      <span className="text-yellow-300 font-bold">{data.rawMaterialsBreakdown.pralineCaramelTons} MT</span>
-                    </div>
-                  )}
+              <div className="grid grid-cols-2 gap-1.5 text-[10px] font-mono">
+                <div className="px-2 py-1 rounded bg-[#090D1E] border border-white/5 flex justify-between">
+                  <span className="text-gray-400">Cocoa Beans:</span>
+                  <span className="text-white font-bold">{data.inventoryParams?.cocoaBeansKg ? `${(data.inventoryParams.cocoaBeansKg / 1000).toFixed(1)} T` : `${data.rawMaterialsBreakdown?.cocoaBeans ?? 0} T`}</span>
                 </div>
-              )}
+                <div className="px-2 py-1 rounded bg-[#090D1E] border border-white/5 flex justify-between">
+                  <span className="text-gray-400">Cocoa Butter:</span>
+                  <span className="text-amber-300 font-bold">{data.inventoryParams?.cocoaButterKg ? `${(data.inventoryParams.cocoaButterKg / 1000).toFixed(1)} T` : `${data.rawMaterialsBreakdown?.cocoaButter ?? 0} T`}</span>
+                </div>
+                <div className="px-2 py-1 rounded bg-[#090D1E] border border-white/5 flex justify-between">
+                  <span className="text-gray-400">Sugar:</span>
+                  <span className="text-cyan-300 font-bold">{data.inventoryParams?.sugarKg ? `${(data.inventoryParams.sugarKg / 1000).toFixed(1)} T` : `${data.rawMaterialsBreakdown?.caneSugar ?? 0} T`}</span>
+                </div>
+                <div className="px-2 py-1 rounded bg-[#090D1E] border border-white/5 flex justify-between">
+                  <span className="text-gray-400">Milk Powder:</span>
+                  <span className="text-purple-300 font-bold">{data.inventoryParams?.milkPowderKg ? `${(data.inventoryParams.milkPowderKg / 1000).toFixed(1)} T` : `${data.rawMaterialsBreakdown?.milkPowder ?? 0} T`}</span>
+                </div>
+                <div className="px-2 py-1 rounded bg-[#090D1E] border border-white/5 flex justify-between">
+                  <span className="text-gray-400">Packaging Mat:</span>
+                  <span className="text-yellow-300 font-bold">{data.inventoryParams?.packagingMaterialPackages?.toLocaleString() ?? '18,500'} pkgs</span>
+                </div>
+                <div className="px-2 py-1 rounded bg-[#090D1E] border border-white/5 flex justify-between">
+                  <span className="text-gray-400">Finished Stock:</span>
+                  <span className="text-emerald-300 font-bold">{data.finishedChocolateTons ? `${data.finishedChocolateTons} T` : '0 T'}</span>
+                </div>
+              </div>
             </div>
 
             {/* 4. SHOCK & QUALITY STABILITY TELEMETRY */}
@@ -292,6 +497,31 @@ export const SelectedEntityDrawer: React.FC = () => {
                 </p>
               )}
             </div>
+
+            {/* 6. ZONE MONITORED PARAMETERS (Section 2 Specification) */}
+            {data.processStageNumber && ZONE_MONITORED_PARAMETERS[data.processStageNumber] && (
+              <div className="p-2.5 rounded-xl bg-blue-950/25 border border-blue-500/40">
+                <div className="flex items-center justify-between mb-1.5 pb-1 border-b border-blue-500/20">
+                  <span className="text-[10px] font-bold text-blue-300 uppercase tracking-wider flex items-center gap-1.5 font-mono">
+                    <span>📋</span> {ZONE_MONITORED_PARAMETERS[data.processStageNumber].zoneName} Checklist
+                  </span>
+                  <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-blue-500/20 text-blue-200 border border-blue-500/30 font-bold">
+                    Zone {data.processStageNumber}
+                  </span>
+                </div>
+                <div className="grid grid-cols-1 gap-1.5 text-[10px] font-mono mt-1">
+                  {ZONE_MONITORED_PARAMETERS[data.processStageNumber].parameters.map((p, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center justify-between px-2 py-1 rounded bg-[#090D1E]/90 border border-white/5"
+                    >
+                      <span className="text-gray-400">{p.label}:</span>
+                      <span className="font-bold text-cyan-200">{p.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Actions */}
             <div className="space-y-1.5 pt-1">

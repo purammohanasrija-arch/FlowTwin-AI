@@ -128,6 +128,98 @@ export interface ShockMetrics {
   shockDescription?: string;
 }
 
+export interface FactoryTemperatureParameters {
+  currentTempCelsius: number;
+  targetTempCelsius: number;
+  roastingTempCelsius?: number;
+  mixingTempCelsius?: number;
+  temperingTempCelsius?: number;
+  coolingTempCelsius?: number;
+  moldTempCelsius?: number;
+  coolingRateCelsiusPerMin?: number;
+  tempToleranceCelsius?: number;
+  status?: 'normal' | 'warning' | 'critical';
+}
+
+export interface FactoryMachineParameters {
+  machineCode: string; // e.g. MIX-01, PKG-02, COOL-01
+  machineName: string; // e.g. Mixing Machine, Packaging, Cooling Tunnel
+  machineSpeedRpm?: number; // RPM
+  motorSpeedRpm?: number; // RPM
+  wrappingSpeedBpm?: number; // packages/min
+  capacityUtilizationPct: number; // %
+  operatingStatus: 'normal' | 'warning' | 'critical' | 'maintenance' | 'offline';
+  downtimeMinutes: number; // minutes
+  maintenanceCondition: 'Optimal' | 'Good' | 'Service Due' | 'Critical Wear';
+  vibrationMmSec?: number;
+  powerKw?: number;
+}
+
+export interface FactoryProductionParameters {
+  chocolateOutputKgPerHour: number; // kg/hour
+  batchSizeKg: number; // kg/batch
+  batchProgressPct?: number; // %
+  productionRateUnitsPerHour: number; // units/hour
+  packagesPerMinute?: number; // packages/min
+  rejectedProductsPct: number; // %
+  packagingCountTotal: number; // units
+  defectCount: number; // units
+  fillLevelPct?: number; // %
+  processingDurationMinutes?: number;
+}
+
+export interface FactoryEnvironmentalParameters {
+  factoryHumidityRh: number; // %RH
+  roomTempCelsius: number; // °C
+  coolingWaterTempCelsius: number; // °C
+  energyConsumptionKwh: number; // kWh
+  co2EmissionsKgPerHour?: number;
+}
+
+export interface FactoryInventoryParameters {
+  cocoaBeansKg: number;
+  cocoaButterKg: number;
+  sugarKg: number;
+  milkPowderKg: number;
+  packagingMaterialPackages: number;
+  finishedStockKg: number;
+  finishedStockPackages: number;
+  rawMaterialBufferDays: number;
+}
+
+export interface FactoryWideKPIs {
+  totalProductionTodayKg: number; // Chocolate produced today in kg (e.g. 28,450 kg)
+  productionEfficiencyPct: number; // Actual output compared with planned output (e.g. 94.2%)
+  machineAvailabilityPct: number; // Percentage of time machines are available (e.g. 98.1%)
+  qualityRatePct: number; // Percentage of products meeting quality criteria (e.g. 99.4%)
+  energyConsumptionKwh: number; // Electricity consumed in kWh (e.g. 4,820 kWh)
+  downtimeMinutes: number; // Minutes lost due to machine stoppages (e.g. 14 min)
+  rawMaterialInventoryTonnes: number; // Available raw materials in tonnes (e.g. 210.5 T)
+  finishedGoodsTonnes: number; // Finished goods in tonnes (e.g. 48.2 T)
+  orderFulfillmentPct: number; // Percentage of orders completed on time (e.g. 98.8%)
+  wastePercentage: number; // Material lost during production (e.g. 0.8%)
+  aiRiskScore: number; // Estimated production disruption risk (e.g. 12/100)
+}
+
+export interface Live3DMapTelemetry {
+  machineTag: string; // e.g. "MIX-01 · Mixing Machine"
+  primaryMetric: {
+    value: string; // e.g. "48°C", "120", "12°C"
+    label: string; // e.g. "Temperature", "Packages/minute", "Cooling temperature"
+    color?: string;
+  };
+  secondaryMetric: {
+    badge: string; // e.g. "CAPACITY", "REJECT RATE", "BATCH PROGRESS"
+    value: string; // e.g. "78%", "1.2%", "65%"
+    statusNote: string; // e.g. "Operating normally", "Within demo threshold"
+    statusColor: 'green' | 'amber' | 'red' | 'purple' | 'cyan';
+  };
+  extraMetrics?: {
+    label: string;
+    value: string;
+  }[];
+}
+
 export interface ChocolateProcessStage {
   stageNumber: number;
   code: string;
@@ -183,6 +275,14 @@ export interface FacilityNode3D extends FacilityRecord {
   thermalShockIndex?: number;
   temperShockRiskPct?: number;
   supplyShockVulnerability?: number;
+
+  // Smart Factory Machine & Process Parameters
+  machineParams?: FactoryMachineParameters;
+  temperatureParams?: FactoryTemperatureParameters;
+  productionParams?: FactoryProductionParameters;
+  environmentalParams?: FactoryEnvironmentalParameters;
+  inventoryParams?: FactoryInventoryParameters;
+  liveMapTelemetry?: Live3DMapTelemetry;
 }
 
 export interface RouteCorridor3D extends RouteRecord {

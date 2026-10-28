@@ -92,28 +92,28 @@ export const RiskVisualization: React.FC = () => {
                   <meshBasicMaterial color={color} />
                 </mesh>
 
-                {/* 3D Floating Utilization Pill Label */}
-                <group position={[0, towerHeight + 5.0, 0]}>
-                  <Html
-                    center
-                    distanceFactor={50}
-                    zIndexRange={[5, 0]}
-                    className="pointer-events-none select-none"
-                  >
-                    <div
-                      className={`px-2 py-0.5 rounded-lg text-[10px] font-mono font-extrabold border backdrop-blur-xl whitespace-nowrap transition-transform shadow-lg ${
-                        isSelected ? 'scale-125 shadow-amber-500/50' : ''
-                      }`}
-                      style={{
-                        backgroundColor: `${color}25`,
-                        borderColor: color,
-                        color: color,
-                      }}
+                {/* 3D Floating Utilization Pill Label (Only when facility is selected) */}
+                {isSelected && (
+                  <group position={[0, towerHeight + 5.0, 0]}>
+                    <Html
+                      center
+                      distanceFactor={44}
+                      zIndexRange={[5, 0]}
+                      className="pointer-events-none select-none"
                     >
-                      {utilPct}% TANK LOAD
-                    </div>
-                  </Html>
-                </group>
+                      <div
+                        className="px-2.5 py-1 rounded-xl text-xs font-mono font-extrabold border backdrop-blur-xl whitespace-nowrap shadow-xl scale-110"
+                        style={{
+                          backgroundColor: '#0D0E19f0',
+                          borderColor: color,
+                          color: color,
+                        }}
+                      >
+                        {utilPct}% TANK LOAD
+                      </div>
+                    </Html>
+                  </group>
+                )}
 
                 {/* Base Glow Ring on Ground */}
                 <mesh position={[0, 0.05, 0]} rotation={[-Math.PI / 2, 0, 0]}>

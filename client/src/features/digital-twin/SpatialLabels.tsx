@@ -2,6 +2,121 @@ import React from 'react';
 import { Html } from '@react-three/drei';
 import { useDigitalTwinStore } from './DigitalTwinStore.js';
 
+const STAGE_SHORT_NAMES: Record<number, string> = {
+  1: 'Raw Silos',
+  2: 'Drum Roasting',
+  3: 'Winnowing',
+  4: 'Butter Press',
+  5: 'Dairy Blend',
+  6: 'Conching',
+  7: 'Tempering',
+  8: 'Bulk Rail Tanker',
+  9: 'Molding & Enrobing',
+  10: 'Packaging Vault',
+};
+
+const STAGE_ICONS: Record<number, string> = {
+  1: '🚢',
+  2: '🔥',
+  3: '💨',
+  4: '⚙️',
+  5: '🥛',
+  6: '🍫',
+  7: '🌡️',
+  8: '🚂',
+  9: '🎨',
+  10: '🎁',
+};
+
+interface FacilityLabelProps {
+  facility: any;
+  isSelected: boolean;
+  onSelect: () => void;
+}
+
+const FacilityLabelItem: React.FC<FacilityLabelProps> = ({ facility, isSelected, onSelect }) => {
+  const [isHovered, setIsHovered] = React.useState(false);
+  const stageNum = facility.processStageNumber;
+  const shortName = stageNum ? STAGE_SHORT_NAMES[stageNum] || facility.name : facility.name;
+  const icon = stageNum ? STAGE_ICONS[stageNum] || '🏭' : '🏭';
+  const processName = facility.processStageName || facility.chocolateFacilityName || facility.name;
+
+  const statusColor =
+    facility.status === 'optimal'
+      ? 'bg-emerald-400'
+      : facility.status === 'congested'
+      ? 'bg-amber-400'
+      : 'bg-rose-400';
+
+  // Stagger height to prevent vertical collisions between adjacent plants
+  const heightOffset = facility.facilityCode === 'FAC-RAIL-08' ? 12.0 : 9.5;
+
+  return (
+    <group position={[facility.position3D[0], facility.position3D[1] + heightOffset, facility.position3D[2]]}>
+      <Html center distanceFactor={44} zIndexRange={[12, 0]} className="pointer-events-auto select-none">
+        <div
+          onClick={onSelect}
+          onMouseEnter={() => setIsHovered(true)}
+          onMouseLeave={() => setIsHovered(false)}
+          className={`cursor-pointer transition-all duration-200 ${
+            isSelected || isHovered ? 'z-50' : 'z-10'
+          }`}
+        >
+          {isSelected || isHovered ? (
+            /* Expanded detailed state on hover or selection */
+            <div className="px-3.5 py-2 rounded-2xl bg-[#140E0A]/95 border-2 border-amber-400 text-amber-100 shadow-[0_0_28px_rgba(245,158,11,0.55)] scale-105 font-mono whitespace-nowrap">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-base">{icon}</span>
+                {stageNum && (
+                  <span className="px-1.5 py-0.2 rounded bg-amber-500/30 text-amber-300 border border-amber-400/40 text-[9px] font-bold">
+                    STAGE {stageNum}
+                  </span>
+                )}
+                <span className="font-extrabold text-xs text-white tracking-wide">
+                  {processName}
+                </span>
+                <span className={`w-2 h-2 rounded-full shrink-0 ${statusColor} ${facility.status === 'congested' ? 'animate-pulse' : ''}`} />
+              </div>
+
+              <div className="flex items-center gap-2 text-[10px] text-gray-300 pl-4 border-t border-amber-500/20 pt-1">
+                <span className="text-amber-400/90 font-medium">{facility.facilityCode}</span>
+                <span className="text-gray-600">•</span>
+                <span className="text-emerald-400 font-bold">{facility.utilizationPercentage}% Tank Load</span>
+                {facility.temperatureCelsius && (
+                  <>
+                    <span className="text-gray-600">•</span>
+                    <span className="text-cyan-300 font-bold">{facility.temperatureCelsius}°C</span>
+                  </>
+                )}
+                {facility.viscosityCp && (
+                  <>
+                    <span className="text-gray-600">•</span>
+                    <span className="text-purple-300">{facility.viscosityCp} cP</span>
+                  </>
+                )}
+              </div>
+            </div>
+          ) : (
+            /* Minimal, sleek capsule badge when idle */
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#090C19]/90 border border-[#232B4E] hover:border-amber-400/80 text-gray-200 shadow-md backdrop-blur-md whitespace-nowrap font-sans hover:bg-[#15121E] transition-all">
+              <span className="text-xs">{icon}</span>
+              <span className="text-xs font-bold text-white tracking-tight">
+                {stageNum ? `${stageNum}. ${shortName}` : facility.name}
+              </span>
+              {facility.temperatureCelsius && (
+                <span className="text-[10px] font-mono text-cyan-300 px-1 py-0.2 rounded bg-black/40">
+                  {facility.temperatureCelsius}°C
+                </span>
+              )}
+              <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${statusColor}`} />
+            </div>
+          )}
+        </div>
+      </Html>
+    </group>
+  );
+};
+
 export const SpatialLabels: React.FC = () => {
   const layers = useDigitalTwinStore(s => s.layers);
   const facilities = useDigitalTwinStore(s => s.facilities);
@@ -15,96 +130,21 @@ export const SpatialLabels: React.FC = () => {
 
   return (
     <group name="SpatialLabels">
-      {/* 1. Facility Process Stage Labels */}
-      {facilities.map(facility => {
-        const isSelected =
-          selectedEntity?.type === 'facility' && selectedEntity.id === facility.facilityCode;
-
-        // Process friendly stage display
-        const stageNum = facility.processStageNumber;
-        const processName =
-          facility.processStageName ||
-          facility.chocolateFacilityName ||
-          facility.name;
-
-        const statusColor =
-          facility.status === 'optimal'
-            ? 'bg-emerald-400'
-            : facility.status === 'congested'
-            ? 'bg-amber-400'
-            : 'bg-rose-400';
-
-        return (
-          <group
-            key={facility.facilityCode}
-            position={[facility.position3D[0], facility.position3D[1] + 9.2, facility.position3D[2]]}
-          >
-            <Html
-              center
-              distanceFactor={44}
-              zIndexRange={[10, 0]}
-              className="pointer-events-auto select-none"
-            >
-              <div
-                onClick={() =>
-                  selectEntity({
-                    type: 'facility',
-                    id: facility.facilityCode,
-                    data: facility,
-                  })
-                }
-                className={`px-3 py-1.5 rounded-xl font-mono whitespace-nowrap backdrop-blur-xl border cursor-pointer transition-all duration-200 ${
-                  isSelected
-                    ? 'bg-[#1C120C]/95 border-amber-400 text-amber-100 shadow-[0_0_25px_rgba(251,191,36,0.6)] scale-110 z-50 ring-2 ring-amber-400/50'
-                    : 'bg-[#0E0F17]/90 border-[#2D334D] text-gray-200 hover:border-amber-400/80 hover:bg-[#16141F]/95 shadow-xl hover:scale-105'
-                }`}
-              >
-                {/* Header row: Stage badge + process title */}
-                <div className="flex items-center gap-1.5 mb-0.5">
-                  <span
-                    className={`w-2 h-2 rounded-full shrink-0 ${statusColor} ${
-                      facility.status === 'congested' ? 'animate-pulse' : ''
-                    }`}
-                  />
-                  {stageNum && (
-                    <span className="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[9px] font-bold tracking-wider">
-                      STAGE {stageNum}
-                    </span>
-                  )}
-                  <span className="font-bold text-[11px] text-white tracking-wide">
-                    {processName}
-                  </span>
-                </div>
-
-                {/* Sub-row: Facility Code + Tank Load + Operating Temp */}
-                <div className="flex items-center gap-2 text-[10px] text-gray-400 pl-3.5">
-                  <span className="text-gray-400 font-medium">{facility.facilityCode}</span>
-                  <span className="text-gray-600">•</span>
-                  <span
-                    className={`font-semibold ${
-                      facility.utilizationPercentage >= 85
-                        ? 'text-rose-400'
-                        : facility.utilizationPercentage >= 72
-                        ? 'text-amber-400'
-                        : 'text-emerald-400'
-                    }`}
-                  >
-                    {facility.utilizationPercentage}% Tank Load
-                  </span>
-                  {facility.temperatureCelsius && (
-                    <>
-                      <span className="text-gray-600">•</span>
-                      <span className="text-cyan-300 font-mono">
-                        {facility.temperatureCelsius}°C
-                      </span>
-                    </>
-                  )}
-                </div>
-              </div>
-            </Html>
-          </group>
-        );
-      })}
+      {/* 1. Facility Process Stage Labels (Clean, Compact, Minimal) */}
+      {facilities.map(facility => (
+        <FacilityLabelItem
+          key={facility.facilityCode}
+          facility={facility}
+          isSelected={selectedEntity?.type === 'facility' && selectedEntity.id === facility.facilityCode}
+          onSelect={() =>
+            selectEntity({
+              type: 'facility',
+              id: facility.facilityCode,
+              data: facility,
+            })
+          }
+        />
+      ))}
 
       {/* 2. Disruption Incident Badges (Jacket Failure & Viscosity Solidification) */}
       {isDisruptionActive &&

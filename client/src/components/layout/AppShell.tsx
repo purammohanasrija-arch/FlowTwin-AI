@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { Sidebar } from './Sidebar.js';
 import { Header } from './Header.js';
 import { AiCopilotDrawer } from '../copilot/AiCopilotDrawer.js';
@@ -7,6 +7,8 @@ import { Sparkles } from 'lucide-react';
 
 export const AppShell: React.FC = () => {
   const [copilotOpen, setCopilotOpen] = useState(false);
+  const location = useLocation();
+  const is3DView = location.pathname.includes('twin-3d');
 
   return (
     <div className="min-h-screen bg-[#090A10] text-[#F3F4F6] flex">
@@ -22,8 +24,8 @@ export const AppShell: React.FC = () => {
         </main>
       </div>
 
-      {/* Floating Copilot Toggle Button (Sticky on bottom right) */}
-      {!copilotOpen && (
+      {/* Floating Copilot Toggle Button (Sticky on bottom right, hidden in 3D twin where integrated copilot is active) */}
+      {!copilotOpen && !is3DView && (
         <button
           onClick={() => setCopilotOpen(true)}
           className="fixed bottom-6 right-6 px-4 py-2.5 rounded-full bg-gradient-to-r from-purple-600 via-indigo-600 to-purple-600 text-white font-semibold text-xs shadow-xl shadow-purple-600/30 hover:shadow-purple-600/50 hover:scale-105 transition-all z-30 flex items-center gap-2 border border-purple-400/30"

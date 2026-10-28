@@ -281,70 +281,70 @@ const RouteCorridorMesh: React.FC<RouteCorridorMeshProps> = ({
         </group>
       )}
 
-      {/* 8. Floating Holographic 3D Route Corridor Label */}
-      <group position={[midPoint.x, midPoint.y + 3.2, midPoint.z]}>
-        <Html center distanceFactor={50} zIndexRange={[15, 0]}>
-          <div
-            onClick={e => {
-              e.stopPropagation();
-              onSelect();
-            }}
-            className={`px-3 py-1.5 rounded-xl text-[10px] font-mono whitespace-nowrap backdrop-blur-xl border cursor-pointer transition-all duration-200 ${
-              isSelected || isHighlighted
-                ? 'bg-[#1F1208]/95 border-amber-400 text-white shadow-[0_0_20px_rgba(251,191,36,0.6)] scale-110 font-bold z-40'
-                : isClosed
-                ? 'bg-[#290808]/95 border-rose-500 text-rose-200 shadow-[0_0_18px_rgba(239,68,68,0.6)] font-bold animate-pulse'
-                : route.isBypassAlternative
-                ? 'bg-[#1C0D2E]/95 border-purple-400 text-purple-200 shadow-[0_0_15px_rgba(168,85,247,0.5)]'
-                : 'bg-[#0B0F1C]/90 border-[#232B4E] text-gray-200 hover:border-amber-400/80 hover:bg-[#151122]'
-            }`}
-          >
-            <div className="flex items-center gap-1.5 mb-0.5">
-              <span
-                className={`w-2 h-2 rounded-full ${
-                  isClosed
-                    ? 'bg-rose-500 animate-ping'
-                    : route.isBypassAlternative
-                    ? 'bg-purple-400 animate-pulse'
-                    : 'bg-emerald-400'
-                }`}
-              />
-              <span className="font-extrabold text-amber-200 tracking-wide">
-                {route.chocolatePipelineName || route.roadCorridor}
-              </span>
-              <span className="text-[9px] px-1.5 py-0.2 rounded bg-black/40 text-gray-300">
-                {route.roadCorridor}
-              </span>
-            </div>
+      {/* 8. Floating Holographic 3D Route Corridor Label (Clean View: Shown on hover, selection, or active disruption) */}
+      {(isHovered || isSelected || isHighlighted || isClosed) && (
+        <group position={[midPoint.x, midPoint.y + 3.2, midPoint.z]}>
+          <Html center distanceFactor={48} zIndexRange={[15, 0]}>
+            <div
+              onClick={e => {
+                e.stopPropagation();
+                onSelect();
+              }}
+              className={`px-3 py-1.5 rounded-xl text-[10px] font-mono whitespace-nowrap backdrop-blur-xl border cursor-pointer transition-all duration-200 ${
+                isSelected || isHighlighted
+                  ? 'bg-[#1F1208]/95 border-amber-400 text-white shadow-[0_0_20px_rgba(251,191,36,0.6)] scale-110 font-bold z-40'
+                  : isClosed
+                  ? 'bg-[#290808]/95 border-rose-500 text-rose-200 shadow-[0_0_18px_rgba(239,68,68,0.6)] font-bold animate-pulse'
+                  : 'bg-[#0B0F1C]/90 border-[#232B4E] text-gray-200 hover:border-amber-400/80 hover:bg-[#151122]'
+              }`}
+            >
+              <div className="flex items-center gap-1.5 mb-0.5">
+                <span
+                  className={`w-2 h-2 rounded-full ${
+                    isClosed
+                      ? 'bg-rose-500 animate-ping'
+                      : route.isBypassAlternative
+                      ? 'bg-purple-400 animate-pulse'
+                      : 'bg-emerald-400'
+                  }`}
+                />
+                <span className="font-extrabold text-amber-200 tracking-wide">
+                  {route.chocolatePipelineName || route.roadCorridor}
+                </span>
+                <span className="text-[9px] px-1.5 py-0.2 rounded bg-black/40 text-gray-300">
+                  {route.roadCorridor}
+                </span>
+              </div>
 
-            <div className="flex items-center gap-2 text-[9px] text-gray-400 pl-3.5">
-              <span
-                className={
-                  isClosed
-                    ? 'text-rose-400 font-bold'
+              <div className="flex items-center gap-2 text-[9px] text-gray-400 pl-3.5">
+                <span
+                  className={
+                    isClosed
+                      ? 'text-rose-400 font-bold'
+                      : route.isBypassAlternative
+                      ? 'text-purple-300 font-bold'
+                      : 'text-emerald-400'
+                  }
+                >
+                  {isClosed
+                    ? '⚠️ JACKET FAULT (SOLIDIFYING)'
                     : route.isBypassAlternative
-                    ? 'text-purple-300 font-bold'
-                    : 'text-emerald-400'
-                }
-              >
-                {isClosed
-                  ? '⚠️ JACKET FAULT (SOLIDIFYING)'
-                  : route.isBypassAlternative
-                  ? '🔄 THERMAL BYPASS (32°C)'
-                  : '🟢 OPTIMAL FLOW (48°C)'}
-              </span>
-              {route.ingredientFlow && (
-                <>
-                  <span className="text-gray-600">•</span>
-                  <span className="text-amber-300/80 italic">
-                    {route.ingredientFlow.split('(')[0]}
-                  </span>
-                </>
-              )}
+                    ? '🔄 THERMAL BYPASS (32°C)'
+                    : '🟢 OPTIMAL FLOW (48°C)'}
+                </span>
+                {route.ingredientFlow && (
+                  <>
+                    <span className="text-gray-600">•</span>
+                    <span className="text-amber-300/80 italic">
+                      {route.ingredientFlow.split('(')[0]}
+                    </span>
+                  </>
+                )}
+              </div>
             </div>
-          </div>
-        </Html>
-      </group>
+          </Html>
+        </group>
+      )}
     </group>
   );
 };

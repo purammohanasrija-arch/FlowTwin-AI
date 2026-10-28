@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDigitalTwinStore } from './DigitalTwinStore.js';
 import { QualityPreset, WeatherPreset, CameraMode, ViewLayer } from './types.js';
 import { CHOCOLATE_PROCESS_STAGES } from './initialData.js';
@@ -81,6 +81,13 @@ export const SpatialHUD: React.FC = () => {
   const [aiPrompt, setAiPrompt] = useState('');
   const [disruptionModalOpen, setDisruptionModalOpen] = useState(false);
   const [guideModalOpen, setGuideModalOpen] = useState(false);
+  const [responseDismissed, setResponseDismissed] = useState(false);
+
+  useEffect(() => {
+    if (aiCopilot.lastResponse) {
+      setResponseDismissed(false);
+    }
+  }, [aiCopilot.lastResponse]);
 
   // Search filter
   const handleSearch = (e: React.FormEvent) => {
@@ -138,90 +145,135 @@ export const SpatialHUD: React.FC = () => {
 
   return (
     <div className="absolute inset-0 pointer-events-none select-none z-40 flex flex-col justify-between p-4 overflow-hidden">
-      {/* 1. TOP SPATIAL NAVIGATION BAR */}
-      <div className="flex items-center justify-between gap-4 pointer-events-auto relative z-30">
-        {/* Left Branding & Mode Indicator */}
-        <div className="flex items-center gap-3 px-4 py-2.5 rounded-2xl bg-[#090D1E]/90 border border-amber-500/40 backdrop-blur-xl shadow-2xl">
+      {/* 1. TOP SPATIAL COMMAND DECK (Unified Single Header) */}
+      <div className="flex items-center justify-between gap-3 px-3.5 py-2 rounded-2xl bg-[#090D1E]/90 border border-amber-500/30 backdrop-blur-xl shadow-2xl pointer-events-auto relative z-30">
+        {/* Left: Brand Identity */}
+        <div className="flex items-center gap-2.5 shrink-0">
           <div className="relative">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-500 via-orange-500 to-amber-700 flex items-center justify-center shadow-[0_0_15px_rgba(245,158,11,0.5)]">
-              <span className="text-base select-none">🍫</span>
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-500 via-orange-500 to-amber-700 flex items-center justify-center shadow-[0_0_15px_rgba(245,158,11,0.5)] text-base select-none">
+              🍫
             </div>
-            <span className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-emerald-400 border-2 border-[#090D1E] animate-pulse" />
+            <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-emerald-400 border-2 border-[#090D1E] animate-pulse" />
           </div>
-
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="font-mono font-extrabold text-sm tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-amber-100 to-amber-500">
+              <span className="font-mono font-extrabold text-sm tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-amber-100 to-amber-500">
                 FLOWTWIN AI
-              </h1>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-950/90 text-amber-300 border border-amber-500/50 font-bold flex items-center gap-1 shadow-[0_0_10px_rgba(245,158,11,0.3)]">
-                CHOCOLATE FACTORY TWIN
+              </span>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-950/90 text-amber-300 border border-amber-500/50 font-bold hidden sm:inline-flex items-center gap-1">
+                CHOCOLATE TWIN
               </span>
             </div>
-            <p className="text-[10px] font-mono text-amber-200/70">
-              Artisan Bean-to-Bar Process Control, Viscosity & Temperature 3D Twin
+            <p className="text-[9px] font-mono text-amber-200/60 hidden xl:block">
+              Bean-to-Bar Process Control & Temperature 3D Twin
             </p>
           </div>
         </div>
 
-        {/* Center Search Bar */}
-        <form
-          onSubmit={handleSearch}
-          className="flex-1 max-w-md hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#0D1226]/85 border border-[#232B4E] backdrop-blur-lg focus-within:border-amber-400 transition-colors shadow-lg"
-        >
-          <Search className="w-4 h-4 text-amber-400" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            placeholder="Search chocolate process (Conching, Tempering, Roasting, Cocoa Butter)..."
-            className="w-full bg-transparent text-xs text-white placeholder-gray-500 focus:outline-none font-mono"
-          />
-        </form>
+        {/* Center: 10-Stage Process Stepper (Clean, Compact & Expandable) */}
+        <div className="flex items-center gap-1 overflow-x-auto no-scrollbar py-0.5 px-2 rounded-xl bg-black/40 border border-[#232B4E]/80">
+          {CHOCOLATE_PROCESS_STAGES.map((stage) => {
+            const isSelected = selectedEntity?.type === 'facility' && selectedEntity.id === stage.facilityCode;
+            return (
+              <button
+                key={stage.code}
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  focusOnFacility(stage.facilityCode);
+                }}
+                className={`flex items-center gap-1 px-2 py-1 rounded-lg text-xs font-mono transition-all cursor-pointer shrink-0 ${
+                  isSelected
+                    ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-black font-extrabold shadow-[0_0_12px_rgba(245,158,11,0.6)] scale-105'
+                    : 'text-gray-300 hover:text-amber-200 hover:bg-white/5 border border-transparent hover:border-amber-500/30'
+                }`}
+                title={`Stage ${stage.stageNumber}: ${stage.name} (${stage.operatingTempCelsius}°C) - Click to inspect ${stage.facilityCode}`}
+              >
+                <span>{stage.icon}</span>
+                <span className="text-[10px] opacity-80">{stage.stageNumber}</span>
+                {isSelected ? (
+                  <span className="text-[11px] font-sans font-bold flex items-center gap-1 pl-0.5">
+                    <span>{stage.name.split(' ')[0]}</span>
+                    <span className="text-[9px] font-mono bg-black/30 px-1 py-0.5 rounded text-amber-950 font-bold">
+                      {stage.operatingTempCelsius}°C
+                    </span>
+                  </span>
+                ) : null}
+              </button>
+            );
+          })}
 
-        {/* Right Scene Quick Controls (Camera, Weather, Quality, Fullscreen) */}
-        <div className="flex items-center gap-2">
+          <div className="h-4 w-[1px] bg-white/10 mx-1 shrink-0" />
+
+          {/* Process Guide Modal Button */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setGuideModalOpen(true);
+            }}
+            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-500/10 border border-amber-400/40 text-amber-300 hover:text-white hover:bg-amber-500/25 text-xs font-mono font-bold shrink-0 cursor-pointer transition-all"
+            title="Open Complete Bean-to-Bar Process Guide & Recipes"
+          >
+            <BookOpen className="w-3.5 h-3.5" />
+            <span className="hidden md:inline text-[11px]">Guide</span>
+          </button>
+        </div>
+
+        {/* Right Scene Quick Controls (Search, Camera, Weather, Quality, Reset, Fullscreen) */}
+        <div className="flex items-center gap-1.5 shrink-0">
+          {/* Quick Search */}
+          <form
+            onSubmit={handleSearch}
+            className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-black/40 border border-[#232B4E] focus-within:border-amber-400 transition-colors"
+          >
+            <Search className="w-3.5 h-3.5 text-amber-400" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              placeholder="Search stage..."
+              className="w-24 lg:w-28 bg-transparent text-xs text-white placeholder-gray-500 focus:outline-none font-mono"
+            />
+          </form>
+
           {/* Camera Preset Dropdown */}
-          <div className="relative">
-            <select
-              value={cameraMode}
-              onChange={e => {
-                e.stopPropagation();
-                setCameraMode(e.target.value as CameraMode);
-              }}
-              className="px-3 py-2 rounded-xl bg-[#0D1226]/90 border border-[#232B4E] text-xs font-mono text-cyan-300 backdrop-blur-md focus:outline-none cursor-pointer"
-            >
-              <option value="overview">🔭 Command Overview</option>
-              <option value="freefly">🎮 Free-Fly Explorer</option>
-              <option value="follow_vehicle">🚛 Follow Vehicle</option>
-              <option value="executive_flyover">🎬 Executive Flyover</option>
-              <option value="incident_focus">⚠️ Incident Focus</option>
-              <option value="warehouse_inspect">🏢 Inspect Warehouse</option>
-            </select>
-          </div>
+          <select
+            value={cameraMode}
+            onChange={e => {
+              e.stopPropagation();
+              setCameraMode(e.target.value as CameraMode);
+            }}
+            className="px-2.5 py-1.5 rounded-xl bg-black/40 border border-[#232B4E] text-xs font-mono text-cyan-300 backdrop-blur-md focus:outline-none cursor-pointer"
+          >
+            <option value="overview">🔭 Overview</option>
+            <option value="freefly">🎮 Free-Fly</option>
+            <option value="follow_vehicle">🚛 Follow</option>
+            <option value="executive_flyover">🎬 Flyover</option>
+            <option value="incident_focus">⚠️ Incident</option>
+            <option value="warehouse_inspect">🏢 Factory</option>
+          </select>
 
           {/* Weather Selector */}
-          <div className="relative">
-            <select
-              value={weather}
-              onChange={e => {
-                e.stopPropagation();
-                setWeather(e.target.value as WeatherPreset);
-              }}
-              className="px-3 py-2 rounded-xl bg-[#0D1226]/90 border border-[#232B4E] text-xs font-mono text-purple-300 backdrop-blur-md focus:outline-none cursor-pointer"
-            >
-              <option value="midnight_cyber">🌌 Cyber Midnight</option>
-              <option value="clear_day">☀️ Clear Midday</option>
-              <option value="golden_hour">🌅 Golden Hour</option>
-              <option value="storm_blizzard">❄️ Blizzard Storm</option>
-              <option value="heavy_rain">🌧️ Heavy Rain</option>
-              <option value="dense_fog">🌫️ Dense Fog</option>
-              <option value="extreme_heat">🔥 Extreme Heat</option>
-            </select>
-          </div>
+          <select
+            value={weather}
+            onChange={e => {
+              e.stopPropagation();
+              setWeather(e.target.value as WeatherPreset);
+            }}
+            className="px-2.5 py-1.5 rounded-xl bg-black/40 border border-[#232B4E] text-xs font-mono text-purple-300 backdrop-blur-md focus:outline-none cursor-pointer hidden lg:block"
+          >
+            <option value="midnight_cyber">🌌 Cyber</option>
+            <option value="clear_day">☀️ Day</option>
+            <option value="golden_hour">🌅 Golden</option>
+            <option value="storm_blizzard">❄️ Blizzard</option>
+            <option value="heavy_rain">🌧️ Rain</option>
+            <option value="dense_fog">🌫️ Fog</option>
+            <option value="extreme_heat">🔥 Heat</option>
+          </select>
 
           {/* Quality Preset Toggle */}
-          <div className="flex items-center bg-[#0D1226]/90 rounded-xl p-1 border border-[#232B4E] text-[11px] font-mono">
+          <div className="hidden 2xl:flex items-center bg-black/40 rounded-xl p-0.5 border border-[#232B4E] text-[10px] font-mono">
             {(['cinematic', 'balanced', 'performance'] as QualityPreset[]).map(q => (
               <button
                 key={q}
@@ -230,9 +282,9 @@ export const SpatialHUD: React.FC = () => {
                   e.stopPropagation();
                   setQuality(q);
                 }}
-                className={`px-2.5 py-1 rounded-lg uppercase tracking-wider font-bold cursor-pointer transition-all ${
+                className={`px-2 py-0.5 rounded-lg uppercase tracking-wider font-bold cursor-pointer transition-all ${
                   quality === q
-                    ? 'bg-purple-600 text-white shadow-[0_0_10px_#A855F7]'
+                    ? 'bg-purple-600 text-white shadow-[0_0_8px_#A855F7]'
                     : 'text-gray-400 hover:text-gray-200'
                 }`}
               >
@@ -248,10 +300,10 @@ export const SpatialHUD: React.FC = () => {
               e.stopPropagation();
               resetScene();
             }}
-            className="p-2 rounded-xl bg-[#0D1226]/90 border border-[#232B4E] hover:border-cyan-400 text-gray-300 hover:text-cyan-300 transition-colors cursor-pointer"
+            className="p-1.5 rounded-xl bg-black/40 border border-[#232B4E] hover:border-cyan-400 text-gray-300 hover:text-cyan-300 transition-colors cursor-pointer"
             title="Reset Scene Viewpoint"
           >
-            <RefreshCw className="w-4 h-4" />
+            <RefreshCw className="w-3.5 h-3.5" />
           </button>
 
           {/* Fullscreen Button */}
@@ -261,79 +313,12 @@ export const SpatialHUD: React.FC = () => {
               e.stopPropagation();
               handleFullscreen();
             }}
-            className="p-2 rounded-xl bg-[#0D1226]/90 border border-[#232B4E] hover:border-cyan-400 text-gray-300 hover:text-cyan-300 transition-colors cursor-pointer"
+            className="p-1.5 rounded-xl bg-black/40 border border-[#232B4E] hover:border-cyan-400 text-gray-300 hover:text-cyan-300 transition-colors cursor-pointer"
             title="Toggle Fullscreen Command Center"
           >
-            <Maximize2 className="w-4 h-4" />
+            <Maximize2 className="w-3.5 h-3.5" />
           </button>
         </div>
-      </div>
-
-      {/* 1.2 CHOCOLATE PROCESS FLOW STAGES BREADCRUMB BAR */}
-      <div className="w-full mt-2 px-3 py-2 rounded-2xl bg-[#090D1E]/95 border border-amber-500/40 backdrop-blur-xl shadow-[0_4px_25px_rgba(245,158,11,0.15)] pointer-events-auto flex items-center justify-between gap-3 text-xs font-mono overflow-x-auto scrollbar-thin">
-        {/* Left Label */}
-        <div className="flex items-center gap-2 shrink-0 pr-2 border-r border-[#232B4E]">
-          <span className="text-base">🍫</span>
-          <div>
-            <div className="text-[10px] font-bold uppercase tracking-wider text-amber-400">
-              Bean-to-Bar Process Flow
-            </div>
-            <div className="text-[9px] text-gray-400">
-              10 Precision Manufacturing Stages
-            </div>
-          </div>
-        </div>
-
-        {/* 10 Interactive Stages */}
-        <div className="flex items-center gap-1.5 overflow-x-auto py-0.5 no-scrollbar">
-          {CHOCOLATE_PROCESS_STAGES.map((stage, idx) => {
-            const isSelected = selectedEntity?.type === 'facility' && selectedEntity.id === stage.facilityCode;
-            return (
-              <React.Fragment key={stage.code}>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    focusOnFacility(stage.facilityCode);
-                  }}
-                  className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-[11px] font-bold shrink-0 transition-all cursor-pointer ${
-                    isSelected
-                      ? 'bg-gradient-to-r from-amber-600 to-amber-700 border-amber-300 text-white shadow-[0_0_15px_rgba(245,158,11,0.6)] scale-105'
-                      : 'bg-[#0D1226]/80 border-[#232B4E] text-gray-300 hover:text-amber-300 hover:border-amber-500/60 hover:bg-amber-950/30'
-                  }`}
-                  title={`${stage.name} • ${stage.facilityCode} (${stage.operatingTempCelsius}°C)`}
-                >
-                  <span className="text-xs">{stage.icon}</span>
-                  <span className="text-[10px] text-amber-400/90 font-mono">
-                    {stage.stageNumber}.
-                  </span>
-                  <span className="truncate max-w-[130px] font-sans text-xs">
-                    {stage.name}
-                  </span>
-                  <span className="text-[9px] font-mono px-1 py-0.5 rounded bg-black/40 text-amber-200">
-                    {stage.operatingTempCelsius}°C
-                  </span>
-                </button>
-                {idx < CHOCOLATE_PROCESS_STAGES.length - 1 && (
-                  <span className="text-amber-500/40 text-[10px] select-none">→</span>
-                )}
-              </React.Fragment>
-            );
-          })}
-        </div>
-
-        {/* Process Guide Button */}
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            setGuideModalOpen(true);
-          }}
-          className="shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500/20 to-orange-500/20 border border-amber-400/50 text-amber-300 hover:text-white hover:bg-amber-500/30 transition-all text-xs font-bold cursor-pointer shadow-sm"
-        >
-          <BookOpen className="w-3.5 h-3.5" />
-          <span>Process Guide</span>
-        </button>
       </div>
 
       {/* 1.5 3D LAYOUT & EXPLODED CONTROLLER BAR */}
@@ -825,46 +810,39 @@ export const SpatialHUD: React.FC = () => {
             >
               ⚠️ Freeze Fault
             </button>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                executeAICommand('Show all chocolate production stages');
-              }}
-              className="px-2 py-0.5 rounded-lg bg-yellow-950/60 border border-yellow-500/40 text-yellow-300 hover:bg-yellow-900/60 cursor-pointer transition-all hover:scale-105 active:scale-95"
-            >
-              📖 10 Stages
-            </button>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                executeAICommand('Exploded supply chain graph');
-              }}
-              className="px-2 py-0.5 rounded-lg bg-indigo-950/60 border border-indigo-500/40 text-indigo-300 hover:bg-indigo-900/60 cursor-pointer transition-all hover:scale-105 active:scale-95"
-            >
-              7-Layer Stack
-            </button>
           </div>
         </div>
 
-        {/* AI Copilot Last Response Banner (if available) */}
-        {aiCopilot.lastResponse && (
-          <div className="w-full max-w-4xl mx-auto px-4 py-1.5 rounded-xl bg-amber-950/80 border border-amber-500/40 text-amber-200 text-[11px] font-mono flex items-center justify-between shadow-lg">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
-              <span>{aiCopilot.lastResponse}</span>
+        {/* AI Copilot Last Response Banner (if available and not dismissed) */}
+        {aiCopilot.lastResponse && !responseDismissed && (
+          <div className="w-full max-w-4xl mx-auto px-4 py-2 rounded-xl bg-[#090D1E]/95 border border-amber-500/40 text-amber-200 text-xs font-mono flex items-center justify-between shadow-2xl backdrop-blur-xl animate-fade-in">
+            <div className="flex items-center gap-2.5 overflow-hidden">
+              <span className="w-2 h-2 rounded-full bg-amber-400 shrink-0 animate-ping" />
+              <span className="truncate">{aiCopilot.lastResponse}</span>
             </div>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                executeAICommand('Reset view to network overview');
-              }}
-              className="text-[10px] text-amber-300 hover:underline cursor-pointer"
-            >
-              Recenter Overview
-            </button>
+            <div className="flex items-center gap-3 shrink-0 ml-3">
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  executeAICommand('Reset view to network overview');
+                }}
+                className="text-[11px] text-amber-300 hover:text-white hover:underline cursor-pointer"
+              >
+                Recenter Overview
+              </button>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setResponseDismissed(true);
+                }}
+                className="p-1 rounded-md text-amber-400 hover:text-white hover:bg-white/10 cursor-pointer transition-colors"
+                title="Dismiss message"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
         )}
 

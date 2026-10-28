@@ -122,9 +122,8 @@ export const PlatformPillarsSection: React.FC = () => {
               transition={{ duration: 0.5, delay: idx * 0.1 }}
               whileHover={{ y: -6, transition: { duration: 0.2 } }}
               onClick={() => navigate(pillar.route)}
-              className={`group relative p-6 sm:p-7 rounded-2xl bg-[#080D24]/85 hover:bg-[#0C1236]/95 border border-white/[0.08] ${pillar.borderHover} backdrop-blur-2xl transition-all duration-300 cursor-pointer flex flex-col justify-between text-left ${
-                idx === 0 ? 'lg:col-span-2' : ''
-              }`}
+              className={`group relative p-6 sm:p-7 rounded-2xl bg-[#080D24]/85 hover:bg-[#0C1236]/95 border border-white/[0.08] ${pillar.borderHover} backdrop-blur-2xl transition-all duration-300 cursor-pointer flex flex-col justify-between text-left ${idx === 0 ? 'lg:col-span-2' : ''
+                }`}
             >
               <div className="space-y-4">
                 {/* Header row: Icon + Badge */}

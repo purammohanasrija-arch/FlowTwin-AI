@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useDigitalTwinStore } from './DigitalTwinStore.js';
 import {
   X,
@@ -107,6 +107,8 @@ const ZONE_MONITORED_PARAMETERS: Record<
 export const SelectedEntityDrawer: React.FC = () => {
   const selectedEntity = useDigitalTwinStore(s => s.selectedEntity);
   const selectEntity = useDigitalTwinStore(s => s.selectEntity);
+  const facilities = useDigitalTwinStore(s => s.facilities);
+  const focusOnFacility = useDigitalTwinStore(s => s.focusOnFacility);
   const followVehicle = useDigitalTwinStore(s => s.followVehicle);
   const followedVehicleId = useDigitalTwinStore(s => s.followedVehicleId);
   const cameraMode = useDigitalTwinStore(s => s.cameraMode);
@@ -115,6 +117,8 @@ export const SelectedEntityDrawer: React.FC = () => {
   const toggleExplodedGraph = useDigitalTwinStore(s => s.toggleExplodedGraph);
   const applyRecoveryPlan = useDigitalTwinStore(s => s.applyRecoveryPlan);
   const triggerDisruption = useDigitalTwinStore(s => s.triggerDisruption);
+
+  const [categoryTab, setCategoryTab] = useState<'all' | 'machine' | 'temp' | 'production' | 'environment' | 'inventory'>('all');
 
   if (!selectedEntity) return null;
 
@@ -183,7 +187,33 @@ export const SelectedEntityDrawer: React.FC = () => {
               )}
             </div>
 
+            {/* 15 Parameters Category Filter Tabs */}
+            <div className="flex items-center gap-1 overflow-x-auto no-scrollbar py-1 border-b border-white/10 mb-1">
+              {[
+                { id: 'all', label: 'All 15' },
+                { id: 'machine', label: '⚙️ Machine' },
+                { id: 'temp', label: '🌡️ Temp' },
+                { id: 'production', label: '🍫 Output' },
+                { id: 'environment', label: '🌿 Eco' },
+                { id: 'inventory', label: '📦 Stock' },
+              ].map(tab => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setCategoryTab(tab.id as any)}
+                  className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold whitespace-nowrap cursor-pointer transition-all ${
+                    categoryTab === tab.id
+                      ? 'bg-amber-500 text-black shadow-sm'
+                      : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
             {/* 1. MACHINE & OPERATING PARAMETERS */}
+            {(categoryTab === 'all' || categoryTab === 'machine') && (
             <div className="p-2.5 rounded-xl bg-[#12172E] border border-[#1E2648]">
               <div className="flex items-center justify-between mb-2 pb-1.5 border-b border-white/10">
                 <div className="flex items-center gap-1.5">
@@ -236,8 +266,10 @@ export const SelectedEntityDrawer: React.FC = () => {
                 </div>
               </div>
             </div>
+            )}
 
             {/* 2. TEMPERATURE PARAMETERS */}
+            {(categoryTab === 'all' || categoryTab === 'temp') && (
             <div className="p-2.5 rounded-xl bg-rose-950/25 border border-rose-500/40">
               <div className="flex items-center justify-between mb-2 pb-1.5 border-b border-rose-500/20">
                 <span className="text-[10px] font-bold text-rose-300 uppercase tracking-wider flex items-center gap-1.5">
@@ -294,8 +326,10 @@ export const SelectedEntityDrawer: React.FC = () => {
                 )}
               </div>
             </div>
+            )}
 
             {/* 3. PRODUCTION PARAMETERS */}
+            {(categoryTab === 'all' || categoryTab === 'production') && (
             <div className="p-2.5 rounded-xl bg-amber-950/30 border border-amber-500/40">
               <div className="flex items-center justify-between mb-1.5 pb-1.5 border-b border-amber-500/20">
                 <span className="text-[10px] font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
@@ -350,8 +384,10 @@ export const SelectedEntityDrawer: React.FC = () => {
                 )}
               </div>
             </div>
+            )}
 
             {/* 4. ENVIRONMENTAL PARAMETERS */}
+            {(categoryTab === 'all' || categoryTab === 'environment') && (
             <div className="p-2.5 rounded-xl bg-cyan-950/25 border border-cyan-500/40">
               <div className="flex items-center justify-between mb-1.5 pb-1.5 border-b border-cyan-500/20">
                 <span className="text-[10px] font-bold text-cyan-300 uppercase tracking-wider flex items-center gap-1.5">
@@ -389,8 +425,10 @@ export const SelectedEntityDrawer: React.FC = () => {
                 </div>
               </div>
             </div>
+            )}
 
             {/* 5. INVENTORY PARAMETERS */}
+            {(categoryTab === 'all' || categoryTab === 'inventory') && (
             <div className="p-2.5 rounded-xl bg-emerald-950/30 border border-emerald-500/40">
               <div className="flex items-center justify-between mb-1.5 pb-1.5 border-b border-emerald-500/20">
                 <span className="text-[10px] font-bold text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
@@ -441,6 +479,7 @@ export const SelectedEntityDrawer: React.FC = () => {
                 </div>
               </div>
             </div>
+            )}
 
             {/* 4. SHOCK & QUALITY STABILITY TELEMETRY */}
             <div className="p-2.5 rounded-xl bg-purple-950/30 border border-purple-500/40">
@@ -524,7 +563,7 @@ export const SelectedEntityDrawer: React.FC = () => {
             )}
 
             {/* Actions */}
-            <div className="space-y-1.5 pt-1">
+            <div className="space-y-2 pt-1">
               <button
                 type="button"
                 onClick={(e) => {
@@ -538,6 +577,32 @@ export const SelectedEntityDrawer: React.FC = () => {
                   ? 'Exit Factory Interior'
                   : 'Inspect Factory Interior Cutaway'}
               </button>
+
+              {/* Easy Previous / Next Machine Stepper */}
+              <div className="flex items-center justify-between gap-2 pt-1 font-mono text-xs">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const currentIdx = facilities.findIndex(f => f.facilityCode === (data.facilityCode || id));
+                    const prevFac = facilities[(currentIdx - 1 + facilities.length) % facilities.length];
+                    if (prevFac) focusOnFacility(prevFac.facilityCode);
+                  }}
+                  className="flex-1 py-1.5 px-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-300 hover:text-white text-center cursor-pointer transition-all"
+                >
+                  ◀ Prev Machine
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const currentIdx = facilities.findIndex(f => f.facilityCode === (data.facilityCode || id));
+                    const nextFac = facilities[(currentIdx + 1) % facilities.length];
+                    if (nextFac) focusOnFacility(nextFac.facilityCode);
+                  }}
+                  className="flex-1 py-1.5 px-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-extrabold shadow-md shadow-amber-500/25 text-center cursor-pointer transition-all"
+                >
+                  Next Machine ▶
+                </button>
+              </div>
             </div>
           </>
         )}

@@ -449,6 +449,14 @@ export const SpatialHUD: React.FC = () => {
 
         {/* The Unified Process Story Dock */}
         <div className="w-full px-4 py-2.5 rounded-2xl bg-[#090D1E]/95 border border-amber-500/40 backdrop-blur-2xl shadow-[0_8px_32px_rgba(0,0,0,0.8)] flex flex-col gap-2">
+          {/* Visual Stage Progress Line */}
+          <div className="w-full bg-black/50 h-1.5 rounded-full overflow-hidden border border-white/5 flex items-center">
+            <div
+              className="bg-gradient-to-r from-amber-500 via-orange-400 to-amber-300 h-full transition-all duration-500 rounded-full shadow-[0_0_8px_rgba(245,158,11,0.6)]"
+              style={{ width: `${(activeStage.stageNumber / 10) * 100}%` }}
+            />
+          </div>
+
           {/* Main Info Row */}
           <div className="flex flex-col md:flex-row items-center justify-between gap-3">
             {/* Left: Stage Icon, Stage Number, Name & Short Narrative */}
@@ -467,6 +475,11 @@ export const SpatialHUD: React.FC = () => {
                   <span className="text-xs font-mono font-bold px-2 py-0.5 rounded-full bg-black/50 border border-amber-400 text-amber-300">
                     {activeStage.operatingTempCelsius}°C
                   </span>
+                  {autoTourActive && (
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/40 font-bold animate-pulse">
+                      🎬 Auto-Touring
+                    </span>
+                  )}
                 </div>
                 <p className="text-[11px] text-gray-300 font-sans mt-0.5 max-w-xl line-clamp-1 md:line-clamp-2">
                   {STAGE_EXPLANATIONS[activeStage.stageNumber] || activeStage.description}
@@ -506,11 +519,11 @@ export const SpatialHUD: React.FC = () => {
                 className={`px-2.5 py-1 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
                   autoTourActive
                     ? 'bg-purple-600 border-purple-400 text-white animate-pulse shadow-md shadow-purple-600/30'
-                    : 'bg-white/5 border-white/10 text-gray-300 hover:text-white'
+                    : 'bg-gradient-to-r from-amber-600/30 to-purple-600/30 border-amber-500/40 text-amber-200 hover:text-white hover:bg-amber-500/20'
                 }`}
                 title="Auto-advance through all 10 stages in sequence"
               >
-                {autoTourActive ? '⏸ Pause' : '▶ Auto-Tour'}
+                {autoTourActive ? '⏸ Pause Tour' : '▶ Auto-Tour'}
               </button>
 
               <button
@@ -565,6 +578,12 @@ export const SpatialHUD: React.FC = () => {
               <span className="text-emerald-400">Quality: <strong>{factoryKPIs?.qualityRatePct ?? 99.4}%</strong></span>
             </div>
           </div>
+        </div>
+
+        {/* Friendly Navigation Hint Pill */}
+        <div className="hidden lg:flex items-center justify-center gap-2 py-1 text-[10px] font-mono text-gray-400/80">
+          <span>💡</span>
+          <span>Tip: Left-Click & Drag to rotate 3D factory • Scroll to zoom • Click any machine to inspect all 15 parameters</span>
         </div>
       </footer>
 

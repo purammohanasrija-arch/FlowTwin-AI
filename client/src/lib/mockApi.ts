@@ -726,12 +726,12 @@ export const MOCK_AUDIT_EVENTS = [
 export const MOCK_NETWORK_GRAPH = {
   nodes: [
     /* ========================================================================= */
-    /* TIER 1: RAW INGREDIENT SOURCING HARBORS & TERMINALS (Left Column x: 60)   */
+    /* ZONE 1: RAW INGREDIENT SOURCING (Column 1 - x: 40)                       */
     /* ========================================================================= */
     {
       id: 'FAC-LAX-03',
       type: 'facilityNode',
-      position: { x: 60, y: 60 },
+      position: { x: 40, y: 70 },
       data: {
         label: 'Pacific Cocoa Intake Harbor',
         code: 'FAC-LAX-03',
@@ -740,15 +740,15 @@ export const MOCK_NETWORK_GRAPH = {
         status: 'optimal',
         throughput: 850,
         city: 'Long Beach, CA',
-        category: 'Tier 1 Sourcing',
+        category: 'Zone 1 · Sourcing',
         ingredient: 'Raw Fermented Cocoa Beans (Ecuador & Ghana)',
-        temperature: '22°C (Dry Vault)',
+        temperature: '22°C (Dry Storage)',
       },
     },
     {
       id: 'FAC-SUPP-10',
       type: 'facilityNode',
-      position: { x: 60, y: 290 },
+      position: { x: 40, y: 300 },
       data: {
         label: 'Midwest Organic Dairy Co-op',
         code: 'FAC-SUPP-10',
@@ -757,7 +757,7 @@ export const MOCK_NETWORK_GRAPH = {
         status: 'optimal',
         throughput: 420,
         city: 'Madison, WI',
-        category: 'Tier 1 Sourcing',
+        category: 'Zone 1 · Sourcing',
         ingredient: 'Organic Whole Milk & Whey Powder',
         temperature: '16°C (Climate-Controlled)',
       },
@@ -765,7 +765,7 @@ export const MOCK_NETWORK_GRAPH = {
     {
       id: 'FAC-DAL-04',
       type: 'facilityNode',
-      position: { x: 60, y: 520 },
+      position: { x: 40, y: 530 },
       data: {
         label: 'Gulf Cane Sugar Terminal',
         code: 'FAC-DAL-04',
@@ -774,33 +774,51 @@ export const MOCK_NETWORK_GRAPH = {
         status: 'optimal',
         throughput: 510,
         city: 'Houston, TX',
-        category: 'Tier 1 Sourcing',
+        category: 'Zone 1 · Sourcing',
         ingredient: 'Ultra-Fine Cane Sugar & Bourbon Vanilla',
         temperature: '20°C (Moisture-Sealed)',
       },
     },
 
     /* ========================================================================= */
-    /* TIER 2: ACTIVE TEMPERATURE FREIGHT & CENTRAL FACTORY (Center Column x: 490)*/
+    /* ZONE 2: HEATED & CLIMATE-CONTROLLED TRANSIT (Column 2 - x: 420)           */
     /* ========================================================================= */
     {
       id: 'TRK-101',
       type: 'vehicleNode',
-      position: { x: 470, y: 70 },
+      position: { x: 420, y: 90 },
       data: {
-        label: 'TRK-TANK-01 · Heated Butter Tanker',
+        label: 'TRK-TANK-01 · Jacketed Butter Tanker',
         type: 'tanker',
-        carrier: 'ChocoFlow Bulk Liquid Logistics',
+        carrier: 'ChocoFlow Liquid Logistics',
         status: 'in_transit',
         currentLocation: 'I-80 Mile 64 (Toledo, OH)',
-        cargo: 'Molten Cocoa Butter (Jacketed at 45°C)',
-        targetTemp: '45°C ± 2°C',
+        cargo: 'Molten Cocoa Butter (Heated at 45°C)',
+        targetTemp: '45°C Strict Jacket',
       },
     },
     {
+      id: 'TRK-204',
+      type: 'vehicleNode',
+      position: { x: 420, y: 320 },
+      data: {
+        label: 'TRK-REEFER-02 · Cold-Chain Reefer',
+        type: 'reefer',
+        carrier: 'Titan Fresh Logistics',
+        status: 'in_transit',
+        currentLocation: 'I-90 Mile 112 (Rockford, IL)',
+        cargo: 'Moisture-Sensitive Whole Milk Powders',
+        targetTemp: '16°C ± 1°C Controlled',
+      },
+    },
+
+    /* ========================================================================= */
+    /* ZONE 3: CENTRAL MANUFACTURING HEART (Column 3 - x: 800)                  */
+    /* ========================================================================= */
+    {
       id: 'FAC-CHI-01',
       type: 'facilityNode',
-      position: { x: 470, y: 280 },
+      position: { x: 800, y: 240 },
       data: {
         label: 'ChocoTwin Smart Factory Campus',
         code: 'FAC-CHI-01',
@@ -809,40 +827,26 @@ export const MOCK_NETWORK_GRAPH = {
         status: 'congested',
         throughput: 1250,
         city: 'Chicago, IL',
-        category: 'Central 10-Stage Process Core',
-        ingredient: 'Roasting, Conching (48°C) & Continuous Tempering (31°C)',
-        temperature: 'Multi-Zone 14°C - 140°C',
-      },
-    },
-    {
-      id: 'TRK-204',
-      type: 'vehicleNode',
-      position: { x: 470, y: 510 },
-      data: {
-        label: 'TRK-REEFER-02 · Climate Reefer Fleet',
-        type: 'reefer',
-        carrier: 'Titan Cold-Chain Logistics',
-        status: 'in_transit',
-        currentLocation: 'I-70 Southern Bypass (Indianapolis)',
-        cargo: 'Moisture-Sensitive Whole Milk Powders',
-        targetTemp: '16°C ± 1°C',
+        category: 'Zone 3 · 10-Stage Core',
+        ingredient: 'Thermal Roasting, Conching (48°C) & Tempering (31°C)',
+        temperature: '10 Stages: 14°C - 140°C',
       },
     },
 
     /* ========================================================================= */
-    /* TIER 3: OUTBOUND CONSIGNMENTS & REGIONAL COLD VAULTS (Right Column x: 880)*/
+    /* ZONE 4: REGIONAL DISTRIBUTION & COLD VAULTS (Column 4 - x: 1220)          */
     /* ========================================================================= */
     {
       id: 'NODE-SH-1042',
       type: 'shipmentNode',
-      position: { x: 880, y: 70 },
+      position: { x: 1220, y: 80 },
       data: {
         shipmentId: 'BATCH-DARK-72',
         status: 'in_transit',
         cargo: '72% Single-Origin Dark Couverture Drops',
         delayHours: 0,
         riskScore: 12,
-        destination: 'Atlantic Regional Cold Vault (Newark)',
+        destination: 'Atlantic Cold Vault (Newark, NJ)',
         batchWeight: '12,500 kg',
         tempTarget: '18°C Controlled',
       },
@@ -850,7 +854,7 @@ export const MOCK_NETWORK_GRAPH = {
     {
       id: 'FAC-NYC-02',
       type: 'facilityNode',
-      position: { x: 880, y: 280 },
+      position: { x: 1220, y: 280 },
       data: {
         label: 'Atlantic Regional Cold-Vault Hub',
         code: 'FAC-NYC-02',
@@ -859,90 +863,121 @@ export const MOCK_NETWORK_GRAPH = {
         status: 'optimal',
         throughput: 620,
         city: 'Newark, NJ',
-        category: 'Regional Fulfillment',
-        ingredient: 'Tempered Bars & Finished Artisan Confections',
+        category: 'Zone 4 · Cold Storage',
+        ingredient: 'Tempered Artisan Bars & Couverture Vault',
         temperature: '16°C Strict Cold Vault',
       },
     },
     {
       id: 'NODE-SH-1043',
       type: 'shipmentNode',
-      position: { x: 880, y: 510 },
+      position: { x: 1220, y: 510 },
       data: {
         shipmentId: 'BATCH-MILK-45',
         status: 'delayed',
         cargo: 'Artisan Creamy Milk Chocolate Bars (Foil-Wrapped)',
         delayHours: 2.5,
         riskScore: 38,
-        destination: 'Southern Confectionery Dispatch (Atlanta)',
+        destination: '34 Regional Retail Supermarkets',
         batchWeight: '8,400 kg',
-        tempTarget: '17°C Cold-Chain Monitored',
+        tempTarget: '17°C Monitored',
       },
     },
   ],
   edges: [
+    /* 1. Sourcing -> Inbound Transit */
     {
       id: 'e-lax-tank101',
       source: 'FAC-LAX-03',
+      sourceHandle: 'right',
       target: 'TRK-101',
+      targetHandle: 'left',
       animated: true,
       label: 'Pacific Liquid Butter Corridor (45°C)',
-      style: { stroke: '#06B6D4', strokeWidth: 2.5 },
-    },
-    {
-      id: 'e-tank101-chi',
-      source: 'TRK-101',
-      target: 'FAC-CHI-01',
-      animated: true,
-      label: 'Heated Jacketed Intake Artery',
       style: { stroke: '#06B6D4', strokeWidth: 3 },
     },
     {
-      id: 'e-supp10-chi',
+      id: 'e-supp10-trk204',
       source: 'FAC-SUPP-10',
-      target: 'FAC-CHI-01',
-      animated: true,
-      label: 'Direct Dairy Powder Supply (Daily 12 MT)',
-      style: { stroke: '#10B981', strokeWidth: 2 },
-    },
-    {
-      id: 'e-dal04-chi',
-      source: 'FAC-DAL-04',
+      sourceHandle: 'right',
       target: 'TRK-204',
+      targetHandle: 'left',
       animated: true,
-      label: 'Refined Sugar Transit Corridor',
-      style: { stroke: '#A855F7', strokeWidth: 2 },
+      label: 'Cold-Chain Dairy Transit (16°C)',
+      style: { stroke: '#10B981', strokeWidth: 2.5 },
+    },
+
+    /* 2. Transit -> Central Chicago Factory */
+    {
+      id: 'e-tank101-chi',
+      source: 'TRK-101',
+      sourceHandle: 'right',
+      target: 'FAC-CHI-01',
+      targetHandle: 'left',
+      animated: true,
+      label: 'Heated Jacketed Intake (45°C)',
+      style: { stroke: '#06B6D4', strokeWidth: 3.5 },
     },
     {
       id: 'e-trk204-chi',
       source: 'TRK-204',
+      sourceHandle: 'right',
       target: 'FAC-CHI-01',
+      targetHandle: 'left',
       animated: true,
-      label: 'I-70 Dry Van Connection',
-      style: { stroke: '#A855F7', strokeWidth: 2 },
+      label: 'Dairy Intake Pipeline',
+      style: { stroke: '#10B981', strokeWidth: 2.5 },
     },
+    {
+      id: 'e-dal04-chi',
+      source: 'FAC-DAL-04',
+      sourceHandle: 'right',
+      target: 'FAC-CHI-01',
+      targetHandle: 'left',
+      animated: true,
+      label: 'Direct Refined Cane Sugar Rail Intake',
+      style: { stroke: '#A855F7', strokeWidth: 2.5 },
+    },
+
+    /* 3. Central Chicago Factory -> Outbound Distribution */
     {
       id: 'e-chi-sh1042',
       source: 'FAC-CHI-01',
+      sourceHandle: 'right',
       target: 'NODE-SH-1042',
+      targetHandle: 'left',
       animated: true,
-      label: 'Couverture Express Delivery',
+      label: 'Couverture Drops (18°C)',
       style: { stroke: '#10B981', strokeWidth: 2.5 },
     },
     {
       id: 'e-sh1042-nyc',
       source: 'NODE-SH-1042',
+      sourceHandle: 'bottom',
       target: 'FAC-NYC-02',
+      targetHandle: 'top',
       animated: true,
-      label: 'Inbound Atlantic Cold Vault',
+      label: 'Vault Receiving Dock',
       style: { stroke: '#10B981', strokeWidth: 2.5 },
+    },
+    {
+      id: 'e-chi-nyc',
+      source: 'FAC-CHI-01',
+      sourceHandle: 'right',
+      target: 'FAC-NYC-02',
+      targetHandle: 'left',
+      animated: true,
+      label: 'Direct Wholesale Couverture Artery',
+      style: { stroke: '#3B82F6', strokeWidth: 3 },
     },
     {
       id: 'e-chi-sh1043',
       source: 'FAC-CHI-01',
+      sourceHandle: 'right',
       target: 'NODE-SH-1043',
+      targetHandle: 'left',
       animated: true,
-      label: 'Packaged Bar Transport (+2.5h Weather Detour)',
+      label: 'Packaged Bars (+2.5h Weather Detour)',
       style: { stroke: '#F59E0B', strokeWidth: 2.5 },
     },
   ],

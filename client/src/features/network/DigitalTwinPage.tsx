@@ -99,7 +99,7 @@ export const DigitalTwinPage: React.FC = () => {
   const [layersMenuOpen, setLayersMenuOpen] = useState(false);
   const [showMinimap, setShowMinimap] = useState(true);
   const [showLegend, setShowLegend] = useState(true);
-  const [viewMode, setViewMode] = useState<'3d' | '2d'>('3d');
+  const [viewMode, setViewMode] = useState<'3d' | '2d'>('2d');
 
   // Check WebGL availability
   useEffect(() => {
@@ -371,31 +371,31 @@ export const DigitalTwinPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Perspective View Switcher: 3D Spatial Universe vs 2D Connected Topology */}
+          {/* Perspective View Switcher: 2D Supply Flow (Recommended) vs 3D Spatial */}
           <div className="flex items-center bg-[#10142B] p-0.5 rounded-xl border border-white/[0.08] shadow-inner">
             <button
               type="button"
-              onClick={() => setViewMode('3d')}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
-                viewMode === '3d'
-                  ? 'bg-gradient-to-r from-amber-500 to-purple-600 text-white shadow-md shadow-amber-500/20'
-                  : 'text-gray-400 hover:text-white hover:bg-white/[0.04]'
-              }`}
-            >
-              <Compass className="w-3.5 h-3.5 text-amber-300" />
-              <span>3D Spatial</span>
-            </button>
-            <button
-              type="button"
               onClick={() => setViewMode('2d')}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
                 viewMode === '2d'
-                  ? 'bg-gradient-to-r from-amber-500 to-purple-600 text-white shadow-md shadow-amber-500/20'
+                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-black shadow-md shadow-amber-500/25'
                   : 'text-gray-400 hover:text-white hover:bg-white/[0.04]'
               }`}
             >
               <GitFork className="w-3.5 h-3.5 text-cyan-300" />
-              <span>2D Process Flow</span>
+              <span>2D Supply Flow (Recommended)</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('3d')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
+                viewMode === '3d'
+                  ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-md shadow-purple-500/25'
+                  : 'text-gray-400 hover:text-white hover:bg-white/[0.04]'
+              }`}
+            >
+              <Compass className="w-3.5 h-3.5 text-purple-300" />
+              <span>3D Geographic Earth</span>
             </button>
           </div>
 

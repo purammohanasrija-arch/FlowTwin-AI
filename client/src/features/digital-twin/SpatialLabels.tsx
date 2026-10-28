@@ -225,19 +225,16 @@ const FacilityLabelItem: React.FC<FacilityLabelProps> = ({ facility, isSelected,
             /* 2. COMPACT TACTICAL PILL (Default - Zero 3D Clutter)         */
             /* ============================================================ */
             <div
-              className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#090D1E]/95 border-2 ${theme.border} text-white shadow-xl backdrop-blur-md font-mono hover:${theme.border} transition-all hover:scale-110 whitespace-nowrap`}
+              className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#090D1E]/95 border ${theme.border} text-white shadow-xl backdrop-blur-md font-mono hover:${theme.border} transition-all hover:scale-105 whitespace-nowrap`}
             >
               <span className={`w-2 h-2 rounded-full shrink-0 ${theme.dot} ${facility.status === 'congested' ? 'animate-pulse' : ''}`} />
               <span className="text-xs">{icon}</span>
               <span className="text-[11px] font-extrabold text-amber-200">
-                {stageNum ? `S${stageNum} · ` : ''}{shortName}
+                {stageNum ? `${stageNum}. ` : ''}{shortName}
               </span>
-              <span className="text-gray-500">|</span>
+              <span className="text-gray-500 text-[10px]">·</span>
               <span className="text-[11px] font-bold text-white">
                 {telemetry?.primaryMetric?.value || `${facility.temperatureCelsius ?? 24}°C`}
-              </span>
-              <span className={`text-[10px] font-bold ${theme.text}`}>
-                {telemetry?.secondaryMetric?.value || `${facility.utilizationPercentage}%`}
               </span>
             </div>
           )}

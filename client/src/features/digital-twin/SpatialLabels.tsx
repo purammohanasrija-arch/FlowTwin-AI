@@ -81,17 +81,31 @@ const FacilityLabelItem: React.FC<FacilityLabelProps> = ({ facility, isSelected,
               <div className="flex items-center gap-2 text-[10px] text-gray-300 pl-4 border-t border-amber-500/20 pt-1">
                 <span className="text-amber-400/90 font-medium">{facility.facilityCode}</span>
                 <span className="text-gray-600">•</span>
-                <span className="text-emerald-400 font-bold">{facility.utilizationPercentage}% Tank Load</span>
+                <span className="text-emerald-400 font-bold">{facility.utilizationPercentage}% Tank</span>
+                {facility.chocolateVolumeTons !== undefined && (
+                  <>
+                    <span className="text-gray-600">•</span>
+                    <span className="text-amber-300 font-bold">🍫 {facility.chocolateVolumeTons} MT</span>
+                  </>
+                )}
+                {facility.rawMaterialStockTons !== undefined && (
+                  <>
+                    <span className="text-gray-600">•</span>
+                    <span className="text-emerald-300 font-bold">🌾 {facility.rawMaterialStockTons} MT</span>
+                  </>
+                )}
+                {facility.thermalShockIndex !== undefined && (
+                  <>
+                    <span className="text-gray-600">•</span>
+                    <span className={`font-bold ${facility.thermalShockIndex > 2.0 ? 'text-rose-400 animate-pulse' : 'text-cyan-300'}`}>
+                      ⚡ {facility.thermalShockIndex}°C/min
+                    </span>
+                  </>
+                )}
                 {facility.temperatureCelsius && (
                   <>
                     <span className="text-gray-600">•</span>
-                    <span className="text-cyan-300 font-bold">{facility.temperatureCelsius}°C</span>
-                  </>
-                )}
-                {facility.viscosityCp && (
-                  <>
-                    <span className="text-gray-600">•</span>
-                    <span className="text-purple-300">{facility.viscosityCp} cP</span>
+                    <span className="text-rose-300 font-bold">{facility.temperatureCelsius}°C</span>
                   </>
                 )}
               </div>

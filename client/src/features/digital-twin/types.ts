@@ -106,6 +106,28 @@ export interface IncidentRecord3D {
   affectedShipments?: string[];
 }
 
+export interface RawMaterialsBreakdown {
+  cocoaBeans?: number;
+  cocoaButter?: number;
+  caneSugar?: number;
+  milkPowder?: number;
+  vanillaLecithinKg?: number;
+  pralineCaramelTons?: number;
+  cocoaBeansTons?: number;
+  cocoaButterTons?: number;
+  caneSugarTons?: number;
+  milkPowderTons?: number;
+}
+
+export interface ShockMetrics {
+  thermalShockIndex: number; // °C/min rate of temp change (Safe < 2.0, Warning 2.0-3.5, Critical > 3.5)
+  thermalShockStatus: 'safe' | 'warning' | 'critical';
+  temperShockRiskPct: number; // 0-100% risk of beta-crystal degradation / fat bloom
+  viscosityShockFactor: number; // 1.0 = baseline, > 1.5 = high shear stress
+  supplyShockVulnerability: number; // 0-100% vulnerability to disruptions
+  shockDescription?: string;
+}
+
 export interface ChocolateProcessStage {
   stageNumber: number;
   code: string;
@@ -116,6 +138,10 @@ export interface ChocolateProcessStage {
   operatingTempCelsius: number;
   targetViscosityCp?: number;
   outputProduct: string;
+  chocolateVolumeTons?: number;
+  rawMaterialSummary?: string;
+  recipeRatio?: string;
+  shockTolerance?: string;
 }
 
 export interface FacilityNode3D extends FacilityRecord {
@@ -145,6 +171,18 @@ export interface FacilityNode3D extends FacilityRecord {
   activeBatches?: number;
   cocoaSolidsPercent?: number;
   qualityGrade?: string;
+
+  // Parameters: Chocolate, Raw Materials, Shock
+  chocolateVolumeTons?: number;
+  finishedChocolateTons?: number;
+  rawMaterialStockTons?: number;
+  rawMaterialBufferDays?: number;
+  rawMaterialsBreakdown?: RawMaterialsBreakdown;
+  recipeRatio?: string;
+  shockMetrics?: ShockMetrics;
+  thermalShockIndex?: number;
+  temperShockRiskPct?: number;
+  supplyShockVulnerability?: number;
 }
 
 export interface RouteCorridor3D extends RouteRecord {
@@ -161,6 +199,9 @@ export interface RouteCorridor3D extends RouteRecord {
   pipeTemperatureCelsius?: number;
   pipePressureBar?: number;
   chocolateStatusText?: string;
+  transportVolumeTons?: number;
+  flowThroughputKgPerHour?: number;
+  thermalShockGradient?: string;
 }
 
 export interface VehicleSimulationState extends Omit<VehicleRecord, 'status'> {

@@ -942,16 +942,42 @@ export const SpatialHUD: React.FC = () => {
                           <span className="text-gray-400 block text-[9px]">OUTPUT PRODUCT</span>
                           <span className="text-amber-300 font-bold truncate block">{stage.outputProduct}</span>
                         </div>
-                        {stage.targetViscosityCp && (
+                        {stage.chocolateVolumeTons !== undefined && (
+                          <div className="bg-[#070A1E] px-2.5 py-1.5 rounded-xl border border-[#1F274E]">
+                            <span className="text-gray-400 block text-[9px]">CHOCOLATE VOLUME</span>
+                            <span className="text-amber-200 font-bold">{stage.chocolateVolumeTons} MT</span>
+                          </div>
+                        )}
+                        {stage.targetViscosityCp ? (
                           <div className="bg-[#070A1E] px-2.5 py-1.5 rounded-xl border border-[#1F274E]">
                             <span className="text-gray-400 block text-[9px]">TARGET VISCOSITY</span>
                             <span className="text-cyan-300 font-bold">{stage.targetViscosityCp} cP</span>
                           </div>
-                        )}
-                        {fac && (
+                        ) : fac ? (
                           <div className="bg-[#070A1E] px-2.5 py-1.5 rounded-xl border border-[#1F274E]">
                             <span className="text-gray-400 block text-[9px]">TANK LOAD / UTILIZATION</span>
                             <span className="text-emerald-400 font-bold">{fac.utilizationPercentage}%</span>
+                          </div>
+                        ) : null}
+
+                        {stage.recipeRatio && (
+                          <div className="bg-[#070A1E] px-2.5 py-1.5 rounded-xl border border-[#1F274E] col-span-2">
+                            <span className="text-gray-400 block text-[9px]">INDUSTRIAL RECIPE FORMULA</span>
+                            <span className="text-amber-100/90 text-[10px]">{stage.recipeRatio}</span>
+                          </div>
+                        )}
+
+                        {stage.rawMaterialSummary && (
+                          <div className="bg-[#070A1E] px-2.5 py-1.5 rounded-xl border border-[#1F274E] col-span-2">
+                            <span className="text-gray-400 block text-[9px]">RAW MATERIAL BUFFER & STOCK</span>
+                            <span className="text-emerald-300/90 text-[10px]">{stage.rawMaterialSummary}</span>
+                          </div>
+                        )}
+
+                        {stage.shockTolerance && (
+                          <div className="bg-[#070A1E] px-2.5 py-1.5 rounded-xl border border-[#1F274E] col-span-2">
+                            <span className="text-gray-400 block text-[9px]">SHOCK & STABILITY TOLERANCE</span>
+                            <span className="text-purple-300/90 text-[10px]">⚡ {stage.shockTolerance}</span>
                           </div>
                         )}
                       </div>

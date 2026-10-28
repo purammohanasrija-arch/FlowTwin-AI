@@ -96,6 +96,7 @@ export const SelectedEntityDrawer: React.FC = () => {
               )}
             </div>
 
+            {/* 1. KEY PRODUCTION PARAMETERS */}
             <div className="grid grid-cols-2 gap-2 p-2.5 rounded-xl bg-[#12172E] border border-[#1E2648]">
               <div>
                 <span className="text-gray-400 text-[10px]">TANK LOAD</span>
@@ -123,16 +124,6 @@ export const SelectedEntityDrawer: React.FC = () => {
                   <p className="text-sm font-bold text-emerald-300">{data.cocoaSolidsPercent}% Dark Mass</p>
                 </div>
               )}
-              {data.qualityGrade && (
-                <div>
-                  <span className="text-gray-400 text-[10px]">QUALITY GRADE</span>
-                  <p className="text-[11px] font-bold text-purple-300 truncate">{data.qualityGrade}</p>
-                </div>
-              )}
-              <div>
-                <span className="text-gray-400 text-[10px]">ACTIVE BATCHES</span>
-                <p className="text-sm font-bold text-gray-200">{data.activeBatches || data.activeShipmentCount || 18}</p>
-              </div>
               <div>
                 <span className="text-gray-400 text-[10px]">STATUS</span>
                 <p
@@ -147,6 +138,159 @@ export const SelectedEntityDrawer: React.FC = () => {
                   {data.status?.toUpperCase()}
                 </p>
               </div>
+            </div>
+
+            {/* 2. HOW MUCH CHOCOLATE (Volume & Output) */}
+            <div className="p-2.5 rounded-xl bg-amber-950/30 border border-amber-500/40">
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-[10px] font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <span>🍫</span> Chocolate Output & Volume
+                </span>
+                <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-200 border border-amber-500/30 font-bold">
+                  {data.chocolateVolumeTons ?? 0} MT Active
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 text-[11px] font-mono mt-2">
+                <div className="bg-[#090D1E]/80 p-2 rounded-lg border border-amber-500/20">
+                  <span className="text-gray-400 text-[9px] block">IN-PROCESS CHOCOLATE</span>
+                  <span className="text-sm font-bold text-amber-200">
+                    {data.chocolateVolumeTons ?? 0} <span className="text-[10px] font-normal text-gray-400">Tons</span>
+                  </span>
+                </div>
+                <div className="bg-[#090D1E]/80 p-2 rounded-lg border border-amber-500/20">
+                  <span className="text-gray-400 text-[9px] block">FINISHED GOODS</span>
+                  <span className="text-sm font-bold text-emerald-300">
+                    {data.finishedChocolateTons ? `${data.finishedChocolateTons} Tons` : 'Intermediate'}
+                  </span>
+                </div>
+                <div className="bg-[#090D1E]/80 p-2 rounded-lg border border-amber-500/20 col-span-2 flex items-center justify-between">
+                  <span className="text-gray-400 text-[10px]">BATCH VESSEL CAPACITY:</span>
+                  <span className="text-cyan-300 font-bold">{data.batchCapacityLiters?.toLocaleString()} Liters</span>
+                </div>
+              </div>
+            </div>
+
+            {/* 3. RAW MATERIALS INVENTORY & BUFFER */}
+            <div className="p-2.5 rounded-xl bg-emerald-950/30 border border-emerald-500/40">
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-[10px] font-bold text-emerald-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <span>🌾</span> Raw Materials Stock
+                </span>
+                <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-emerald-500/20 text-emerald-200 border border-emerald-500/30 font-bold">
+                  {data.rawMaterialBufferDays ?? 14}d Reserve
+                </span>
+              </div>
+
+              <div className="bg-[#090D1E]/80 p-2 rounded-lg border border-emerald-500/20 mb-2">
+                <div className="flex items-center justify-between text-[11px]">
+                  <span className="text-gray-400">Total Raw Stock:</span>
+                  <span className="text-emerald-300 font-bold text-xs">{data.rawMaterialStockTons ?? 0} MT</span>
+                </div>
+                {data.recipeRatio && (
+                  <p className="text-[10px] text-amber-200/90 mt-1 italic border-t border-emerald-500/10 pt-1">
+                    Formula: {data.recipeRatio}
+                  </p>
+                )}
+              </div>
+
+              {/* Material Breakdown Tags */}
+              {data.rawMaterialsBreakdown && (
+                <div className="grid grid-cols-2 gap-1.5 text-[10px] font-mono">
+                  {data.rawMaterialsBreakdown.cocoaBeans !== undefined && data.rawMaterialsBreakdown.cocoaBeans > 0 && (
+                    <div className="px-2 py-1 rounded bg-[#090D1E] border border-white/5 flex justify-between">
+                      <span className="text-gray-400">Cocoa Beans:</span>
+                      <span className="text-white font-bold">{data.rawMaterialsBreakdown.cocoaBeans} MT</span>
+                    </div>
+                  )}
+                  {data.rawMaterialsBreakdown.cocoaButter !== undefined && data.rawMaterialsBreakdown.cocoaButter > 0 && (
+                    <div className="px-2 py-1 rounded bg-[#090D1E] border border-white/5 flex justify-between">
+                      <span className="text-gray-400">Cocoa Butter:</span>
+                      <span className="text-amber-300 font-bold">{data.rawMaterialsBreakdown.cocoaButter} MT</span>
+                    </div>
+                  )}
+                  {data.rawMaterialsBreakdown.caneSugar !== undefined && data.rawMaterialsBreakdown.caneSugar > 0 && (
+                    <div className="px-2 py-1 rounded bg-[#090D1E] border border-white/5 flex justify-between">
+                      <span className="text-gray-400">Cane Sugar:</span>
+                      <span className="text-cyan-300 font-bold">{data.rawMaterialsBreakdown.caneSugar} MT</span>
+                    </div>
+                  )}
+                  {data.rawMaterialsBreakdown.milkPowder !== undefined && data.rawMaterialsBreakdown.milkPowder > 0 && (
+                    <div className="px-2 py-1 rounded bg-[#090D1E] border border-white/5 flex justify-between">
+                      <span className="text-gray-400">Milk Solids:</span>
+                      <span className="text-purple-300 font-bold">{data.rawMaterialsBreakdown.milkPowder} MT</span>
+                    </div>
+                  )}
+                  {data.rawMaterialsBreakdown.vanillaLecithinKg !== undefined && data.rawMaterialsBreakdown.vanillaLecithinKg > 0 && (
+                    <div className="px-2 py-1 rounded bg-[#090D1E] border border-white/5 flex justify-between">
+                      <span className="text-gray-400">Vanilla & Lecithin:</span>
+                      <span className="text-rose-300 font-bold">{data.rawMaterialsBreakdown.vanillaLecithinKg} kg</span>
+                    </div>
+                  )}
+                  {data.rawMaterialsBreakdown.pralineCaramelTons !== undefined && data.rawMaterialsBreakdown.pralineCaramelTons > 0 && (
+                    <div className="px-2 py-1 rounded bg-[#090D1E] border border-white/5 flex justify-between">
+                      <span className="text-gray-400">Praline/Caramel:</span>
+                      <span className="text-yellow-300 font-bold">{data.rawMaterialsBreakdown.pralineCaramelTons} MT</span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* 4. SHOCK & QUALITY STABILITY TELEMETRY */}
+            <div className="p-2.5 rounded-xl bg-purple-950/30 border border-purple-500/40">
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-[10px] font-bold text-purple-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <span>⚡</span> Shock & Stability Dynamics
+                </span>
+                <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded border font-bold ${
+                  (data.thermalShockIndex ?? 0) > 3.0
+                    ? 'bg-red-500/20 text-red-300 border-red-500/40 animate-pulse'
+                    : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                }`}>
+                  {(data.thermalShockIndex ?? 0) > 3.0 ? 'SHOCK CRITICAL' : 'STABILITY OPTIMAL'}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 text-[11px] font-mono">
+                <div className="bg-[#090D1E]/80 p-2 rounded-lg border border-purple-500/20">
+                  <span className="text-gray-400 text-[9px] block">THERMAL SHOCK INDEX</span>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-sm font-bold text-rose-300">{data.thermalShockIndex ?? 0.4}°C/min</span>
+                    <span className="text-[9px] text-gray-500">(Safe &lt;2°C)</span>
+                  </div>
+                </div>
+
+                <div className="bg-[#090D1E]/80 p-2 rounded-lg border border-purple-500/20">
+                  <span className="text-gray-400 text-[9px] block">TEMPER SHOCK (FAT BLOOM)</span>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-sm font-bold text-emerald-300">
+                      {100 - (data.temperShockRiskPct ?? 0)}%
+                    </span>
+                    <span className="text-[9px] text-gray-500">Beta-V Form</span>
+                  </div>
+                </div>
+
+                <div className="bg-[#090D1E]/80 p-2 rounded-lg border border-purple-500/20">
+                  <span className="text-gray-400 text-[9px] block">VISCOSITY SHEAR FACTOR</span>
+                  <span className="text-sm font-bold text-amber-300">
+                    {data.shockMetrics?.viscosityShockFactor ?? 1.05}x
+                  </span>
+                </div>
+
+                <div className="bg-[#090D1E]/80 p-2 rounded-lg border border-purple-500/20">
+                  <span className="text-gray-400 text-[9px] block">SUPPLY SHOCK RESILIENCE</span>
+                  <span className="text-sm font-bold text-cyan-300">
+                    {100 - (data.supplyShockVulnerability ?? 10)}%
+                  </span>
+                </div>
+              </div>
+
+              {data.shockMetrics?.shockDescription && (
+                <p className="text-[10px] text-gray-400 mt-2 bg-black/40 p-1.5 rounded border border-white/5">
+                  {data.shockMetrics.shockDescription}
+                </p>
+              )}
             </div>
 
             {/* Actions */}
@@ -296,6 +440,51 @@ export const SelectedEntityDrawer: React.FC = () => {
                   {data.roadCorridor || 'LINE-CHOC-01'}
                 </p>
               </div>
+            </div>
+
+            {/* PIPELINE THROUGHPUT & MASS TRANSFER */}
+            <div className="p-2.5 rounded-xl bg-amber-950/30 border border-amber-500/40">
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-[10px] font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <span>🍫</span> Mass Throughput Telemetry
+                </span>
+                <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-200 border border-amber-500/30 font-bold">
+                  {data.transportVolumeTons ?? 15.0} MT In-Transit
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-2 text-[11px] font-mono mt-2">
+                <div className="bg-[#090D1E]/80 p-2 rounded-lg border border-amber-500/20">
+                  <span className="text-gray-400 text-[9px] block">TRANSFER RATE</span>
+                  <span className="text-sm font-bold text-amber-200">
+                    {data.flowThroughputKgPerHour ? `${data.flowThroughputKgPerHour.toLocaleString()} kg/h` : '2,400 kg/h'}
+                  </span>
+                </div>
+                <div className="bg-[#090D1E]/80 p-2 rounded-lg border border-amber-500/20">
+                  <span className="text-gray-400 text-[9px] block">CONVEYANCE MODE</span>
+                  <span className="text-sm font-bold text-cyan-300 capitalize">
+                    {data.corridorCategory || 'Jacketed Line'}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* JACKET THERMAL GRADIENT & SHOCK RISKS */}
+            <div className="p-2.5 rounded-xl bg-purple-950/30 border border-purple-500/40">
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-[10px] font-bold text-purple-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <span>⚡</span> Thermal Gradient & Shock
+                </span>
+                <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded border font-bold ${
+                  data.isClosed
+                    ? 'bg-red-500/20 text-red-300 border-red-500/40 animate-pulse'
+                    : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                }`}>
+                  {data.isClosed ? 'CRYSTALLIZATION FREEZE' : 'ISOTHERMAL NOMINAL'}
+                </span>
+              </div>
+              <p className="text-[11px] font-mono text-gray-300 bg-[#090D1E]/80 p-2 rounded-lg border border-purple-500/20">
+                {data.thermalShockGradient || 'Nominal continuous temperature control across jacket boundary.'}
+              </p>
             </div>
 
             {data.isClosed && (

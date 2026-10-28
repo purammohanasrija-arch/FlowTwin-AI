@@ -39,6 +39,19 @@ import { WorldMinimap } from './WorldMinimap.js';
 import { WorldTimeline } from './WorldTimeline.js';
 import { SelectedEntityDrawer } from './SelectedEntityDrawer.js';
 
+const STAGE_EXPLANATIONS: Record<number, string> = {
+  1: 'Raw cocoa beans arrive from international ports, undergo optical sorting and moisture regulation, and are stored in bulk stainless silos.',
+  2: 'Thermal drum roasters develop rich chocolate aromas and precursor flavors under strict heat profiles (135°C–140°C).',
+  3: 'High-velocity winnowers crush the roasted beans and blow away brittle husks, leaving pure aromatic cocoa nibs.',
+  4: 'Hydraulic presses exert massive mechanical pressure to separate pure golden cocoa butter from dense cocoa cake.',
+  5: 'Milk powder, sugar, vanilla, and cocoa liquor are dosed with recipe stoichiometry in continuous paddle blenders.',
+  6: 'Molten chocolate is kneaded and sheared at 48°C for 24 hours to evaporate unwanted volatiles and refine particle size under 20 microns.',
+  7: 'Chocolate is precisely cooled to 28°C and gently reheated to 31°C to seed stable Form V crystals for crisp snap and glossy sheen.',
+  8: 'Continuous heated jacketed rail tankers transfer bulk liquid chocolate (couverture) without solidification risk.',
+  9: 'Continuous depositors meter chocolate into polycarbonate molds, vibrating out air voids and cooling for bar setting.',
+  10: 'High-speed automated wrapping seals bars in foil and barrier film, passing through metal/vision scanners to the 18°C vault.',
+};
+
 export const SpatialHUD: React.FC = () => {
   const quality = useDigitalTwinStore(s => s.quality);
   const setQuality = useDigitalTwinStore(s => s.setQuality);
@@ -74,6 +87,8 @@ export const SpatialHUD: React.FC = () => {
   const selectedEntity = useDigitalTwinStore(s => s.selectedEntity);
   const focusOnFacility = useDigitalTwinStore(s => s.focusOnFacility);
   const factoryKPIs = useDigitalTwinStore(s => s.factoryKPIs);
+  const labelDisplayMode = useDigitalTwinStore(s => s.labelDisplayMode);
+  const setLabelDisplayMode = useDigitalTwinStore(s => s.setLabelDisplayMode);
 
   // Local state for drawers & modals
   const [searchQuery, setSearchQuery] = useState('');
@@ -84,6 +99,26 @@ export const SpatialHUD: React.FC = () => {
   const [guideModalOpen, setGuideModalOpen] = useState(false);
   const [responseDismissed, setResponseDismissed] = useState(false);
   const [kpiBarVisible, setKpiBarVisible] = useState(true);
+  const [walkthroughOpen, setWalkthroughOpen] = useState(true);
+  const [autoTourActive, setAutoTourActive] = useState(false);
+
+  // Determine active process stage
+  const currentStageIndex = Math.max(
+    0,
+    CHOCOLATE_PROCESS_STAGES.findIndex(s => s.facilityCode === selectedEntity?.id)
+  );
+  const activeStage = CHOCOLATE_PROCESS_STAGES[currentStageIndex] || CHOCOLATE_PROCESS_STAGES[0];
+  const activeFacility = facilities.find(f => f.facilityCode === activeStage.facilityCode);
+
+  // Auto-tour timer advancing every 6 seconds smoothly
+  useEffect(() => {
+    if (!autoTourActive) return;
+    const interval = setInterval(() => {
+      const nextIdx = (currentStageIndex + 1) % CHOCOLATE_PROCESS_STAGES.length;
+      focusOnFacility(CHOCOLATE_PROCESS_STAGES[nextIdx].facilityCode);
+    }, 6000);
+    return () => clearInterval(interval);
+  }, [autoTourActive, currentStageIndex, focusOnFacility]);
 
   useEffect(() => {
     if (aiCopilot.lastResponse) {
@@ -160,10 +195,10 @@ export const SpatialHUD: React.FC = () => {
           <div>
             <div className="flex items-center gap-2">
               <span className="font-mono font-extrabold text-sm tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-amber-100 to-amber-500">
-                FLOWTWIN AI
+                CHOCOTWIN AI
               </span>
               <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-950/90 text-amber-300 border border-amber-500/50 font-bold hidden sm:inline-flex items-center gap-1">
-                CHOCOLATE TWIN
+                3D SMART TWIN
               </span>
             </div>
             <p className="text-[9px] font-mono text-amber-200/60 hidden xl:block">
@@ -237,6 +272,21 @@ export const SpatialHUD: React.FC = () => {
           >
             <Activity className="w-3.5 h-3.5 text-amber-400" />
             <span className="hidden md:inline text-[11px]">10 KPIs</span>
+          </button>
+
+          {/* 3D Label Density Mode Selector (Pills / Cards / Focus) */}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              const nextMode = labelDisplayMode === 'pill' ? 'card' : labelDisplayMode === 'card' ? 'focus' : 'pill';
+              setLabelDisplayMode(nextMode);
+            }}
+            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-black/40 border border-white/10 hover:border-amber-400 text-xs font-mono font-bold shrink-0 cursor-pointer transition-all text-gray-300 hover:text-white"
+            title={`Toggle 3D label display density (Current: ${labelDisplayMode.toUpperCase()})`}
+          >
+            <SlidersHorizontal className="w-3.5 h-3.5 text-cyan-400" />
+            <span className="hidden md:inline text-[11px] capitalize">{labelDisplayMode}</span>
           </button>
         </div>
 
@@ -501,6 +551,128 @@ export const SpatialHUD: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* 1.2 INTERACTIVE FACTORY PROCESS WALKTHROUGH BANNER ("How It Works") */}
+      {walkthroughOpen && (
+        <div className="w-full max-w-5xl mx-auto px-4 py-2 rounded-2xl bg-[#090D1E]/95 border border-amber-500/40 backdrop-blur-2xl shadow-[0_4px_30px_rgba(0,0,0,0.8)] pointer-events-auto flex flex-col md:flex-row items-center justify-between gap-3 text-xs font-sans mt-1.5 animate-in fade-in duration-200">
+          {/* Active Stage Info */}
+          <div className="flex items-center gap-3 overflow-hidden">
+            <span className="text-2xl p-1.5 rounded-xl bg-amber-950/60 border border-amber-500/40 shadow-inner shrink-0">
+              {activeStage.icon}
+            </span>
+            <div className="leading-snug">
+              <div className="flex items-center gap-2">
+                <span className="px-1.5 py-0.2 rounded text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                  STAGE {activeStage.stageNumber} OF 10
+                </span>
+                <span className="font-extrabold text-white font-mono text-sm">
+                  {activeStage.name}
+                </span>
+                <span className="text-[11px] font-mono text-amber-400 font-bold">
+                  ({activeStage.operatingTempCelsius}°C)
+                </span>
+              </div>
+              <p className="text-[11px] text-gray-300 font-sans mt-0.5 max-w-xl line-clamp-2 md:line-clamp-none">
+                {STAGE_EXPLANATIONS[activeStage.stageNumber] || activeStage.description}
+              </p>
+            </div>
+          </div>
+
+          {/* Controls: Prev, Next, Auto-Tour, Inspect */}
+          <div className="flex items-center gap-1.5 shrink-0 font-mono">
+            <button
+              type="button"
+              onClick={() => {
+                const prevIdx = (currentStageIndex - 1 + CHOCOLATE_PROCESS_STAGES.length) % CHOCOLATE_PROCESS_STAGES.length;
+                focusOnFacility(CHOCOLATE_PROCESS_STAGES[prevIdx].facilityCode);
+              }}
+              className="px-2.5 py-1 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-gray-200 hover:text-white transition-all cursor-pointer font-bold text-xs"
+              title="Previous Process Stage"
+            >
+              ◀ Prev
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                const nextIdx = (currentStageIndex + 1) % CHOCOLATE_PROCESS_STAGES.length;
+                focusOnFacility(CHOCOLATE_PROCESS_STAGES[nextIdx].facilityCode);
+              }}
+              className="px-2.5 py-1 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-extrabold shadow-md shadow-amber-500/30 transition-all cursor-pointer text-xs"
+              title="Next Process Stage"
+            >
+              Next Stage ▶
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setAutoTourActive(!autoTourActive)}
+              className={`px-2.5 py-1 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                autoTourActive
+                  ? 'bg-purple-600 border-purple-400 text-white animate-pulse shadow-md shadow-purple-600/30'
+                  : 'bg-white/5 border-white/10 text-gray-300 hover:text-white'
+              }`}
+              title="Auto-advance through all 10 stages in sequence"
+            >
+              {autoTourActive ? '⏸ Pause Tour' : '▶ Auto Tour'}
+            </button>
+
+            {/* Inspect parameters shortcut */}
+            <button
+              type="button"
+              onClick={() => {
+                if (activeFacility) {
+                  selectEntity({ type: 'facility', id: activeFacility.facilityCode, data: activeFacility });
+                }
+              }}
+              className="px-2 py-1 rounded-xl bg-cyan-950/60 border border-cyan-500/40 text-cyan-300 hover:text-white text-xs font-bold transition-all cursor-pointer"
+              title="Inspect All 15 Machine Parameters in Drawer"
+            >
+              🔍 Inspect
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setWalkthroughOpen(false)}
+              className="p-1 rounded-xl text-gray-400 hover:text-white hover:bg-white/10 cursor-pointer ml-1"
+              title="Hide Walkthrough Banner"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 1.3 STATUS COLOR CONVENTIONS STRIP */}
+      <div className="w-full max-w-5xl mx-auto flex items-center justify-between px-3.5 py-1 rounded-xl bg-black/70 border border-white/10 backdrop-blur-md pointer-events-auto text-[10px] font-mono text-gray-400 mt-1">
+        <span className="font-bold text-gray-300 uppercase tracking-wider hidden sm:inline">Color Codes:</span>
+        <div className="flex items-center gap-3 overflow-x-auto no-scrollbar">
+          <span className="flex items-center gap-1 text-emerald-400 font-semibold">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_6px_#10B981]" /> Green: Normal
+          </span>
+          <span className="flex items-center gap-1 text-amber-400 font-semibold">
+            <span className="w-2 h-2 rounded-full bg-amber-400 shadow-[0_0_6px_#F59E0B]" /> Amber: Warning / Limit
+          </span>
+          <span className="flex items-center gap-1 text-rose-400 font-semibold">
+            <span className="w-2 h-2 rounded-full bg-rose-500 shadow-[0_0_6px_#EF4444]" /> Red: Fault / Solidifying
+          </span>
+          <span className="flex items-center gap-1 text-purple-300 font-semibold">
+            <span className="w-2 h-2 rounded-full bg-purple-400 shadow-[0_0_6px_#A855F7]" /> Purple: AI Prediction
+          </span>
+          <span className="flex items-center gap-1 text-cyan-300 font-semibold">
+            <span className="w-2 h-2 rounded-full bg-cyan-400 shadow-[0_0_6px_#06B6D4]" /> Cyan: Active Pipeline
+          </span>
+        </div>
+        {!walkthroughOpen && (
+          <button
+            type="button"
+            onClick={() => setWalkthroughOpen(true)}
+            className="text-amber-400 hover:underline font-bold text-[10px] cursor-pointer"
+          >
+            Show Walkthrough
+          </button>
+        )}
+      </div>
 
       {/* 1.5 3D LAYOUT & EXPLODED CONTROLLER BAR */}
       {explodedGraph.active && (

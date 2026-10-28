@@ -243,6 +243,12 @@ export const DigitalTwinPage: React.FC = () => {
         focusOnPosition([lax.position3D[0], lax.position3D[1] + 18, lax.position3D[2] + 28], lax.position3D);
         selectEntity({ type: 'facility', id: lax.facilityCode, data: lax });
       }
+    } else if (mode === 'focus_atlantic') {
+      const nyc = facilities.find(f => f.facilityCode === 'FAC-NYC-02');
+      if (nyc) {
+        focusOnPosition([nyc.position3D[0], nyc.position3D[1] + 16, nyc.position3D[2] + 24], nyc.position3D);
+        selectEntity({ type: 'facility', id: nyc.facilityCode, data: nyc });
+      }
     } else if (mode === 'reset') {
       resetScene();
     }
@@ -353,14 +359,14 @@ export const DigitalTwinPage: React.FC = () => {
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="text-xs font-extrabold text-white font-mono tracking-wider">
-                  NETWORK TWIN
+                  CHOCOTWIN NETWORK
                 </span>
-                <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30 font-bold uppercase">
-                  {viewMode === '3d' ? '3D Spatial' : '2D Topology'}
+                <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 font-bold uppercase">
+                  {viewMode === '3d' ? '3D Spatial Network' : '2D Flow Topology'}
                 </span>
               </div>
               <span className="text-[10px] text-gray-400 font-mono hidden sm:block">
-                Interconnected Supply Chain Graph
+                Ingredient Intake & Cold-Chain Distribution
               </span>
             </div>
           </div>
@@ -372,11 +378,11 @@ export const DigitalTwinPage: React.FC = () => {
               onClick={() => setViewMode('3d')}
               className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
                 viewMode === '3d'
-                  ? 'bg-gradient-to-r from-purple-600 to-cyan-600 text-white shadow-md shadow-purple-500/20'
+                  ? 'bg-gradient-to-r from-amber-500 to-purple-600 text-white shadow-md shadow-amber-500/20'
                   : 'text-gray-400 hover:text-white hover:bg-white/[0.04]'
               }`}
             >
-              <Compass className="w-3.5 h-3.5 text-cyan-300" />
+              <Compass className="w-3.5 h-3.5 text-amber-300" />
               <span>3D Spatial</span>
             </button>
             <button
@@ -384,19 +390,19 @@ export const DigitalTwinPage: React.FC = () => {
               onClick={() => setViewMode('2d')}
               className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-mono font-bold transition-all cursor-pointer ${
                 viewMode === '2d'
-                  ? 'bg-gradient-to-r from-purple-600 to-cyan-600 text-white shadow-md shadow-purple-500/20'
+                  ? 'bg-gradient-to-r from-amber-500 to-purple-600 text-white shadow-md shadow-amber-500/20'
                   : 'text-gray-400 hover:text-white hover:bg-white/[0.04]'
               }`}
             >
-              <GitFork className="w-3.5 h-3.5 text-purple-300" />
-              <span>2D Topology</span>
+              <GitFork className="w-3.5 h-3.5 text-cyan-300" />
+              <span>2D Process Flow</span>
             </button>
           </div>
 
           {/* Connection Counter Badge */}
           <div className="hidden xl:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#11162C] border border-cyan-500/20 text-[10px] font-mono text-cyan-300">
             <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-ping" />
-            <span>15 CONNECTIONS ACTIVE</span>
+            <span>15 SUPPLY ROUTES ACTIVE</span>
           </div>
 
           {/* Active Disruption Pill */}
@@ -408,21 +414,21 @@ export const DigitalTwinPage: React.FC = () => {
             }`}
           >
             <AlertTriangle className={`w-3 h-3 ${isDisruptionActive ? 'text-rose-400' : 'text-emerald-400'}`} />
-            <span>{isDisruptionActive ? '1 DISRUPTION (I-80)' : 'ALL OPTIMAL'}</span>
+            <span>{isDisruptionActive ? 'FREEZE INCIDENT (I-80)' : 'TEMPERATURES NOMINAL'}</span>
           </div>
         </div>
 
         {/* Search Bar */}
         <form
           onSubmit={handleSearch}
-          className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#12162B]/90 border border-white/[0.08] focus-within:border-cyan-400 transition-colors w-64 max-w-xs shadow-inner"
+          className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[#12162B]/90 border border-white/[0.08] focus-within:border-amber-400 transition-colors w-64 max-w-xs shadow-inner"
         >
           <Search className="w-3.5 h-3.5 text-gray-400 shrink-0" />
           <input
             type="text"
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            placeholder="Search hub, TRK-101, I-80..."
+            placeholder="Search Cocoa Port, Chicago Plant, Tanker..."
             className="w-full bg-transparent text-xs text-white placeholder-gray-500 focus:outline-none font-mono"
           />
         </form>
@@ -437,10 +443,10 @@ export const DigitalTwinPage: React.FC = () => {
                 ? 'bg-rose-500/25 text-rose-200 border-rose-500/60 shadow-lg shadow-rose-500/25 ring-1 ring-rose-500'
                 : 'bg-white/[0.04] text-gray-300 hover:text-white hover:bg-white/[0.08] border-white/[0.08]'
             }`}
-            title="Toggle I-80 Winter Blizzard & Road Closure Disruption"
+            title="Toggle Liquid Cocoa Butter Roadblock & Weather Shock Simulation"
           >
             <Zap className={`w-3.5 h-3.5 ${isDisruptionActive ? 'text-rose-400 animate-bounce' : 'text-amber-400'}`} />
-            <span>{isDisruptionActive ? 'Blast Radius Active' : 'Trace Disruption Blast Radius'}</span>
+            <span>{isDisruptionActive ? 'Disruption Active' : 'Simulate Freeze Disruption'}</span>
           </button>
 
           {/* 3D Exploded Layer Graph Toggle Button */}
@@ -454,7 +460,7 @@ export const DigitalTwinPage: React.FC = () => {
             title="Toggle 7-Tier 3D Exploded Supply Chain Dependency Graph"
           >
             <Activity className="w-3.5 h-3.5 text-purple-400" />
-            <span className="hidden sm:inline">3D Exploded Graph</span>
+            <span className="hidden sm:inline">3D Exploded View</span>
           </button>
 
           {/* Camera Mode Selector */}
@@ -462,13 +468,14 @@ export const DigitalTwinPage: React.FC = () => {
             <select
               value={cameraMode}
               onChange={e => handleCameraPreset(e.target.value)}
-              className="px-2.5 py-1.5 rounded-xl bg-[#12162B] border border-white/[0.08] text-xs font-mono text-cyan-300 focus:outline-none cursor-pointer hover:border-cyan-500/40 transition-colors"
+              className="px-2.5 py-1.5 rounded-xl bg-[#12162B] border border-white/[0.08] text-xs font-mono text-amber-300 focus:outline-none cursor-pointer hover:border-amber-500/40 transition-colors"
             >
               <option value="overview">🔭 Overview</option>
-              <option value="top_down">⬇️ Top-Down (2D/3D Map)</option>
-              <option value="follow_trk101">🚛 Follow TRK-101</option>
-              <option value="focus_chicago">🏢 Focus Chicago Hub</option>
-              <option value="focus_pacific">🚢 Focus Pacific Port</option>
+              <option value="top_down">⬇️ Top-Down Map</option>
+              <option value="follow_trk101">🚛 Follow Heated Tanker</option>
+              <option value="focus_chicago">🏭 Focus Chicago Factory</option>
+              <option value="focus_pacific">🚢 Focus Cocoa Intake (LAX)</option>
+              <option value="focus_atlantic">🏢 Focus Cold Vault (NYC)</option>
               <option value="reset">🔄 Reset View</option>
             </select>
           </div>
@@ -656,7 +663,7 @@ export const DigitalTwinPage: React.FC = () => {
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 shrink-0 shadow-[0_0_8px_#10B981]" />
                 <span className="text-gray-300 text-[11px] group-hover:text-white">
-                  Logistics Facilities (Tier 1/2)
+                  Cocoa Sourcing Harbors & Dairy Co-ops
                 </span>
               </div>
               <span className="text-[10px] font-mono text-gray-500">{facilities.length}</span>
@@ -670,7 +677,7 @@ export const DigitalTwinPage: React.FC = () => {
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 shrink-0 shadow-[0_0_8px_#06B6D4]" />
                 <span className="text-gray-300 text-[11px] group-hover:text-white">
-                  Carrier Fleet Asset (Interstate Tractors)
+                  Heated Jacketed Tankers (45°C Butter)
                 </span>
               </div>
               <span className="text-[10px] font-mono text-gray-500">{vehicles.length}</span>
@@ -684,7 +691,7 @@ export const DigitalTwinPage: React.FC = () => {
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-purple-400 shrink-0 shadow-[0_0_8px_#8B5CF6]" />
                 <span className="text-gray-300 text-[11px] group-hover:text-white">
-                  Active Consignments & Cargo
+                  Couverture Drops & Wrapped Bar Batches
                 </span>
               </div>
               <span className="text-[10px] font-mono text-gray-500">25+</span>
@@ -698,11 +705,11 @@ export const DigitalTwinPage: React.FC = () => {
               <div className="flex items-center gap-2">
                 <span className="w-4 h-0.5 bg-rose-500 shrink-0 shadow-[0_0_8px_#EF4444]" />
                 <span className="text-rose-300 text-[11px] font-semibold group-hover:text-rose-200">
-                  Disrupted Route (I-80 Blizzard)
+                  Solidification Hazard Route (I-80 Cold)
                 </span>
               </div>
               <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-rose-500/20 text-rose-300">
-                {isDisruptionActive ? 'CLOSED' : 'CLEAR'}
+                {isDisruptionActive ? 'SOLIDIFYING' : 'HEATED'}
               </span>
             </div>
 
@@ -714,7 +721,7 @@ export const DigitalTwinPage: React.FC = () => {
               <div className="flex items-center gap-2">
                 <span className="w-4 h-0.5 bg-purple-400 border-b border-dashed border-purple-300 shrink-0 shadow-[0_0_8px_#A855F7]" />
                 <span className="text-purple-300 text-[11px] font-semibold group-hover:text-purple-200">
-                  Proposed Recovery Bypass (I-70)
+                  Thermal Heated Bypass (32°C Detour)
                 </span>
               </div>
               <span className="text-[9px] font-mono px-1 py-0.2 rounded bg-purple-500/20 text-purple-300">

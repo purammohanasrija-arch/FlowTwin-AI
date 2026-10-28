@@ -4,15 +4,15 @@ import { useDigitalTwinStore } from './DigitalTwinStore.js';
 
 const STAGE_SHORT_NAMES: Record<number, string> = {
   1: 'Raw Silos',
-  2: 'Drum Roasting',
+  2: 'Roasting',
   3: 'Winnowing',
   4: 'Butter Press',
   5: 'Dairy Blend',
   6: 'Conching',
   7: 'Tempering',
-  8: 'Bulk Rail Tanker',
-  9: 'Molding & Enrobing',
-  10: 'Packaging Vault',
+  8: 'Rail Tanker',
+  9: 'Molding',
+  10: 'Packaging',
 };
 
 const STAGE_ICONS: Record<number, string> = {
@@ -32,6 +32,7 @@ interface FacilityLabelProps {
   facility: any;
   isSelected: boolean;
   onSelect: () => void;
+  displayMode: 'pill' | 'card' | 'focus';
 }
 
 const STATUS_COLOR_MAP = {
@@ -77,7 +78,7 @@ const STATUS_COLOR_MAP = {
   },
 };
 
-const FacilityLabelItem: React.FC<FacilityLabelProps> = ({ facility, isSelected, onSelect }) => {
+const FacilityLabelItem: React.FC<FacilityLabelProps> = ({ facility, isSelected, onSelect, displayMode }) => {
   const [isHovered, setIsHovered] = React.useState(false);
   const stageNum = facility.processStageNumber;
   const shortName = stageNum ? STAGE_SHORT_NAMES[stageNum] || facility.name : facility.name;
@@ -101,6 +102,24 @@ const FacilityLabelItem: React.FC<FacilityLabelProps> = ({ facility, isSelected,
       ? 11.0
       : 9.8;
 
+  // If focus-only mode is active and this node is not active, hide to avoid clutter
+  if (displayMode === 'focus' && !isSelected && !isHovered) {
+    return (
+      <group position={[facility.position3D[0], facility.position3D[1] + heightOffset, facility.position3D[2]]}>
+        <Html center distanceFactor={42} zIndexRange={[10, 0]} className="pointer-events-auto select-none">
+          <div
+            onClick={onSelect}
+            onMouseEnter={() => setIsHovered(true)}
+            className="w-3 h-3 rounded-full bg-white/20 border border-white/40 hover:scale-150 transition-all cursor-pointer shadow-md"
+            title={`Stage ${stageNum}: ${shortName} (Click to inspect)`}
+          />
+        </Html>
+      </group>
+    );
+  }
+
+  const showFullCard = isSelected || isHovered || displayMode === 'card';
+
   return (
     <group position={[facility.position3D[0], facility.position3D[1] + heightOffset, facility.position3D[2]]}>
       <Html center distanceFactor={42} zIndexRange={[20, 0]} className="pointer-events-auto select-none">
@@ -109,15 +128,15 @@ const FacilityLabelItem: React.FC<FacilityLabelProps> = ({ facility, isSelected,
           onMouseEnter={() => setIsHovered(true)}
           onMouseLeave={() => setIsHovered(false)}
           className={`cursor-pointer transition-all duration-200 ${
-            isSelected || isHovered ? 'scale-105 z-50' : 'z-10'
+            showFullCard ? 'scale-105 z-50' : 'z-10'
           }`}
         >
-          {isSelected || isHovered ? (
+          {showFullCard ? (
             /* ============================================================ */
-            /* 1. EXPANDED LIVE SENSOR CARD (Hover or Selected)              */
+            /* 1. EXPANDED LIVE SENSOR CARD (Hover, Selected, or Card Mode) */
             /* ============================================================ */
             <div
-              className={`p-3.5 rounded-2xl bg-[#090D1E]/95 border-2 ${theme.border} text-white ${theme.glow} font-sans min-w-[240px] backdrop-blur-xl shadow-2xl`}
+              className={`p-3.5 rounded-2xl bg-[#090D1E]/95 border-2 ${theme.border} text-white ${theme.glow} font-sans min-w-[240px] backdrop-blur-xl shadow-2xl animate-in fade-in zoom-in-95 duration-150`}
             >
               {/* Header: Machine Code & Name + Status Dot */}
               <div className="flex items-center justify-between gap-2 pb-2 mb-2 border-b border-white/10">
@@ -143,7 +162,7 @@ const FacilityLabelItem: React.FC<FacilityLabelProps> = ({ facility, isSelected,
                 </div>
               </div>
 
-              {/* Primary Live Value (Section 3 Spec) */}
+              {/* Primary Live Value */}
               <div className="grid grid-cols-2 gap-2 mb-2 font-mono">
                 <div className="p-2 rounded-xl bg-black/50 border border-white/5">
                   <span className="text-[9px] text-gray-400 uppercase tracking-wider block">
@@ -157,7 +176,7 @@ const FacilityLabelItem: React.FC<FacilityLabelProps> = ({ facility, isSelected,
                   </span>
                 </div>
 
-                {/* Secondary Live Value (Section 3 Spec) */}
+                {/* Secondary Live Value */}
                 <div className="p-2 rounded-xl bg-black/50 border border-white/5">
                   <span className="text-[9px] text-gray-400 uppercase tracking-wider block">
                     {telemetry?.secondaryMetric?.badge || 'CAPACITY'}
@@ -203,43 +222,23 @@ const FacilityLabelItem: React.FC<FacilityLabelProps> = ({ facility, isSelected,
             </div>
           ) : (
             /* ============================================================ */
-            /* 2. FLOATING SENSOR BADGE (Default Idle on 3D Map)            */
-            /* Matches Section 3 specifications: Machine, Temp, Capacity/KPI*/
+            /* 2. COMPACT TACTICAL PILL (Default - Zero 3D Clutter)         */
             /* ============================================================ */
             <div
-              className={`p-2 rounded-2xl bg-[#090D1E]/90 border ${theme.border} text-white shadow-xl backdrop-blur-md min-w-[155px] font-sans hover:${theme.border} transition-all`}
+              className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#090D1E]/95 border-2 ${theme.border} text-white shadow-xl backdrop-blur-md font-mono hover:${theme.border} transition-all hover:scale-110 whitespace-nowrap`}
             >
-              {/* Machine Header */}
-              <div className="flex items-center justify-between gap-1.5 pb-1 mb-1 border-b border-white/10">
-                <div className="flex items-center gap-1">
-                  <span className="text-xs">{icon}</span>
-                  <span className="text-[11px] font-mono font-extrabold text-amber-200 tracking-tight truncate max-w-[125px]">
-                    {telemetry?.machineTag?.split(' · ')[0] || facility.facilityCode} · {shortName}
-                  </span>
-                </div>
-                <span className={`w-2 h-2 rounded-full shrink-0 ${theme.dot} ${facility.status === 'congested' ? 'animate-pulse' : ''}`} />
-              </div>
-
-              {/* 3-5 Key Values Display */}
-              <div className="flex items-baseline justify-between gap-2 mt-0.5">
-                <div>
-                  <div className="text-sm font-extrabold font-mono text-white tracking-tight leading-none">
-                    {telemetry?.primaryMetric?.value || `${facility.temperatureCelsius ?? 24}°C`}
-                  </div>
-                  <span className="text-[9px] text-gray-400 font-mono block mt-0.5">
-                    {telemetry?.primaryMetric?.label || 'Temperature'}
-                  </span>
-                </div>
-
-                <div className="text-right">
-                  <div className={`text-xs font-bold font-mono ${theme.text} leading-none`}>
-                    {telemetry?.secondaryMetric?.badge || 'CAPACITY'} {telemetry?.secondaryMetric?.value || `${facility.utilizationPercentage}%`}
-                  </div>
-                  <span className="text-[8px] text-gray-400 font-mono block mt-0.5 truncate max-w-[85px]" title={telemetry?.secondaryMetric?.statusNote}>
-                    {telemetry?.secondaryMetric?.statusNote || 'Operating normally'}
-                  </span>
-                </div>
-              </div>
+              <span className={`w-2 h-2 rounded-full shrink-0 ${theme.dot} ${facility.status === 'congested' ? 'animate-pulse' : ''}`} />
+              <span className="text-xs">{icon}</span>
+              <span className="text-[11px] font-extrabold text-amber-200">
+                {stageNum ? `S${stageNum} · ` : ''}{shortName}
+              </span>
+              <span className="text-gray-500">|</span>
+              <span className="text-[11px] font-bold text-white">
+                {telemetry?.primaryMetric?.value || `${facility.temperatureCelsius ?? 24}°C`}
+              </span>
+              <span className={`text-[10px] font-bold ${theme.text}`}>
+                {telemetry?.secondaryMetric?.value || `${facility.utilizationPercentage}%`}
+              </span>
             </div>
           )}
         </div>
@@ -256,6 +255,7 @@ export const SpatialLabels: React.FC = () => {
   const selectEntity = useDigitalTwinStore(s => s.selectEntity);
   const selectedEntity = useDigitalTwinStore(s => s.selectedEntity);
   const explodedGraph = useDigitalTwinStore(s => s.explodedGraph);
+  const labelDisplayMode = useDigitalTwinStore(s => s.labelDisplayMode);
 
   if (!layers.labels || explodedGraph.active) return null;
 
@@ -267,6 +267,7 @@ export const SpatialLabels: React.FC = () => {
           key={facility.facilityCode}
           facility={facility}
           isSelected={selectedEntity?.type === 'facility' && selectedEntity.id === facility.facilityCode}
+          displayMode={labelDisplayMode}
           onSelect={() =>
             selectEntity({
               type: 'facility',

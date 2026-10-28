@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useEffect } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import ReactFlow, {
   MiniMap,
   Controls,
@@ -23,25 +23,32 @@ import {
   ArrowRight,
   ShieldCheck,
   CheckCircle2,
+  Thermometer,
+  Layers,
+  HelpCircle,
+  X,
+  Compass,
 } from 'lucide-react';
 import { useDigitalTwinStore } from '../digital-twin/DigitalTwinStore.js';
 import { MOCK_NETWORK_GRAPH } from '../../lib/mockApi.js';
 
-// 1. Custom Connected Facility Node with Active Handles
+// 1. Custom Connected Facility Node with Active Handles & Cocoa Telemetry
 const ConnectedFacilityNode: React.FC<NodeProps> = ({ id, data, selected }) => {
   const isCongested = data.status === 'congested';
+  const isManufacturing = data.type === 'manufacturing';
 
   return (
     <div
-      className={`p-3.5 rounded-2xl bg-[#0C1024]/95 border-2 text-white shadow-2xl min-w-[220px] transition-all backdrop-blur-xl ${
+      className={`p-3.5 rounded-2xl bg-[#0C1024]/95 border-2 text-white shadow-2xl min-w-[240px] max-w-[260px] transition-all backdrop-blur-xl ${
         selected
-          ? 'border-cyan-400 ring-2 ring-cyan-500/40 shadow-[0_0_20px_rgba(0,245,255,0.3)] scale-[1.02]'
+          ? 'border-cyan-400 ring-2 ring-cyan-500/40 shadow-[0_0_24px_rgba(0,245,255,0.4)] scale-[1.03]'
+          : isManufacturing
+          ? 'border-amber-500/80 shadow-[0_0_20px_rgba(245,158,11,0.25)]'
           : isCongested
-          ? 'border-amber-500/60 shadow-[0_0_15px_rgba(245,158,11,0.2)]'
+          ? 'border-rose-500/70 shadow-[0_0_16px_rgba(239,68,68,0.25)]'
           : 'border-emerald-500/50 hover:border-emerald-400'
       }`}
     >
-      {/* Input Target Handles */}
       <Handle
         type="target"
         position={Position.Top}
@@ -55,22 +62,43 @@ const ConnectedFacilityNode: React.FC<NodeProps> = ({ id, data, selected }) => {
         className="!w-3 !h-3 !bg-emerald-400 !border-2 !border-[#070913] hover:!scale-125 !transition-transform"
       />
 
+      {/* Category Pill */}
+      {data.category && (
+        <div className="flex items-center justify-between text-[9px] font-mono mb-1.5 pb-1 border-b border-white/10">
+          <span className="text-amber-400 font-bold uppercase tracking-wider">{data.category}</span>
+          <span className="text-gray-400">{data.city}</span>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between text-xs mb-2">
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-lg bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
-            <Building2 className="w-3.5 h-3.5" />
+          <div
+            className={`w-7 h-7 rounded-lg flex items-center justify-center font-bold text-xs ${
+              isManufacturing
+                ? 'bg-amber-500/20 border border-amber-500/40 text-amber-300'
+                : 'bg-emerald-500/20 border border-emerald-500/30 text-emerald-400'
+            }`}
+          >
+            {isManufacturing ? '🏭' : '🏢'}
           </div>
-          <span className="font-bold text-white font-mono truncate max-w-[130px]" title={data.label}>
-            {data.label}
-          </span>
+          <div>
+            <span className="font-bold text-white font-mono truncate max-w-[140px] block" title={data.label}>
+              {data.label}
+            </span>
+            <span className="text-[9px] text-gray-400 font-mono block">{data.code}</span>
+          </div>
         </div>
-        <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 font-bold border border-emerald-500/30">
-          {data.code}
-        </span>
       </div>
 
-      {/* Utilization Bar */}
+      {/* Ingredient / Process Note */}
+      {data.ingredient && (
+        <div className="text-[10px] text-amber-200/90 font-mono bg-black/40 p-1.5 rounded-lg border border-white/5 mb-2 leading-tight">
+          {data.ingredient}
+        </div>
+      )}
+
+      {/* Utilization & Throughput */}
       <div className="space-y-1 mb-2">
         <div className="flex justify-between text-[10px] text-gray-400 font-mono">
           <span>Capacity Load</span>
@@ -92,11 +120,15 @@ const ConnectedFacilityNode: React.FC<NodeProps> = ({ id, data, selected }) => {
 
       {/* Footer Metrics */}
       <div className="flex items-center justify-between text-[10px] font-mono text-gray-400 pt-1.5 border-t border-white/[0.08]">
-        <span>{data.city || 'Hub Facility'}</span>
-        <span className="text-cyan-300 font-bold">{data.throughput || 320} units/h</span>
+        <span className="text-cyan-300 font-bold">{data.throughput || 320} kg/h</span>
+        {data.temperature && (
+          <span className="text-amber-300 font-bold flex items-center gap-0.5">
+            <Thermometer className="w-3 h-3 text-amber-400" />
+            {data.temperature.split(' ')[0]}
+          </span>
+        )}
       </div>
 
-      {/* Output Source Handles */}
       <Handle
         type="source"
         position={Position.Bottom}
@@ -119,7 +151,7 @@ const ConnectedVehicleNode: React.FC<NodeProps> = ({ id, data, selected }) => {
 
   return (
     <div
-      className={`p-3 rounded-2xl bg-[#0C1024]/95 border-2 text-white shadow-2xl min-w-[200px] transition-all backdrop-blur-xl ${
+      className={`p-3 rounded-2xl bg-[#0C1024]/95 border-2 text-white shadow-2xl min-w-[220px] max-w-[240px] transition-all backdrop-blur-xl ${
         selected
           ? 'border-cyan-400 ring-2 ring-cyan-500/40 shadow-[0_0_20px_rgba(0,245,255,0.3)] scale-[1.02]'
           : isDelayed
@@ -143,7 +175,7 @@ const ConnectedVehicleNode: React.FC<NodeProps> = ({ id, data, selected }) => {
       <div className="flex items-center justify-between text-xs mb-1.5">
         <div className="flex items-center gap-2">
           <div
-            className={`w-6 h-6 rounded-lg flex items-center justify-center ${
+            className={`w-7 h-7 rounded-lg flex items-center justify-center ${
               isDelayed
                 ? 'bg-rose-500/20 text-rose-400 border border-rose-500/40 animate-pulse'
                 : 'bg-cyan-500/20 text-cyan-400 border border-cyan-500/30'
@@ -152,24 +184,26 @@ const ConnectedVehicleNode: React.FC<NodeProps> = ({ id, data, selected }) => {
             <Truck className="w-3.5 h-3.5" />
           </div>
           <div>
-            <span className="font-bold text-white font-mono block">{data.label}</span>
+            <span className="font-bold text-white font-mono block text-xs">{data.label}</span>
             <span className="text-[9px] text-gray-400 font-mono">{data.carrier}</span>
           </div>
         </div>
-        <span
-          className={`text-[9px] font-mono px-1.5 py-0.5 rounded font-bold uppercase ${
-            isDelayed
-              ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
-              : 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30'
-          }`}
-        >
-          {data.status || 'in_transit'}
-        </span>
       </div>
 
-      <div className="text-[10px] font-mono text-gray-300 pt-1.5 border-t border-white/[0.08] flex items-center justify-between">
-        <span className="text-gray-400">Position:</span>
-        <span className="text-gray-200 truncate max-w-[130px]">{data.currentLocation || 'In Transit'}</span>
+      {/* Cargo & Target Temperature */}
+      {data.cargo && (
+        <div className="text-[10px] text-cyan-200/90 font-mono bg-black/40 p-1.5 rounded-lg border border-white/5 mb-1.5 leading-tight">
+          {data.cargo}
+        </div>
+      )}
+
+      <div className="text-[10px] font-mono text-gray-300 pt-1 border-t border-white/[0.08] flex items-center justify-between">
+        <span className="text-gray-400 truncate max-w-[120px]">{data.currentLocation}</span>
+        {data.targetTemp && (
+          <span className="text-cyan-300 font-bold bg-cyan-950/80 px-1 py-0.5 rounded border border-cyan-500/30">
+            {data.targetTemp}
+          </span>
+        )}
       </div>
 
       <Handle
@@ -194,7 +228,7 @@ const ConnectedShipmentNode: React.FC<NodeProps> = ({ id, data, selected }) => {
 
   return (
     <div
-      className={`p-3 rounded-2xl bg-[#0C1024]/95 border-2 text-white shadow-2xl min-w-[210px] transition-all backdrop-blur-xl ${
+      className={`p-3 rounded-2xl bg-[#0C1024]/95 border-2 text-white shadow-2xl min-w-[220px] max-w-[240px] transition-all backdrop-blur-xl ${
         selected
           ? 'border-purple-400 ring-2 ring-purple-500/40 shadow-[0_0_20px_rgba(168,85,247,0.3)] scale-[1.02]'
           : isDelayed
@@ -218,7 +252,7 @@ const ConnectedShipmentNode: React.FC<NodeProps> = ({ id, data, selected }) => {
       <div className="flex items-center justify-between text-xs mb-1.5">
         <div className="flex items-center gap-2">
           <div
-            className={`w-6 h-6 rounded-lg flex items-center justify-center ${
+            className={`w-7 h-7 rounded-lg flex items-center justify-center ${
               isDelayed
                 ? 'bg-rose-500/20 text-rose-400 border border-rose-500/40'
                 : 'bg-purple-500/20 text-purple-400 border border-purple-500/30'
@@ -226,7 +260,7 @@ const ConnectedShipmentNode: React.FC<NodeProps> = ({ id, data, selected }) => {
           >
             <Package className="w-3.5 h-3.5" />
           </div>
-          <span className="font-bold font-mono text-white">{data.shipmentId}</span>
+          <span className="font-bold font-mono text-white text-xs">{data.shipmentId}</span>
         </div>
         <span
           className={`text-[9px] font-mono px-1.5 py-0.5 rounded font-bold uppercase ${
@@ -239,12 +273,14 @@ const ConnectedShipmentNode: React.FC<NodeProps> = ({ id, data, selected }) => {
         </span>
       </div>
 
-      <div className="text-[10px] text-gray-300 font-mono truncate mb-1" title={data.cargo}>
+      <div className="text-[10px] text-purple-200 font-mono truncate mb-1" title={data.cargo}>
         {data.cargo}
       </div>
 
       <div className="flex items-center justify-between text-[10px] font-mono pt-1.5 border-t border-white/[0.08]">
-        <span className="text-gray-400">Dest: {data.destination}</span>
+        <span className="text-gray-400 truncate max-w-[110px]" title={data.destination}>
+          {data.destination}
+        </span>
         {data.delayHours > 0 ? (
           <span className="text-rose-400 font-bold">+{data.delayHours}h Delay</span>
         ) : (
@@ -285,6 +321,7 @@ export const ConnectedNetworkGraph2D: React.FC<ConnectedNetworkGraph2DProps> = (
 }) => {
   const selectEntity = useDigitalTwinStore(s => s.selectEntity);
   const selectedEntity = useDigitalTwinStore(s => s.selectedEntity);
+  const [guideOpen, setGuideOpen] = useState(true);
 
   // Initialize state with default mock graph
   const [nodes, setNodes, onNodesChange] = useNodesState(MOCK_NETWORK_GRAPH.nodes as Node[]);
@@ -295,7 +332,7 @@ export const ConnectedNetworkGraph2D: React.FC<ConnectedNetworkGraph2DProps> = (
     return edges.map(edge => {
       const isBlastPath =
         isBlastRadiusActive &&
-        (edge.id === 'e-chi-trk101' || edge.id === 'e-trk101-sh1042' || edge.id === 'e-trk101-nyc');
+        (edge.id === 'e-tank101-chi' || edge.id === 'e-chi-sh1043');
 
       const isSelected = selectedEntity && (edge.id.includes(selectedEntity.id) || edge.source === selectedEntity.id || edge.target === selectedEntity.id);
 
@@ -311,18 +348,18 @@ export const ConnectedNetworkGraph2D: React.FC<ConnectedNetworkGraph2DProps> = (
         style: {
           ...edge.style,
           stroke: isBlastPath ? '#EF4444' : isSelected ? '#00F5FF' : edge.style?.stroke,
-          strokeWidth: isBlastPath ? 4 : isSelected ? 3.5 : edge.style?.strokeWidth || 2,
+          strokeWidth: isBlastPath ? 4 : isSelected ? 3.5 : edge.style?.strokeWidth || 2.5,
           filter: isBlastPath ? 'drop-shadow(0 0 8px rgba(239, 68, 68, 0.7))' : undefined,
         },
         labelStyle: {
-          fill: isBlastPath ? '#FFAAAA' : '#94A3B8',
+          fill: isBlastPath ? '#FFAAAA' : '#CBD5E1',
           fontWeight: 700,
           fontFamily: 'monospace',
           fontSize: 10,
         },
         labelBgStyle: {
           fill: '#080B1E',
-          fillOpacity: 0.9,
+          fillOpacity: 0.95,
           stroke: isBlastPath ? '#EF4444' : '#1E2548',
           strokeWidth: 1,
           rx: 6,
@@ -362,8 +399,8 @@ export const ConnectedNetworkGraph2D: React.FC<ConnectedNetworkGraph2DProps> = (
           sourceName: edge.source,
           targetName: edge.target,
           label: edge.label,
-          roadCorridor: edge.id.includes('trk101') ? 'I-80' : 'I-70',
-          isDisrupted: edge.id.includes('trk101'),
+          roadCorridor: edge.id.includes('tank101') ? 'I-80' : 'I-70',
+          isDisrupted: edge.id.includes('sh1043'),
         },
       };
 
@@ -375,6 +412,28 @@ export const ConnectedNetworkGraph2D: React.FC<ConnectedNetworkGraph2DProps> = (
 
   return (
     <div className="w-full h-full relative bg-[#070913] select-none">
+      {/* 1. TOP SWIMLANE PIPELINE GUIDE */}
+      <div className="absolute top-16 left-6 right-6 z-10 pointer-events-none hidden md:grid grid-cols-3 gap-4">
+        <div className="px-3.5 py-1.5 rounded-xl bg-[#090D1E]/90 border border-emerald-500/30 backdrop-blur-md flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-emerald-400" />
+          <span className="text-[11px] font-mono font-bold text-emerald-300">
+            1. INGREDIENT INTAKE (COCOA / DAIRY / SUGAR)
+          </span>
+        </div>
+        <div className="px-3.5 py-1.5 rounded-xl bg-[#090D1E]/90 border border-cyan-500/30 backdrop-blur-md flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+          <span className="text-[11px] font-mono font-bold text-cyan-300">
+            2. HEATED & CLIMATE-CONTROLLED TRANSIT
+          </span>
+        </div>
+        <div className="px-3.5 py-1.5 rounded-xl bg-[#090D1E]/90 border border-purple-500/30 backdrop-blur-md flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-purple-400" />
+          <span className="text-[11px] font-mono font-bold text-purple-300">
+            3. REGIONAL FULFILLMENT & COLD VAULTS
+          </span>
+        </div>
+      </div>
+
       <ReactFlow
         nodes={nodes}
         edges={styledEdges}
@@ -384,7 +443,7 @@ export const ConnectedNetworkGraph2D: React.FC<ConnectedNetworkGraph2DProps> = (
         onNodeClick={onNodeClick}
         onEdgeClick={onEdgeClick}
         fitView
-        fitViewOptions={{ padding: 0.2 }}
+        fitViewOptions={{ padding: 0.25 }}
         minZoom={0.3}
         maxZoom={2.2}
       >
@@ -406,6 +465,56 @@ export const ConnectedNetworkGraph2D: React.FC<ConnectedNetworkGraph2DProps> = (
           maskColor="rgba(7, 9, 19, 0.85)"
         />
       </ReactFlow>
+
+      {/* 2. BOTTOM FLOATING GUIDE & EXPLAINER CARD */}
+      <div className="absolute bottom-5 left-5 z-20 pointer-events-auto max-w-sm">
+        {guideOpen ? (
+          <div className="p-3.5 rounded-2xl bg-[#090D1E]/95 border border-amber-500/30 shadow-2xl backdrop-blur-xl text-xs font-mono space-y-2">
+            <div className="flex items-center justify-between pb-1.5 border-b border-white/10">
+              <div className="flex items-center gap-2 text-amber-300 font-bold">
+                <Compass className="w-4 h-4 text-amber-400" />
+                <span>How This Network Flows</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setGuideOpen(false)}
+                className="text-gray-400 hover:text-white p-1"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+            <p className="text-[11px] text-gray-300 leading-relaxed font-sans">
+              Follow the flow from <strong>Raw Material Intake</strong> on the left, through 
+              <strong> Heated Jacketed Tankers</strong> (45°C), into the 
+              <strong> Chicago Processing Campus</strong>, and outbound to East Coast 
+              <strong> Cold Storage Vaults</strong> (16°C).
+            </p>
+            <div className="grid grid-cols-2 gap-1.5 pt-1 text-[10px]">
+              <span className="flex items-center gap-1.5 text-emerald-300">
+                <span className="w-2 h-2 rounded-full bg-emerald-400" /> Sourcing Hubs
+              </span>
+              <span className="flex items-center gap-1.5 text-cyan-300">
+                <span className="w-2 h-2 rounded-full bg-cyan-400" /> Liquid Tankers (45°C)
+              </span>
+              <span className="flex items-center gap-1.5 text-amber-300">
+                <span className="w-2 h-2 rounded-full bg-amber-400" /> Central Factory
+              </span>
+              <span className="flex items-center gap-1.5 text-purple-300">
+                <span className="w-2 h-2 rounded-full bg-purple-400" /> Regional Vaults
+              </span>
+            </div>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => setGuideOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#090D1E]/90 border border-amber-500/30 text-amber-300 text-xs font-mono font-bold hover:bg-[#090D1E] shadow-xl"
+          >
+            <HelpCircle className="w-3.5 h-3.5" />
+            <span>Network Guide</span>
+          </button>
+        )}
+      </div>
     </div>
   );
 };

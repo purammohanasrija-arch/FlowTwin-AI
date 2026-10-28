@@ -101,6 +101,10 @@ interface DigitalTwinState {
   factoryKPIs: FactoryWideKPIs;
   setFactoryKPIs: (kpis: Partial<FactoryWideKPIs>) => void;
 
+  // 3D Spatial Label Display Mode (Declutters 3D Factory)
+  labelDisplayMode: 'pill' | 'card' | 'focus';
+  setLabelDisplayMode: (mode: 'pill' | 'card' | 'focus') => void;
+
   // Actions
   setQuality: (quality: QualityPreset) => void;
   setWeather: (weather: WeatherPreset) => void;
@@ -246,6 +250,9 @@ export const useDigitalTwinStore = create<DigitalTwinState>((set, get) => ({
 
   factoryKPIs: INITIAL_FACTORY_KPIS,
   setFactoryKPIs: kpis => set(s => ({ factoryKPIs: { ...s.factoryKPIs, ...kpis } })),
+
+  labelDisplayMode: 'pill',
+  setLabelDisplayMode: mode => set({ labelDisplayMode: mode }),
 
   twinMode: 'chocolate',
   setTwinMode: mode => set({ twinMode: mode }),
